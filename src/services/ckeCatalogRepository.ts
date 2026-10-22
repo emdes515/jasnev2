@@ -1,0 +1,455 @@
+/**
+ * Katalogi CKE: oficjalne wzory matematyczne oraz wagi punktowe działów.
+ *
+ * ZASADA: żadne treści nie są bundlowane. Wszystko czytamy z Cloud Firestore
+ * (`system/ckeFormulas`, `system/ckeSubjectWeights`), a wynik trzymamy w pamięci
+ * podręcznej. Firestore SDK ma włączony persistent cache, więc po pierwszym
+ * uruchomieniu odczyt jest natychmiastowy i działa offline.
+ *
+ * Komponenty używają hooka `useCkeCatalogs()`, który sam inicjuje wczytanie
+ * i wymusza ponowny render, gdy dane dotrą z chmury.
+ */
+
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { getFromCurriculumStorage, saveToCurriculumStorage } from './curriculumRepository';
+import type { SubjectCkeConfig } from '../types';
+import type { MathDiagramData } from '../components/MathDiagram';
+import type { PlotData } from '../components/MathPlot';
+import type { NumberLineData } from '../components/NumberLineDiagram';
+
+export interface CkeFormulaSubItem {
+  label: string;
+  formula: string;
+}
+
+export interface CkeFormulaItem {
+  id: string;
+  topicId: string;
+  topicName: string;
+  title: string;
+  formula: string;
+  subFormulas?: CkeFormulaSubItem[];
+  explanation?: string;
+  goldenRule?: string;
+  ckeTrap?: string;
+  keywords: string[];
+  cke_page?: string;
+  pageNumber?: number | string;
+  diagram?: MathDiagramData | PlotData | NumberLineData;
+}
+
+export interface CkeFormulaTopic {
+  id: string;
+  name: string;
+}
+
+export interface CkeSubjectOption {
+  id: string;
+  key: string;
+  shortName: string;
+  fullName: string;
+  examTag: string;
+  totalPoints: number;
+  passingPoints: number;
+  accentColor: string;
+  glowColor: string;
+  isAvailable: boolean;
+  iconName: 'math' | 'book' | 'globe' | 'dna' | 'flask' | 'calculator';
+}
+
+export const DEFAULT_CKE_SUBJECTS_CONFIG: Record<string, SubjectCkeConfig> = {
+  'matematyka-podstawowa': {
+    subjectId: 'matematyka-podstawowa',
+    name: 'Matematyka (Poziom Podstawowy)',
+    totalExamPoints: 50,
+    passingThresholdPoints: 15,
+    passingThresholdPercent: 30,
+    topics: {
+      'dzial-1': { topicId: 'dzial-1', name: 'Liczby Rzeczywiste', minPoints: 4, maxPoints: 8, averagePoints: 6, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-2': { topicId: 'dzial-2', name: 'Wyrażenia Algebraiczne', minPoints: 2, maxPoints: 4, averagePoints: 3, importance: 'HIGH' },
+      'dzial-3': { topicId: 'dzial-3', name: 'Równania i Nierówności', minPoints: 4, maxPoints: 7, averagePoints: 5.5, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-4': { topicId: 'dzial-4', name: 'Układy Równań', minPoints: 1, maxPoints: 3, averagePoints: 2, importance: 'MEDIUM' },
+      'dzial-5': { topicId: 'dzial-5', name: 'Funkcje i Wykresy', minPoints: 3, maxPoints: 4, averagePoints: 3.5, importance: 'HIGH' },
+      'dzial-6': { topicId: 'dzial-6', name: 'Funkcja Kwadratowa', minPoints: 4, maxPoints: 6, averagePoints: 5.5, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-7': { topicId: 'dzial-7', name: 'Ciągi Liczbowe', minPoints: 4, maxPoints: 6, averagePoints: 5, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-8': { topicId: 'dzial-8', name: 'Trygonometria', minPoints: 3, maxPoints: 5, averagePoints: 4, importance: 'HIGH' },
+      'dzial-9': { topicId: 'dzial-9', name: 'Planimetria', minPoints: 5, maxPoints: 7, averagePoints: 6, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-10': { topicId: 'dzial-10', name: 'Geometria Analityczna', minPoints: 3, maxPoints: 5, averagePoints: 4, importance: 'HIGH' },
+      'dzial-11': { topicId: 'dzial-11', name: 'Ciągi liczbowe', minPoints: 4, maxPoints: 6, averagePoints: 5, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-12': { topicId: 'dzial-12', name: 'Funkcja kwadratowa', minPoints: 4, maxPoints: 6, averagePoints: 5.5, importance: 'CRITICAL_PEWNIAK' },
+      'dzial-13': { topicId: 'dzial-13', name: 'Przekształcenia wykresów funkcji', minPoints: 2, maxPoints: 4, averagePoints: 3, importance: 'HIGH' },
+      'dzial-14': { topicId: 'dzial-14', name: 'Statystyka', minPoints: 2, maxPoints: 3, averagePoints: 2, importance: 'MEDIUM' },
+      'dzial-15': { topicId: 'dzial-15', name: 'Optymalizacja', minPoints: 4, maxPoints: 5, averagePoints: 4, importance: 'HIGH' }
+    }
+  },
+  'jezyk-polski': {
+    subjectId: 'jezyk-polski',
+    name: 'Język Polski (Formuła 2023)',
+    totalExamPoints: 60,
+    passingThresholdPoints: 18,
+    passingThresholdPercent: 30,
+    topics: {
+      'pol-dzial-1': { topicId: 'pol-dzial-1', name: 'Komunikacja językowa i akty mowy', minPoints: 1, maxPoints: 2, averagePoints: 1.5, importance: 'HIGH' },
+      'pol-dzial-2': { topicId: 'pol-dzial-2', name: 'Retoryka, logika i sztuka argumentacji', minPoints: 1, maxPoints: 2, averagePoints: 1.5, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-3': { topicId: 'pol-dzial-3', name: 'Style funkcjonalne i rejestry polszczyzny', minPoints: 1, maxPoints: 2, averagePoints: 1.0, importance: 'HIGH' },
+      'pol-dzial-4': { topicId: 'pol-dzial-4', name: 'Środki językowe, składnia i mechanizmy perswazji', minPoints: 1, maxPoints: 2, averagePoints: 1.0, importance: 'HIGH' },
+      'pol-dzial-5': { topicId: 'pol-dzial-5', name: 'Frazeologia, semantyka i kultura języka', minPoints: 1, maxPoints: 2, averagePoints: 1.0, importance: 'HIGH' },
+      'pol-dzial-6': { topicId: 'pol-dzial-6', name: 'Spójność, kohezja i krytyczna analiza tekstu', minPoints: 1, maxPoints: 2, averagePoints: 1.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-7': { topicId: 'pol-dzial-7', name: 'Notatka syntetyzująca – Warsztat mistrzowski', minPoints: 3, maxPoints: 3, averagePoints: 3.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-8': { topicId: 'pol-dzial-8', name: 'Antyk – Mitologia grecka i teatr', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-9': { topicId: 'pol-dzial-9', name: 'Biblia – Sacrum, toposy i przypowieści', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-10': { topicId: 'pol-dzial-10', name: 'Średniowiecze – Teocentryzm, asceza i śmierć', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'HIGH' },
+      'pol-dzial-11': { topicId: 'pol-dzial-11', name: 'Renesans – Humanizm Jana Kochanowskiego', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-12': { topicId: 'pol-dzial-12', name: 'Renesans dramatyczny – Makbet Williama Szekspira', minPoints: 1, maxPoints: 2, averagePoints: 1.5, importance: 'HIGH' },
+      'pol-dzial-13': { topicId: 'pol-dzial-13', name: 'Barok – Poezja metafizyczna i konceptyzm', minPoints: 1, maxPoints: 2, averagePoints: 1.5, importance: 'HIGH' },
+      'pol-dzial-14': { topicId: 'pol-dzial-14', name: 'Barok sarmacki – Etos szlachecki i pamiętnikarstwo', minPoints: 1, maxPoints: 2, averagePoints: 1.0, importance: 'MEDIUM' },
+      'pol-dzial-15': { topicId: 'pol-dzial-15', name: 'Oświecenie – Satyra, bajka i dydaktyzm', minPoints: 1, maxPoints: 2, averagePoints: 1.5, importance: 'HIGH' },
+      'pol-dzial-16': { topicId: 'pol-dzial-16', name: 'Romantyzm I – Ballady, mistycyzm i bunt', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'HIGH' },
+      'pol-dzial-17': { topicId: 'pol-dzial-17', name: 'Romantyzm II – Dziady cz. III: Konrad i Wielka Improwizacja', minPoints: 2, maxPoints: 5, averagePoints: 3.5, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-18': { topicId: 'pol-dzial-18', name: 'Romantyzm III – Dziady cz. III: Mesjanizm i Martyrologia', minPoints: 2, maxPoints: 5, averagePoints: 3.5, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-19': { topicId: 'pol-dzial-19', name: 'Romantyzm IV – Kordian Słowackiego: Winkelriedyzm', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-20': { topicId: 'pol-dzial-20', name: 'Romantyzm V – Pan Tadeusz: Epopeja narodowa i Jacek Soplica', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-21': { topicId: 'pol-dzial-21', name: 'Pozytywizm I – Lalka: Stanisław Wokulski i dualizm epok', minPoints: 2, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-22': { topicId: 'pol-dzial-22', name: 'Pozytywizm II – Lalka: Ignacy Rzecki i topos theatrum mundi', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'HIGH' },
+      'pol-dzial-23': { topicId: 'pol-dzial-23', name: 'Pozytywizm III – Panorama społeczna, Powiśle i nowelistyka', minPoints: 1, maxPoints: 3, averagePoints: 2.0, importance: 'HIGH' },
+      'pol-dzial-24': { topicId: 'pol-dzial-24', name: 'Młoda Polska I – Nastroje fin de siècle, dekadentyzm i liryka', minPoints: 1, maxPoints: 2, averagePoints: 1.5, importance: 'HIGH' },
+      'pol-dzial-25': { topicId: 'pol-dzial-25', name: 'Młoda Polska II – Wesele Stanisława Wyspiańskiego', minPoints: 2, maxPoints: 5, averagePoints: 3.5, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-26': { topicId: 'pol-dzial-26', name: 'Dwudziestolecie międzywojenne – Przedwiośnie i Ferdydurke', minPoints: 2, maxPoints: 4, averagePoints: 3.0, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-27': { topicId: 'pol-dzial-27', name: 'Wojna, okupacja i literatura współczesna', minPoints: 2, maxPoints: 5, averagePoints: 3.5, importance: 'CRITICAL_PEWNIAK' },
+      'pol-dzial-28': { topicId: 'pol-dzial-28', name: 'Wypracowanie maturalne CKE – Teza, kompozycja i eliminacja błędu kardynalnego', minPoints: 15, maxPoints: 35, averagePoints: 25.0, importance: 'CRITICAL_PEWNIAK' }
+    }
+  },
+  'jezyk-angielski': {
+    subjectId: 'jezyk-angielski',
+    name: 'Język Angielski (Poziom Podstawowy)',
+    totalExamPoints: 60,
+    passingThresholdPoints: 18,
+    passingThresholdPercent: 30,
+    topics: {
+      'eng-dzial-1': { topicId: 'eng-dzial-1', name: 'Czasy gramatyczne i aspekty', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-dzial-2': { topicId: 'eng-dzial-2', name: 'Konstrukcje czasownikowe: Gerund, Infinitive i Modals', minPoints: 2, maxPoints: 4, averagePoints: 3.0, importance: 'HIGH' },
+      'eng-dzial-3': { topicId: 'eng-dzial-3', name: 'Okresy warunkowe (Conditionals 0, 1, 2) i zdania czasowe', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-dzial-4': { topicId: 'eng-dzial-4', name: 'Słowotwórstwo i False Friends', minPoints: 3, maxPoints: 4, averagePoints: 3.5, importance: 'HIGH' },
+      'eng-dzial-5': { topicId: 'eng-dzial-5', name: 'Parafrazy ze słowem kluczem i tłumaczenie fragmentów', minPoints: 3, maxPoints: 4, averagePoints: 3.5, importance: 'CRITICAL_PEWNIAK' },
+      'eng-dzial-6': { topicId: 'eng-dzial-6', name: 'Słuchanie: Wybór wielokrotny ABCD i intencje', minPoints: 5, maxPoints: 6, averagePoints: 5.5, importance: 'CRITICAL_PEWNIAK' },
+      'eng-dzial-7': { topicId: 'eng-dzial-7', name: 'Słuchanie: Dobieranie wypowiedzi do osób i sytuacji', minPoints: 4, maxPoints: 5, averagePoints: 4.5, importance: 'HIGH' },
+      'eng-dzial-8': { topicId: 'eng-dzial-8', name: 'Słuchanie: Uzupełnianie luk i notatek', minPoints: 3, maxPoints: 4, averagePoints: 3.5, importance: 'MEDIUM' },
+      'eng-dzial-9': { topicId: 'eng-dzial-9', name: 'Czytanie: Dobieranie nagłówków i zdań do luk', minPoints: 6, maxPoints: 8, averagePoints: 7.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-dzial-10': { topicId: 'eng-dzial-10', name: 'Czytanie: Analiza szczegółowa i Prawda/Fałsz', minPoints: 5, maxPoints: 6, averagePoints: 5.5, importance: 'HIGH' },
+      'eng-dzial-11': { topicId: 'eng-dzial-11', name: 'Czytanie: Teksty użytkowe i wieloźródłowe', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'HIGH' },
+      'eng-dzial-12': { topicId: 'eng-dzial-12', name: 'Pisanie: Warsztat 4 kropek CKE (Treść)', minPoints: 5, maxPoints: 5, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-dzial-13': { topicId: 'eng-dzial-13', name: 'Pisanie: Spójność i logika tekstu (Łączniki)', minPoints: 2, maxPoints: 2, averagePoints: 2.0, importance: 'HIGH' },
+      'eng-dzial-14': { topicId: 'eng-dzial-14', name: 'Pisanie: Zakres i poprawność językowa', minPoints: 5, maxPoints: 5, averagePoints: 5.0, importance: 'HIGH' },
+      'eng-dzial-15': { topicId: 'eng-dzial-15', name: 'Pisanie: Symulacja pełnego zadania CKE (E-mail/Blog)', minPoints: 12, maxPoints: 12, averagePoints: 12.0, importance: 'CRITICAL_PEWNIAK' }
+    }
+  },
+  'matematyka-rozszerzona': {
+    subjectId: 'matematyka-rozszerzona',
+    name: 'Matematyka (Poziom Rozszerzony)',
+    totalExamPoints: 50,
+    passingThresholdPoints: 15,
+    passingThresholdPercent: 30,
+    topics: {
+      'mat-roz-dzial-1': { topicId: 'mat-roz-dzial-1', name: 'Wielomiany i algebra rozszerzona', minPoints: 3, maxPoints: 6, averagePoints: 4.5, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-2': { topicId: 'mat-roz-dzial-2', name: 'Równania i nierówności z parametrem', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-3': { topicId: 'mat-roz-dzial-3', name: 'Wartość bezwzględna i nierówności z modułem', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'HIGH' },
+      'mat-roz-dzial-4': { topicId: 'mat-roz-dzial-4', name: 'Funkcje wymierne i ułamki algebraiczne', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'HIGH' },
+      'mat-roz-dzial-5': { topicId: 'mat-roz-dzial-5', name: 'Funkcja wykładnicza i logarytmy rozszerzone', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'HIGH' },
+      'mat-roz-dzial-6': { topicId: 'mat-roz-dzial-6', name: 'Trygonometria rozszerzona', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-7': { topicId: 'mat-roz-dzial-7', name: 'Ciągi i szeregi geometryczne', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'HIGH' },
+      'mat-roz-dzial-8': { topicId: 'mat-roz-dzial-8', name: 'Granice funkcji i asymptoty', minPoints: 2, maxPoints: 4, averagePoints: 3.0, importance: 'MEDIUM' },
+      'mat-roz-dzial-9': { topicId: 'mat-roz-dzial-9', name: 'Pochodna funkcji i styczne', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-10': { topicId: 'mat-roz-dzial-10', name: 'Zadania optymalizacyjne', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-11': { topicId: 'mat-roz-dzial-11', name: 'Planimetria rozszerzona', minPoints: 4, maxPoints: 7, averagePoints: 5.5, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-12': { topicId: 'mat-roz-dzial-12', name: 'Geometria analityczna rozszerzona', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-13': { topicId: 'mat-roz-dzial-13', name: 'Stereometria rozszerzona', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'mat-roz-dzial-14': { topicId: 'mat-roz-dzial-14', name: 'Kombinatoryka rozszerzona', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'HIGH' },
+      'mat-roz-dzial-15': { topicId: 'mat-roz-dzial-15', name: 'Prawdopodobieństwo rozszerzone', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' }
+    }
+  },
+  'jezyk-angielski-rozszerzony': {
+    subjectId: 'jezyk-angielski-rozszerzony',
+    name: 'Język Angielski (Poziom Rozszerzony)',
+    totalExamPoints: 60,
+    passingThresholdPoints: 18,
+    passingThresholdPercent: 30,
+    topics: {
+      'eng-roz-dzial-1': { topicId: 'eng-roz-dzial-1', name: 'Inwersja stylistyczna i emfaza', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-2': { topicId: 'eng-roz-dzial-2', name: 'Mixed & Inverted Conditionals', minPoints: 3, maxPoints: 6, averagePoints: 4.5, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-3': { topicId: 'eng-roz-dzial-3', name: 'Wish, Rather & Subjunctive', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-4': { topicId: 'eng-roz-dzial-4', name: 'Modals in the Past & Deduction', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-5': { topicId: 'eng-roz-dzial-5', name: 'Participle Clauses', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-6': { topicId: 'eng-roz-dzial-6', name: 'Strona bierna i kauzatywy', minPoints: 3, maxPoints: 6, averagePoints: 4.5, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-7': { topicId: 'eng-roz-dzial-7', name: 'Słowotwórstwo zaawansowane', minPoints: 3, maxPoints: 5, averagePoints: 4.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-8': { topicId: 'eng-roz-dzial-8', name: 'Phrasal Verbs i kolokacje', minPoints: 3, maxPoints: 6, averagePoints: 4.5, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-9': { topicId: 'eng-roz-dzial-9', name: 'Key Word Transformations', minPoints: 4, maxPoints: 6, averagePoints: 5.0, importance: 'CRITICAL_PEWNIAK' },
+      'eng-roz-dzial-10': { topicId: 'eng-roz-dzial-10', name: 'Wypowiedź pisemna i leksyka', minPoints: 13, maxPoints: 18, averagePoints: 15.0, importance: 'CRITICAL_PEWNIAK' }
+    }
+  }
+};
+
+export const DEFAULT_CKE_SUBJECT_OPTIONS: CkeSubjectOption[] = [
+  {
+    id: 'matematyka-podstawowa',
+    key: 'math',
+    shortName: 'Matematyka',
+    fullName: 'Matematyka (Poziom Podstawowy)',
+    examTag: 'Podstawa • 50 pkt',
+    totalPoints: 50,
+    passingPoints: 15,
+    accentColor: '#FFB800',
+    glowColor: 'rgba(255, 184, 0, 0.25)',
+    isAvailable: true,
+    iconName: 'math'
+  },
+  {
+    id: 'jezyk-polski',
+    key: 'pol',
+    shortName: 'Język Polski',
+    fullName: 'Język Polski (Poziom Podstawowy)',
+    examTag: 'Podstawa • 60 pkt',
+    totalPoints: 60,
+    passingPoints: 18,
+    accentColor: '#F43F5E',
+    glowColor: 'rgba(244, 63, 94, 0.25)',
+    isAvailable: true,
+    iconName: 'book'
+  },
+  {
+    id: 'jezyk-angielski',
+    key: 'eng',
+    shortName: 'Język Angielski',
+    fullName: 'Język Angielski (Poziom Podstawowy)',
+    examTag: 'Podstawa • 60 pkt',
+    totalPoints: 60,
+    passingPoints: 18,
+    accentColor: '#10B981',
+    glowColor: 'rgba(16, 185, 129, 0.25)',
+    isAvailable: true,
+    iconName: 'globe'
+  },
+  {
+    id: 'matematyka-rozszerzona',
+    key: 'math-roz',
+    shortName: 'Matematyka Roz.',
+    fullName: 'Matematyka (Poziom Rozszerzony)',
+    examTag: 'Rozszerzenie • 50 pkt',
+    totalPoints: 50,
+    passingPoints: 15,
+    accentColor: '#8B5CF6',
+    glowColor: 'rgba(139, 92, 246, 0.25)',
+    isAvailable: true,
+    iconName: 'calculator'
+  },
+  {
+    id: 'jezyk-angielski-rozszerzony',
+    key: 'eng-roz',
+    shortName: 'Angielski Roz.',
+    fullName: 'Język Angielski (Poziom Rozszerzony)',
+    examTag: 'Rozszerzenie • 60 pkt',
+    totalPoints: 60,
+    passingPoints: 18,
+    accentColor: '#06B6D4',
+    glowColor: 'rgba(6, 182, 212, 0.25)',
+    isAvailable: true,
+    iconName: 'globe'
+  }
+];
+
+let formulas: CkeFormulaItem[] = [];
+let formulaTopics: CkeFormulaTopic[] = [];
+let subjectsConfig: Record<string, SubjectCkeConfig> = { ...DEFAULT_CKE_SUBJECTS_CONFIG };
+let subjectOptions: CkeSubjectOption[] = [ ...DEFAULT_CKE_SUBJECT_OPTIONS ];
+let isLoaded = false;
+let loadPromise: Promise<void> | null = null;
+let loadFailed = false;
+
+const listeners = new Set<() => void>();
+
+function emit(): void {
+  listeners.forEach(listener => {
+    try {
+      listener();
+    } catch (err) {
+      console.warn('[ckeCatalogRepository] listener error:', err);
+    }
+  });
+}
+
+export function subscribeCkeCatalogs(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+/**
+ * Hook mobilny: uruchamia wczytanie katalogów przy pierwszym montażu
+ * i zwraca `true`, gdy dane są już dostępne.
+ */
+export function useCkeCatalogs(): boolean {
+  const [version, setVersion] = useState(0);
+  useEffect(() => subscribeCkeCatalogs(() => setVersion(v => v + 1)), []);
+  useEffect(() => {
+    void ensureCkeCatalogsLoaded();
+  }, []);
+  void version;
+  return isLoaded;
+}
+
+export function isCkeCatalogLoaded(): boolean {
+  return isLoaded;
+}
+
+export function didCkeCatalogLoadFail(): boolean {
+  return loadFailed;
+}
+
+/** Idempotentne wczytanie katalogów CKE z Firestore (0 odczytów przy cache w localStorage/SDK). */
+export async function ensureCkeCatalogsLoaded(): Promise<void> {
+  if (isLoaded) return;
+
+  // 1. Sprawdź trwały cache w localStorage (Zero-cost across F5)
+  const cachedFormulas = getFromCurriculumStorage<{ formulas?: CkeFormulaItem[]; topics?: CkeFormulaTopic[] }>('jasne_cke_formulas_v1');
+  const cachedWeights = getFromCurriculumStorage<{ subjects?: Record<string, SubjectCkeConfig>; options?: CkeSubjectOption[] }>('jasne_cke_weights_v1');
+
+  if (cachedFormulas?.data && cachedWeights?.data) {
+    if (Array.isArray(cachedFormulas.data.formulas)) {
+      formulas = cachedFormulas.data.formulas;
+    }
+    if (Array.isArray(cachedFormulas.data.topics)) {
+      formulaTopics = cachedFormulas.data.topics;
+    }
+    if (cachedWeights.data.subjects && typeof cachedWeights.data.subjects === 'object') {
+      subjectsConfig = { ...DEFAULT_CKE_SUBJECTS_CONFIG, ...cachedWeights.data.subjects };
+    }
+    if (Array.isArray(cachedWeights.data.options) && cachedWeights.data.options.length > 0) {
+      subjectOptions = cachedWeights.data.options;
+    }
+    isLoaded = formulas.length > 0 || subjectOptions.length > 0;
+    if (isLoaded) {
+      emit();
+      const isTestEnv = typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || typeof (process.env as any).VITEST !== 'undefined');
+      if ((cachedFormulas.isStale || cachedWeights.isStale) && !isTestEnv) {
+        _fetchCkeCatalogsFromFirestore().catch(() => {});
+      }
+      return;
+    }
+  }
+
+  if (loadPromise) return loadPromise;
+  loadPromise = _fetchCkeCatalogsFromFirestore();
+  return loadPromise;
+}
+
+async function _fetchCkeCatalogsFromFirestore(): Promise<void> {
+  try {
+    const [formulasSnap, weightsSnap] = await Promise.all([
+      getDoc(doc(db, 'system', 'ckeFormulas')),
+      getDoc(doc(db, 'system', 'ckeSubjectWeights'))
+    ]);
+
+    if (formulasSnap.exists()) {
+      const data = formulasSnap.data() as { formulas?: CkeFormulaItem[]; topics?: CkeFormulaTopic[] };
+      formulas = Array.isArray(data.formulas) ? data.formulas : [];
+      formulaTopics = Array.isArray(data.topics) ? data.topics : [];
+      saveToCurriculumStorage('jasne_cke_formulas_v1', data);
+    }
+
+    if (weightsSnap.exists()) {
+      const data = weightsSnap.data() as { subjects?: Record<string, SubjectCkeConfig>; options?: CkeSubjectOption[] };
+      if (data.subjects && typeof data.subjects === 'object' && Object.keys(data.subjects).length > 0) {
+        subjectsConfig = { ...DEFAULT_CKE_SUBJECTS_CONFIG, ...data.subjects };
+      }
+      if (Array.isArray(data.options) && data.options.length > 0) {
+        subjectOptions = data.options;
+      } else if (!subjectOptions || subjectOptions.length === 0) {
+        subjectOptions = [ ...DEFAULT_CKE_SUBJECT_OPTIONS ];
+      }
+      saveToCurriculumStorage('jasne_cke_weights_v1', data);
+    }
+
+    isLoaded = formulas.length > 0 || subjectOptions.length > 0;
+    loadFailed = !isLoaded;
+  } catch (err) {
+    loadFailed = true;
+    console.warn('[ckeCatalogRepository] Nie udało się wczytać katalogów CKE:', err);
+  } finally {
+    loadPromise = null;
+    emit();
+  }
+}
+
+/**
+ * Bezpieczne kształty zapasowe. To NIE są treści kurikulum — zero nazw działów,
+ * wag i wzorów. Służą tylko temu, żeby UI nie wybuchło, zanim katalogi dotrą
+ * z Firestore (stan pusty = brak danych, nie zmyślone dane).
+ */
+const FALLBACK_SUBJECT_CONFIG: SubjectCkeConfig = {
+  subjectId: 'matematyka-podstawowa',
+  name: '',
+  totalExamPoints: 50,
+  passingThresholdPoints: 15,
+  passingThresholdPercent: 30,
+  topics: {}
+};
+
+const FALLBACK_SUBJECT_OPTION: CkeSubjectOption = {
+  id: '',
+  key: '',
+  shortName: '',
+  fullName: '',
+  examTag: '',
+  totalPoints: 0,
+  passingPoints: 0,
+  accentColor: '#64748B',
+  glowColor: 'rgba(100,116,139,0.35)',
+  isAvailable: false,
+  iconName: 'math'
+};
+
+export function getCkeFormulas(): CkeFormulaItem[] {
+  return formulas;
+}
+
+export function getCkeFormulaTopics(): CkeFormulaTopic[] {
+  return formulaTopics.length > 0 ? formulaTopics : [{ id: 'all', name: 'Wszystkie działy' }];
+}
+
+export function getCkeAvailableSubjects(): CkeSubjectOption[] {
+  return (Array.isArray(subjectOptions) && subjectOptions.length > 0)
+    ? subjectOptions
+    : DEFAULT_CKE_SUBJECT_OPTIONS;
+}
+
+export function normalizeSubjectFirestoreId(subjectKeyOrId?: string): string {
+  if (!subjectKeyOrId) return 'matematyka-podstawowa';
+  if (subjectKeyOrId === 'pol' || subjectKeyOrId === 'jezyk-polski') return 'jezyk-polski';
+  if (subjectKeyOrId === 'eng' || subjectKeyOrId === 'jezyk-angielski') return 'jezyk-angielski';
+  if (subjectKeyOrId === 'math-roz' || subjectKeyOrId === 'mat-roz' || subjectKeyOrId === 'matematyka-rozszerzona') return 'matematyka-rozszerzona';
+  if (subjectKeyOrId === 'eng-roz' || subjectKeyOrId === 'ang-roz' || subjectKeyOrId === 'jezyk-angielski-rozszerzony') return 'jezyk-angielski-rozszerzony';
+  return 'matematyka-podstawowa';
+}
+
+/** Konfiguracja wag CKE przedmiotu (kształt zapasowy do czasu wczytania katalogu). */
+export function getSubjectCkeConfig(subjectId?: string): SubjectCkeConfig {
+  const normId = normalizeSubjectFirestoreId(subjectId);
+  return subjectsConfig[normId] || subjectsConfig['matematyka-podstawowa'] || FALLBACK_SUBJECT_CONFIG;
+}
+
+export function getSubjectMetaByKey(key: string): CkeSubjectOption {
+  return subjectOptions.find(s => s.key === key || s.id === key) || subjectOptions[0] || FALLBACK_SUBJECT_OPTION;
+}
+
+/** Tylko do testów — czyści pamięć podręczną katalogów. */
+export function resetCkeCatalogCache(): void {
+  formulas = [];
+  formulaTopics = [];
+  subjectsConfig = { ...DEFAULT_CKE_SUBJECTS_CONFIG };
+  subjectOptions = [ ...DEFAULT_CKE_SUBJECT_OPTIONS ];
+  isLoaded = false;
+  loadFailed = false;
+  loadPromise = null;
+}

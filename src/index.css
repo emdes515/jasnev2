@@ -1,0 +1,708 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+
+  /* Core Surfaces & Backgrounds mapped to runtime CSS variables */
+  --color-surface-bg: var(--surface-bg);
+  --color-background-base: var(--surface-bg);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-hover: var(--surface-card-hover);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-border: var(--surface-border);
+  --color-surface-border-hover: var(--surface-border-hover);
+  --color-surface-border-active: var(--surface-border-active);
+
+  /* Brand Primary & Accents */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-glow: var(--primary-glow);
+  --color-primary-dark: var(--primary-dark);
+
+  /* Typography Text Tokens */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-accent: var(--text-accent);
+
+  /* Gamification & Semantic Accents */
+  --color-alert-crimson: var(--alert-crimson);
+  --color-alert-crimson-bg: var(--alert-crimson-bg);
+  --color-accent-danger: var(--alert-crimson);
+  --color-streak-flame: #EA580C;
+  --color-accent-streak: #FF782D;
+  --color-accent-success: var(--accent-success);
+  --color-accent-arena: #06B6D4;
+  --color-accent-ai: #A855F7;
+
+  /* Backward Compatibility Aliases */
+  --color-jasne: var(--primary);
+  --color-jasne-hover: var(--primary-hover);
+  --color-jasne-dark: var(--primary-dark);
+  --color-jasne-glow: var(--primary-glow);
+  --color-jasne-surface: var(--primary-surface);
+  --color-jasne-border: var(--primary-border);
+  --color-jasne-blue: var(--accent-blue);
+}
+
+:root {
+  /* Default: Nocturne Luminary (Dark Mode) */
+  --surface-bg: #070A0F;
+  --surface-card: #0F1726;
+  --surface-card-hover: #152238;
+  --surface-elevated: #152238;
+  --surface-border: rgba(255, 255, 255, 0.12);
+  --surface-border-hover: rgba(255, 255, 255, 0.22);
+  --surface-border-active: #FFB800;
+
+  --primary: #FFB800;
+  --primary-hover: #FFC72C;
+  --primary-glow: rgba(255, 184, 0, 0.25);
+  --primary-dark: #B37F00;
+  --primary-surface: rgba(255, 184, 0, 0.08);
+  --primary-border: rgba(255, 184, 0, 0.25);
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-subtle: #475569;
+  --text-accent: #FFB800;
+
+  --alert-crimson: #F43F5E;
+  --alert-crimson-bg: rgba(244, 63, 94, 0.12);
+  --accent-success: #10B981;
+  --accent-blue: #38BDF8;
+
+  --formula-bg: rgba(255, 184, 0, 0.03);
+  --formula-border: rgba(255, 184, 0, 0.12);
+  --formula-text: #FFFFFF;
+  --formula-shadow: 0 0 10px rgba(255, 184, 0, 0.2);
+
+  --jasne: #FFB800;
+  --jasne-hover: #FFC72C;
+  --jasne-dark: #D97706;
+  --jasne-glow: rgba(255, 184, 0, 0.25);
+  --jasne-surface: rgba(255, 184, 0, 0.08);
+  --jasne-border: rgba(255, 184, 0, 0.25);
+  --jasne-blue: #38BDF8;
+
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+:root[data-theme="light"],
+html.light {
+  /* Solar Luminary (Light Mode) */
+  --surface-bg: #F8F9FC;
+  --surface-card: #FFFFFF;
+  --surface-card-hover: #F1F5F9;
+  --surface-elevated: #FFFFFF;
+  --surface-border: #E2E8F0;
+  --surface-border-hover: #CBD5E1;
+  --surface-border-active: #D97706;
+
+  --primary: #D97706;
+  --primary-hover: #B45309;
+  --primary-glow: rgba(217, 119, 6, 0.2);
+  --primary-dark: #92400E;
+  --primary-surface: rgba(217, 119, 6, 0.08);
+  --primary-border: rgba(217, 119, 6, 0.3);
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-subtle: #94A3B8;
+  --text-accent: #D97706;
+
+  --alert-crimson: #E11D48;
+  --alert-crimson-bg: rgba(225, 29, 72, 0.08);
+  --accent-success: #059669;
+  --accent-blue: #0284C7;
+
+  --formula-bg: rgba(217, 119, 6, 0.04);
+  --formula-border: rgba(217, 119, 6, 0.2);
+  --formula-text: #0F172A;
+  --formula-shadow: none;
+
+  --jasne: #D97706;
+  --jasne-hover: #B45309;
+  --jasne-dark: #92400E;
+  --jasne-glow: rgba(217, 119, 6, 0.2);
+  --jasne-surface: rgba(217, 119, 6, 0.08);
+  --jasne-border: rgba(217, 119, 6, 0.3);
+  --jasne-blue: #0284C7;
+}
+
+html, body {
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background-color: var(--primary-surface);
+  color: var(--primary);
+}
+
+/* Autorski Nocturne Luminary & Solar Luminary scrollbar */
+html,
+body,
+#root {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-border-hover) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-border-hover);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Wymogi identyfikacji JASNE. dla przycisków Solar Amber */
+button[class*="bg-[#FFB800]"],
+button[class*="bg-jasne"],
+a[class*="bg-[#FFB800]"],
+a[class*="bg-jasne"],
+.btn-jasne {
+  color: #080B11 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+button, a, input, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+}
+
+/* Jawne ukrywanie pasków przewijania tylko dla elementów z klasami pomocniczymi */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Bezwzględne ukrycie suwaków we wszystkich wzorach KaTeX */
+.katex,
+.katex-display,
+.katex-html,
+.katex *,
+.math-text-wrapper * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Swobodne przewijanie i ochrona przed ucinaniem wzorów KaTeX */
+.katex-display {
+  display: block !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  text-align: left !important;
+  padding: 0.35rem 0.25rem !important;
+  margin: 0.5rem 0 !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.katex-display > .katex {
+  display: inline-block !important;
+  min-width: min-content !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+@media (min-width: 640px) {
+  .katex-display {
+    text-align: center !important;
+  }
+}
+
+.katex::-webkit-scrollbar,
+.katex-display::-webkit-scrollbar,
+.katex-html::-webkit-scrollbar,
+.katex *::-webkit-scrollbar,
+.math-text-wrapper *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* KaTeX clarity, line clearance & contrast */
+.katex {
+  color: var(--text-primary) !important;
+  font-size: 1.05em;
+  text-rendering: geometricPrecision;
+  white-space: nowrap !important;
+}
+
+.katex .mfrac {
+  margin: 0.2em 0.1em !important;
+}
+
+.katex .sqrt {
+  margin: 0.15em 0.1em !important;
+}
+
+.katex .mord.accent {
+  margin-top: 0.15em !important;
+}
+
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-border-hover) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--surface-border-hover);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Stylizacja list numerowanych z kapsułkami */
+.math-text-wrapper ol {
+  counter-reset: math-step-counter;
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.math-text-wrapper ol > li {
+  counter-increment: math-step-counter;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.625rem;
+  line-height: 1.6;
+}
+
+.math-text-wrapper ol > li::before {
+  content: counter(math-step-counter);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 9999px;
+  background-color: var(--primary-surface);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 0.75rem;
+  margin-right: 0.75rem;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Stylizacja wyróżnionych ramek wzorów */
+.math-text-wrapper .formula-callout,
+.math-text-wrapper blockquote {
+  border: 1px solid var(--formula-border);
+  background: var(--formula-bg);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.125rem;
+  margin: 0.875rem 0;
+}
+
+/* Animacja shake dla błędnej odpowiedzi */
+@keyframes quiz-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-quiz-shake {
+  animation: quiz-shake 0.3s ease-in-out;
+}
+
+/* GPU-accelerated micro-animations for cards, streak flame, and specular shine */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes flame-breath {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.05) translateY(-1px); }
+}
+
+.animate-flame-breath {
+  animation: flame-breath 2.2s ease-in-out infinite;
+}
+
+@keyframes beacon-ping {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+/* Smooth crossfade and blur-dissolve for subject transitions */
+@keyframes subject-crossfade {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.995);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.animate-subject-switch {
+  animation: subject-crossfade 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes pageTransition {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.995);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+.animate-pageTransition {
+  animation: pageTransition 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Animacja shake dla błędnej odpowiedzi */
+.math-text-wrapper .katex-display,
+.katex-display {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  margin: 0.5rem auto !important;
+  padding: 0.4rem 0.6rem !important;
+  background: var(--formula-bg) !important;
+  border: 1px solid var(--formula-border) !important;
+  border-radius: 0.75rem !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  box-shadow: inset 0 0 15px rgba(255, 184, 0, 0.02) !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.math-text-wrapper .katex-display > .katex,
+.katex-display > .katex {
+  display: inline-block !important;
+  margin: 0 auto !important; /* flex-row: margin: 0 auto centruje gdy mieści się w linii, a staje się 0 przy przepełnieniu (brak ucinania lewej strony) */
+  text-align: center !important;
+  padding: 0 !important;
+  font-size: 1.08em !important;
+  color: var(--formula-text) !important;
+  text-shadow: var(--formula-shadow) !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+/* Wewnątrz kart wzorów (formula-sheet-card) eliminujemy podwójne zagnieżdżone ramki i tła */
+.formula-sheet-card .katex-display {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0.2rem 0 !important;
+}
+
+.math-text-wrapper .katex-display .mtable,
+.katex-display .mtable {
+  margin: 0 auto !important;
+}
+
+.math-text-wrapper .katex-display > .katex > .katex-html,
+.katex-display > .katex > .katex-html {
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+/* Responsywne skalowanie typografii i wzorów KaTeX na desktopie (+10-15%) */
+@media (min-width: 1024px) {
+  .katex {
+    font-size: 1.12em !important;
+  }
+  .math-text-wrapper .katex-display > .katex,
+  .katex-display > .katex {
+    font-size: 1.28em !important;
+  }
+  .task-reading-line {
+    max-width: 72ch;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+}
+
+/* Safe area padding utilities for mobile/PWA */
+.pb-safe-bottom {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+.pt-safe-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+
+/* =========================================================================
+   DESIGN SYSTEM TYPOGRAPHY SPECIFICATION (DESIGN.md)
+   Plus Jakarta Sans (Display, Headlines, Labels, Metrics)
+   DM Sans (Body text, continuous reading)
+   ========================================================================= */
+
+.text-display-hero {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 48px;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 640px) {
+  .text-display-hero {
+    font-size: 28px;
+    line-height: 36px;
+    letter-spacing: -0.02em;
+  }
+}
+
+.text-headline-xl {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 38px;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+  .text-headline-xl {
+    font-size: 22px;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+  }
+}
+
+.text-headline-lg {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+}
+
+.text-headline-sm {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.text-body-lg {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.text-body-md {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.text-body-sm {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.text-label-lg {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.01em;
+}
+
+.text-label-sm {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.text-metric {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================================
+   Mafs (Nocturne Luminary Theme Customization)
+   ========================================================================= */
+.MafsView {
+  --mafs-bg: #070A0F;
+  --mafs-fg: #DFE2F1;
+  --mafs-origin-color: #94A3B8;
+  --mafs-line-color: rgba(255, 255, 255, 0.10);
+  --grid-line-subdivision-color: rgba(255, 255, 255, 0.035);
+  --mafs-axis-stroke-width: 1.5px;
+
+  --mafs-yellow: #FFB800;
+  --mafs-blue: #38BDF8;
+  --mafs-green: #10B981;
+  --mafs-red: #F43F5E;
+  --mafs-indigo: #818CF8;
+  --mafs-violet: #C084FC;
+
+  --movable-point-color: #FFB800;
+  border-radius: 1rem;
+}
+
+.MafsView text {
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  user-select: none;
+}
+
+.MafsView .mafs-shadow {
+  paint-order: stroke fill;
+  stroke: #070A0F;
+  stroke-width: 4px;
+  stroke-opacity: 1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
+}
+
+.MafsView:focus-visible {
+  outline: 2px solid #FFB800;
+}
+
+/* =========================================================================
+   MOBILE FIRST UTILITIES (JASNE Mobile Engine)
+   ========================================================================= */
+.pb-mobile-safe {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.pt-mobile-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.tap-highlight-transparent {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-scroll-cue {
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+
+@media (max-width: 640px) {
+  /* Zabezpieczenie przed h-scrollem na małych ekranach */
+  html, body {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  /* Poprawa dotykowego feedbacku */
+  button, a {
+    touch-action: manipulation;
+  }
+
+  /* Wyrazistsze obramowania i podbita głębia kart na mobile, aby zapobiec zlewaniu się */
+  .bg-surface-card {
+    border-color: rgba(255, 255, 255, 0.13);
+    box-shadow: 0 4px 18px -2px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Wyraźniejsze separatory list i kafelków na małych ekranach */
+  .border-surface-border {
+    border-color: rgba(255, 255, 255, 0.13);
+  }
+}
+

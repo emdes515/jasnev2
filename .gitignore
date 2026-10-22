@@ -1,0 +1,92 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+target/
+*.tsbuildinfo
+
+# Logs and temporary files
+*.log
+*.tmp
+debug*.cjs
+patch_*.cjs
+rewrite_*.cjs
+fix_*.cjs
+
+# Environment variables
+.env*
+!.env.example
+
+# Service account credentials (CRITICAL SECURITY)
+serviceAccountKey*.json
+*adminsdk*.json
+
+# Editors
+.vscode/
+.idea/
+
+# Testing and coverage
+coverage/
+htmlcov/
+.coverage
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Firebase CLI state (may contain deploy cache / project aliases)
+.firebase/
+
+# Local, machine-specific seed overrides (never the tracked seed/curriculum data)
+seed/*.local.json
+*_backup.json
+seed/**/*_backup.json
+
+# Archives & reference docs
+*.zip
+*.rar
+*.pdf
+*.mp3
+baza_cke_matematyka/
+matura_angielski_podstawowy/
+scripts/temp/
+matemaks_tier_lista.html
+tier-lista-pp.pdf
+
+# One-off temporary scripts / codemods kept in the repository root only.
+# Anchored with a leading slash so nested, legitimate source files with the same
+# prefix (e.g. src/**/test*.js) are NOT silently ignored.
+/test*.js
+/test*.cjs
+/fix_*.js
+/patch_*.js
+/rewrite_*.js
+
+# Firebase Admin SDK service account keys (CRITICAL SECURITY)
+*-firebase-adminsdk*.json
+
+# Local environment overrides
+.env.local
+.env.*.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Subagent run directories and request logs
+ORIGINAL_REQUEST.md
+.agents/*
+!.agents/skills/
+
+# Local screenshots and text scratchpad files
+screenshot_*.png
+test_bottom_crop.png
+*.txt
+scratch_inspect.mjs
+extract_pdfs.py
+strip_plots.py
+tmp_inject.py
+audit_screenshots/
+wypchnij_na_github.bat

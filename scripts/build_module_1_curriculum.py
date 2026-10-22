@@ -1,0 +1,114 @@
+# -*- coding: utf-8 -*-
+"""
+build_module_1_curriculum.py - Główny skrypt budujący Moduł 1:
+"NA 30% – ŻELAZNE PEWNIAKI MATURALNE (Tiers S+ i S)"
+10 działów, 34 mikrolekcje, pełny standard Core-4 Bento + Nocturne Luminary SVG.
+Zapisuje wynik bezpośrednio do: seed/curriculum/curriculum_matematyka.json
+"""
+import sys
+import os
+import json
+
+if sys.stdout.encoding != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from scripts.curriculum_builder.topic_01_builder import build_topic_01
+from scripts.curriculum_builder.topic_02_builder import build_topic_02
+from scripts.curriculum_builder.topic_03_builder import build_topic_03
+from scripts.curriculum_builder.topic_04_builder import build_topic_04
+from scripts.curriculum_builder.topic_05_builder import build_topic_05
+from scripts.curriculum_builder.topic_06_builder import build_topic_06
+from scripts.curriculum_builder.topic_07_builder import build_topic_07
+from scripts.curriculum_builder.topic_08_builder import build_topic_08
+from scripts.curriculum_builder.topic_09_builder import build_topic_09
+from scripts.curriculum_builder.topic_10_builder import build_topic_10
+from scripts.curriculum_builder.topic_11_builder import build_topic_11
+from scripts.curriculum_builder.topic_12_builder import build_topic_12
+from scripts.curriculum_builder.topic_13_builder import build_topic_13
+from scripts.curriculum_builder.topic_14_builder import build_topic_14
+from scripts.curriculum_builder.topic_15_builder import build_topic_15
+from scripts.curriculum_builder.topic_16_builder import build_topic_16
+from scripts.curriculum_builder.topic_17_builder import build_topic_17
+from scripts.curriculum_builder.topic_18_builder import build_topic_18
+from scripts.curriculum_builder.topic_19_builder import build_topic_19
+from scripts.curriculum_builder.topic_20_builder import build_topic_20
+from scripts.curriculum_builder.topic_21_builder import build_topic_21
+from scripts.sanitize_curriculum_text import sanitize_topic_data
+
+def build_full_curriculum():
+    print("=" * 60)
+    print("  BUDOWANIE KURIKULUM MATEMATYKI PODSTAWOWEJ (Działy 1–21)")
+    print("  Standard: Core-4 Bento, Nocturne Luminary SVG, Autentyczne CKE")
+    print("=" * 60)
+
+    builders = [
+        ("Potęgi i pierwiastki", build_topic_01),
+        ("Logarytmy", build_topic_02),
+        ("Wartość bezwzględna", build_topic_03),
+        ("Wzory skróconego mnożenia i algebra", build_topic_04),
+        ("Nierówności liniowe", build_topic_05),
+        ("Równania w postaci iloczynowej", build_topic_06),
+        ("Równania i wyrażenia wymierne", build_topic_07),
+        ("Nierówności kwadratowe", build_topic_08),
+        ("Odczytywanie informacji z wykresu funkcji", build_topic_09),
+        ("Funkcja liniowa i jej własności", build_topic_10),
+        ("Ciągi liczbowe", build_topic_11),
+        ("Funkcja kwadratowa", build_topic_12),
+        ("Przekształcenia wykresów funkcji", build_topic_13),
+        ("Trygonometria w Trójkącie Prostokątnym i Wzory Redukcyjne", build_topic_14),
+        ("Planimetria – Trójkąty, Cechy Podobieństwa i Twierdzenie Talesa", build_topic_15),
+        ("Planimetria – Czworokąty oraz Okrąg i Koło", build_topic_16),
+        ("Geometria Analityczna na Płaszczyźnie Kartezjańskiej", build_topic_17),
+        ("Stereometria (Geometria Przestrzenna)", build_topic_18),
+        ("Kombinatoryka i Rachunek Prawdopodobieństwa", build_topic_19),
+        ("Statystyka Opisowa", build_topic_20),
+        ("Zadania Optymalizacyjne z Funkcją Kwadratową", build_topic_21),
+    ]
+
+    topics = []
+    total_lessons = 0
+    total_tasks = 0
+
+    for idx, (name, builder) in enumerate(builders, start=1):
+        print(f"[{idx}/{len(builders)}] Budowanie i sanityzacja KaTeX: {name}...")
+        topic_obj = builder()
+        topic_obj = sanitize_topic_data(topic_obj)
+        lesson_count = len(topic_obj.get("lessons", []))
+        task_count = sum(len(l.get("tasks", [])) for l in topic_obj.get("lessons", []))
+        total_lessons += lesson_count
+        total_tasks += task_count
+        print(f"       -> {lesson_count} lekcji, {task_count} zadań (100% KaTeX)")
+        topics.append(topic_obj)
+
+    print("-" * 60)
+    print(f"Podsumowanie: {len(topics)} działów, {total_lessons} lekcji, {total_tasks} zadań.")
+
+    curriculum = {
+        "module_id": "matematyka-podstawowa-pelne",
+        "module_title": "MATEMATYKA PODSTAWOWA (Formuła 2023)",
+        "module_description": f"{len(topics)} kluczowych tematów maturalnych. Każda lekcja w metodyce Core-4 Bento z grafikami Nocturne Luminary, czystymi wykresami wektorowymi SVG i autentycznymi zadaniami CKE 2022–2026.",
+        "target_score": "30% - 60%+ (Gwarancja zdania i wysoki wynik)",
+        "total_topics": len(topics),
+        "total_lessons": total_lessons,
+        "total_tasks": total_tasks,
+        "topics": topics
+    }
+
+    output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'seed', 'curriculum', 'curriculum_matematyka.json'))
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(curriculum, f, ensure_ascii=False, indent=2)
+
+    file_size_mb = os.path.getsize(output_path) / (1024 * 1024)
+    print(f"Pomyślnie zapisano do: {output_path}")
+    print(f"Rozmiar pliku JSON: {file_size_mb:.2f} MB")
+    print("=" * 60)
+
+if __name__ == '__main__':
+    build_full_curriculum()
