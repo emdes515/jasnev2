@@ -27,22 +27,23 @@ import { MaturalnyDuetGame } from './english/MaturalnyDuetGame';
 import { MathTheoryModal } from './math/MathTheoryModal';
 
 
+// Ikony zapasowe działów matematyki – w kolejności działów 1–15
 const mathIcons = [
-  Hash, 
-  Binary, 
-  EqualNot, 
-  Layers, 
-  TrendingUp, 
-  Activity, 
-  Target, 
-  ListOrdered, 
-  TriangleRight, 
-  CircleDot, 
-  MapIcon, 
-  Box, 
-  PieChart, 
-  Clock, 
-  Trophy
+  Hash,          // 1. Liczby rzeczywiste
+  Binary,        // 2. Wyrażenia algebraiczne
+  EqualNot,      // 3. Równania i nierówności
+  Layers,        // 4. Funkcje i ich własności
+  TrendingUp,    // 5. Funkcja liniowa i układy równań
+  Activity,      // 6. Funkcja kwadratowa
+  ListOrdered,   // 7. Ciągi liczbowe
+  TriangleRight, // 8. Trygonometria
+  CircleDot,     // 9. Planimetria
+  MapIcon,       // 10. Geometria analityczna
+  Box,           // 11. Stereometria
+  ListChecks,    // 12. Kombinatoryka
+  PieChart,      // 13. Rachunek prawdopodobieństwa
+  Clock,         // 14. Statystyka
+  Target         // 15. Optymalizacja
 ];
 
 const subjectIconMap: Record<string, any> = {
@@ -72,7 +73,20 @@ const subjectIconMap: Record<string, any> = {
   ListChecks,
   Clock,
   Zap,
-  Award
+  Award,
+  // Ikony działów matematyki po nazwie (kurs PR podaje je w blueprintach)
+  Hash,
+  Binary,
+  EqualNot,
+  TrendingUp,
+  Activity,
+  ListOrdered,
+  TriangleRight,
+  CircleDot,
+  Map: MapIcon,
+  Box,
+  PieChart,
+  Target
 };
 
 function getTopicIcon(subjectKey: string, topicIndex: number, DefaultIcon: any, topic?: any) {
@@ -620,7 +634,9 @@ export function LearnView({
   }, [viewState, selectedTopicIndex, lessonsForCurrentTopic.length]);
 
   // Overall math progress calculation
-  const totalMathTasks = mathTopicsList.reduce((acc, t) => acc + (t.lessons_metadata?.reduce((sum: number, l: any) => sum + (l.tasks_count || 0), 0) || 0), 0);
+  // Mianownik = pełna pula zadań działu (t.tasks), bo licznik liczy zadania z tej samej puli;
+  // suma tasks_count (5 na sesję) dawała przy 20 zadaniach na lekcję postęp ponad 100%.
+  const totalMathTasks = mathTopicsList.reduce((acc, t) => acc + ((t.tasks || []).length || t.lessons_metadata?.reduce((sum: number, l: any) => sum + (l.tasks_count || 0), 0) || 0), 0);
   const completedMathTasks = mathTopicsList.reduce((acc, t) => acc + (t.tasks || []).filter((tsk: any) => completedTasks.includes(tsk.id)).length, 0);
   const mathProgressPercent = totalMathTasks > 0 ? Math.round((completedMathTasks / totalMathTasks) * 100) : 0;
 
@@ -882,7 +898,7 @@ export function LearnView({
             <motion.div 
               key={`topics-${selectedSubjectKey}-${selectedSubjectKey === 'pol' ? selectedPillarId : selectedEnglishPillarId}`}
               initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
               exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
               transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
               className="flex-1 flex flex-col w-full"
@@ -2109,7 +2125,7 @@ export function LearnView({
                           </span>
                         </div>
                         <p className="text-xs text-[#8B8D98] truncate">
-                          14 działów • 150+ lekcji
+                          15 działów • 75 lekcji • 1500 zadań
                         </p>
                         <div className="mt-2.5 flex items-center gap-2.5">
                           <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
@@ -2295,7 +2311,7 @@ export function LearnView({
                           </span>
                         </div>
                         <p className="text-xs text-[#8B8D98] truncate">
-                          15 działów • 20 lekcji • 120 zadań
+                          15 działów • 75 lekcji • 1500 zadań
                         </p>
                         <div className="mt-2.5 flex items-center gap-2.5">
                           <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">

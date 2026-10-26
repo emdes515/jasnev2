@@ -3,8 +3,9 @@ import { createPortal } from 'react-dom';
 import { X, Search, BookOpen, AlertTriangle, Compass, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getCkeFormulas, getCkeFormulaTopics, useCkeCatalogs, type CkeFormulaItem, type CkeFormulaSubItem } from '../services/ckeCatalogRepository';
-import { CKE_FORMULAS_DATA, CKE_FORMULA_TOPICS } from '../data/ckeFormulasData';
+import { CKE_FORMULAS_DATA, withLocalCkeFormulas, withLocalCkeFormulaTopics } from '../data/ckeFormulasData';
 import { MathRenderer } from './MathRenderer';
+import { toFormulaBoxContent } from '../lib/formulaBox';
 import { MathPlot } from './MathPlot';
 import { MathDiagram } from './MathDiagram';
 import { NumberLineDiagram } from './NumberLineDiagram';
@@ -28,8 +29,7 @@ export const CkeFormulasModal: React.FC<CkeFormulasModalProps> = ({
   const isCatalogLoaded = useCkeCatalogs();
 
   const availableTopics = useMemo(() => {
-    const remote = getCkeFormulaTopics();
-    return remote.length > 1 ? remote : CKE_FORMULA_TOPICS;
+    return withLocalCkeFormulaTopics(getCkeFormulaTopics());
   }, [isCatalogLoaded]);
 
   // Close on Escape key
@@ -90,7 +90,7 @@ export const CkeFormulasModal: React.FC<CkeFormulasModalProps> = ({
   // Filtered formulas
   const filteredFormulas = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const source = getCkeFormulas().length > 0 ? getCkeFormulas() : CKE_FORMULAS_DATA;
+    const source = withLocalCkeFormulas(getCkeFormulas());
 
     return source.filter((item: CkeFormulaItem) => {
       // Topic match
@@ -275,15 +275,22 @@ export const CkeFormulasModal: React.FC<CkeFormulasModalProps> = ({
                       <h3 className="font-bold text-white text-sm sm:text-base leading-snug">
                         {item.title}
                       </h3>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-[#FFB800] bg-[#FFB800]/10 border border-[#FFB800]/20 px-2 py-0.5 rounded-full shrink-0">
                         {item.topicName}
                       </span>
+                        {item.level === 'PR' && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/40 px-2 py-0.5 rounded-full">
+                            Rozszerzenie
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Główny Wzór KaTeX o wysokim kontraście */}
                     <div className="bg-[#070A11] border border-[#FFB800]/25 rounded-xl p-3 sm:p-4 text-center shadow-[inset_0_2px_12px_rgba(0,0,0,0.6)] overflow-x-auto">
                       <div className="font-mono text-amber-200 font-bold text-base sm:text-lg leading-relaxed tracking-wide">
-                        <MathRenderer content={mainFormula} displayMode />
+                        <MathRenderer content={toFormulaBoxContent(mainFormula)} displayMode />
                       </div>
                     </div>
 
@@ -299,7 +306,7 @@ export const CkeFormulasModal: React.FC<CkeFormulasModalProps> = ({
                               {sub.label}
                             </span>
                             <div className="text-white font-semibold text-xs sm:text-sm overflow-x-auto py-0.5">
-                              <MathRenderer content={sub.formula} />
+                              <MathRenderer content={toFormulaBoxContent(sub.formula)} />
                             </div>
                           </div>
                         ))}

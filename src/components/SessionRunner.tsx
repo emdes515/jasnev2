@@ -53,11 +53,14 @@ import { Badge } from './Badge';
 
 import { UserState, LessonTheoryPill } from '../types';
 import { LessonFormulaSheet, drawSessionTasks, getLessonTheoryPill, getLessonTaskPool } from '../data/dzial1TaskPool';
+import { pickRetryTask, nextQueueIndex } from '../lib/sessionQueue';
+import { toFormulaBoxContent } from '../lib/formulaBox';
 import { curriculumRepository } from '../services/curriculumRepository';
 import { addMistakeToBank, removeMistakeFromBank } from '../utils/mistakesBank';
 import { OpenTaskWorkspace, convertDataUrlToAiOptimized } from './OpenTaskWorkspace';
 import { WritingWorkspace } from './writing/WritingWorkspace';
 import { AiTutorScanOverlay } from './AiTutorScanOverlay';
+import { RubricSelfAssessment } from './RubricSelfAssessment';
 import { MathPlot } from './MathPlot';
 import { MathDiagram } from './MathDiagram';
 import { NumberLineDiagram } from './NumberLineDiagram';
@@ -65,11 +68,12 @@ import { OutOfHeartsModal } from './OutOfHeartsModal';
 import { ParentSponsorModal } from './ParentSponsorModal';
 import { ProPopup } from './ProPopup';
 import { PromoFloatingPill } from './PromoFloatingPill';
-import { getSyncedHearts, deductHeart, refillHeartsWithCoins, activatePro, activateProWithCode } from '../lib/heartsManager';
+import { getSyncedHearts, deductHeart, refillHeartsWithCoins, activatePro, activateProWithCode, isFirstLessonGrace } from '../lib/heartsManager';
+import { showToast } from '../lib/toast';
 import { recordAiTokenUsage } from '../services/aiUsageTracker';
 import { enrichTaskWithVisual, enrichTheoryPillWithVisual } from '../data/mathVisualRegistry';
 import { getCkeFormulas, getCkeFormulaTopics } from '../services/ckeCatalogRepository';
-import { CKE_FORMULAS_DATA, CKE_FORMULA_TOPICS } from '../data/ckeFormulasData';
+import { withLocalCkeFormulas, withLocalCkeFormulaTopics } from '../data/ckeFormulasData';
 import { getPolishLessonDocument } from '../data/polishCurriculumData';
 import { getPolishBookSummary } from '../data/polish/polishBookSummaries';
 import { getPolishBentoConceptsForLesson } from '../data/polish/polishBentoConcepts';
@@ -1259,6 +1263,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     return heartsData.hearts;
   }, [isTheoryStep, heartsData, heartFlyAnim, pillImpactDone]);
 
+  // Bieżąca wartość isEvaluated dostępna także dla handlerów z poprzedniego renderu (patrz handleNextStep)
+  const isEvaluatedLiveRef = React.useRef(false);
+  isEvaluatedLiveRef.current = isEvaluated;
   const rawCurrentTask = taskQueue[currentQueueIndex] || taskQueue[0] || tasks[0];
   const currentTask = useMemo(() => {
     if (!rawCurrentTask) return rawCurrentTask;
@@ -1277,6 +1284,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
   const isTwoPartTask = currentTask?.type === 'TWO_PART' || Boolean(currentTask?.part_1 && currentTask?.part_2);
   const isOpenTask = (
     currentTask?.type === 'OPEN_PROOF' || 
+    currentTask?.type === 'OPEN_CALCULATION' ||
     currentTask?.type === 'OPEN_TASK' || 
     currentTask?.type === 'OPEN_GENERAL' ||
     currentTask?.type === 'OPEN' ||
@@ -1970,7 +1978,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
     // 3. Wzbogacenie o oficjalne tablice CKE dla danego działu (jeśli matematyka)
     if (!isPolishSession && matchedCkeTopicId) {
-      const ckeList = getCkeFormulas().length > 0 ? getCkeFormulas() : CKE_FORMULAS_DATA;
+      const ckeList = withLocalCkeFormulas(getCkeFormulas());
       const matchingCke = [...ckeList.filter(item => item.topicId === matchedCkeTopicId)];
       const searchContext = `${departmentBadgeLabel} ${moduleBadgeName || ''} ${lessonTitleClean || rawLessonTitle || ''}`.toLowerCase();
 
@@ -2010,8 +2018,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
   // Dostępne tematy CKE do filtrowania w widoku "Wszystkie działy CKE"
   const availableCkeTopics = useMemo(() => {
-    const fromRepo = getCkeFormulaTopics();
-    return fromRepo.length > 1 ? fromRepo : CKE_FORMULA_TOPICS;
+    return withLocalCkeFormulaTopics(getCkeFormulaTopics());
   }, []);
 
   // Filtrowane wzory w drawerze (wspiera wyszukiwanie i filtrowanie działów CKE)
@@ -2019,7 +2026,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     const query = formulaSearchQuery.trim().toLowerCase();
 
     if (formulaViewMode === 'all' && !isPolishSession) {
-      const ckeList = getCkeFormulas().length > 0 ? getCkeFormulas() : CKE_FORMULAS_DATA;
+      const ckeList = withLocalCkeFormulas(getCkeFormulas());
       return ckeList
         .filter(item => {
           // Filtr działu CKE
@@ -2070,7 +2077,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     
     if (!raw) {
       return {
-        label: 'Trening JASNE • Baza CKE',
+        label: 'Trening JASNE • w stylu CKE',
         type: 'autorskie' as const,
         badgeClass: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300',
         dotClass: 'bg-emerald-400'
@@ -2145,7 +2152,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
     // 4. Zadania treningowe, rozgrzewkowe lub autorskie
     return {
-      label: 'Trening JASNE • Baza CKE',
+      label: 'Trening JASNE • w stylu CKE',
       type: 'autorskie' as const,
       badgeClass: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300',
       dotClass: 'bg-emerald-400'
@@ -2405,8 +2412,16 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
   }, [lessonId]);
 
   // Obsługa utraty serc (Hearts Engine)
+  const firstLessonGraceNoticeShown = React.useRef(false);
   const handleMistakeDeduction = (count: number = 1) => {
     if (userState?.isPro) return;
+    if (isFirstLessonGrace(userState)) {
+      if (!firstLessonGraceNoticeShown.current) {
+        firstLessonGraceNoticeShown.current = true;
+        showToast('Pierwsza lekcja jest na próbę – błędy nie zabierają serc.', 'info');
+      }
+      return;
+    }
 
     // Obliczenie dokładnych współrzędnych docelowych wskaźnika serc w nagłówku
     let targetX = typeof window !== 'undefined' ? window.innerWidth - 65 : 140;
@@ -2870,16 +2885,26 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       // Zasada Mastery Learning: błędna odpowiedź nie przesuwa paska postępu,
       // a zadanie (lub inne wylosowane z tej samej lekcji) trafia na koniec kolejki
       const lessonPool = getLessonTaskPool(lessonId);
-      const usedIds = taskQueue.map((t: any) => t.id);
-      const unusedInPool = lessonPool.filter((t: any) => !usedIds.includes(t.id));
-      if (unusedInPool.length > 0) {
-        const nextPoolTask = unusedInPool[0];
+      // Najpierw zadanie z puli, którego nie było w kolejce; gdy pula jest wyczerpana – zadanie jeszcze
+      // nierozwiązane poprawnie, inne niż bieżące (logika i testy: src/lib/sessionQueue.ts).
+      const retryCandidate: any = pickRetryTask(lessonPool as any[], taskQueue, currentTask?.id, correctlySolvedTaskIds);
+      if (retryCandidate) {
+        const nextPoolTask = retryCandidate;
+        // Dane merytoryczne powtórki (treść, klucz, rysunek, podpowiedzi) pochodzą wyłącznie z nowego zadania puli.
+        // Z poprzedniego zadania zostają tylko pola sesji – inaczej powtórka dziedziczyłaby np. cudzy rysunek albo jednostkę.
+        const isMathLesson = !/^(pol|eng)-/.test(String(lessonId || ''));
+        const {
+          diagram: _d, plot: _p, numberLine: _n, visual: _v, statements: _s, part_1: _p1, part_2: _p2,
+          options: _o, unit: _u, tolerance: _t, hints: _h, matura_tip: _m, input_placeholder: _ip,
+          ...sessionFields
+        } = (currentTask || {}) as any;
         const formattedTask = {
-          ...currentTask,
+          ...sessionFields,
+          ...(isMathLesson ? nextPoolTask : {}),
           id: nextPoolTask.id,
           type: nextPoolTask.type || currentTask.type,
-          title: `Zadanie powtórkowe • ${nextPoolTask.tierLabel}`,
-          instruction: nextPoolTask.instruction || 'Dokończ zdanie. Wybierz właściwą odpowiedź spośród podanych.',
+          title: `Zadanie powtórkowe${nextPoolTask.tierLabel ? ` • ${nextPoolTask.tierLabel}` : ''}`,
+          instruction: nextPoolTask.instruction || (isMathLesson ? undefined : 'Dokończ zdanie. Wybierz właściwą odpowiedź spośród podanych.'),
           math_statement: nextPoolTask.question,
           question: nextPoolTask.question,
           options: nextPoolTask.options || [],
@@ -2892,7 +2917,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
           part_2: nextPoolTask.part_2,
           explanation: nextPoolTask.explanation,
           officialKey: nextPoolTask.officialKey || nextPoolTask.explanation,
-          hints: {
+          hints: nextPoolTask.hints || {
             level_1: nextPoolTask.hint_1,
             level_2: nextPoolTask.hint_2
           },
@@ -2972,6 +2997,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
           subjectId: isEnglishSession ? 'jezyk-angielski' : (isPolishSession ? 'jezyk-polski' : undefined),
           maxPoints: targetPts,
           ai_tutor_rubric: currentTask?.ai_tutor_rubric,
+          rubric_stages: currentTask?.rubric_stages,
+          zero_rules: currentTask?.zero_rules,
           attemptCount: 1,
           mode: 'grade'
         })
@@ -3016,6 +3043,11 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     // przeglądarki (klucz VITE_OPENROUTER_API_KEY trafiał do publicznego bundla).
     // Każde zapytanie do modelu przechodzi przez backend: /api/ai-tutor,
     // /api/evaluate-task, /api/generate-task.
+
+    // Zadania z etapami CKE nie są oceniane heurystyką słów kluczowych – zostaje ponowienie albo samoocena etapami.
+    if (!evalData && Array.isArray(currentTask?.rubric_stages) && currentTask.rubric_stages.length > 0) {
+      aiEvaluationUnavailableRef.current = true;
+    }
 
     // If server AI evaluation didn't succeed, generate resilient offline rubric evaluation
     if (!evalData && !aiEvaluationUnavailableRef.current) {
@@ -3284,6 +3316,40 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     }, 750);
   };
 
+  // Samoocena etapami CKE: wybrany próg punktowy przechodzi tę samą ścieżkę co ocena egzaminatora AI
+  const handleRubricSelfAssessment = (points: number) => {
+    const stages = currentTask?.rubric_stages || [];
+    if (isEvaluated || isTutorScanning || stages.length === 0) return;
+    const maxPts = currentTask?.points || stages[stages.length - 1].points;
+    const reached = stages.filter((s: any) => s.points <= points);
+    const next = stages.find((s: any) => s.points > points);
+
+    setEvaluationUnavailable(false);
+    setIsApproximateEvaluation(false);
+    pendingEvalDataRef.current = {
+      score: points,
+      maxPoints: maxPts,
+      isPassed: points > 0,
+      gradeTitle: `${points} / ${maxPts} PKT – samoocena według etapów CKE`,
+      summary: points === maxPts
+        ? 'Pełne rozwiązanie według zasad oceniania CKE.'
+        : reached.length > 0 ? `Osiągnięty etap: ${reached[reached.length - 1].label}.` : 'Nie masz jeszcze żadnego etapu – zacznij od pierwszego kroku ze wzorcowego rozwiązania.',
+      mentorComment: next
+        ? `Do progu ${next.points} pkt brakuje: ${next.criterion}`
+        : 'Masz komplet punktów. Porównaj jeszcze zapis ze wzorcowym rozwiązaniem – egzaminator sprawdza też uzasadnienia.',
+      strengths: reached.map((s: any) => s.criterion),
+      errors: next ? [next.criterion] : [],
+      ckeFeedback: 'Samoocena według etapów z zasad oceniania CKE.',
+      suggestion: currentTask?.zero_rules?.[0] || '',
+      hintForNextAttempt: '',
+      selfAssessed: true,
+      // Uczciwe „0 pkt” w samoocenie nie zabiera serca – inaczej opłacałoby się zawyżać wynik.
+      wasDeducted: false
+    };
+    triggerHaptic('light');
+    handleScanAnimationComplete();
+  };
+
   // Called when the scanning animation has smoothly finished
   const handleScanAnimationComplete = () => {
     const evalData = pendingEvalDataRef.current;
@@ -3398,8 +3464,12 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
         });
       } catch (e) {}
     } else {
-      // Przejdź do kolejnego zadania z kolejki
-      setCurrentQueueIndex(prev => prev + 1);
+      // Ponowne stuknięcie „Dalej” (przycisk znika dopiero po animacji) nie może przeskoczyć zadania:
+      // przechodzimy dalej tylko z zadania, które zostało już sprawdzone.
+      if (!isEvaluatedLiveRef.current) return;
+      isEvaluatedLiveRef.current = false;
+      // Przejdź do kolejnego zadania z kolejki – nigdy poza jej koniec (inaczej wyświetlałoby się w kółko pierwsze zadanie)
+      setCurrentQueueIndex(prev => nextQueueIndex(prev, taskQueueRef.current.length));
       setSelectedOption(null);
       setIsEvaluated(false);
       setIsCorrect(null);
@@ -3466,7 +3536,11 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     const perfectCoinsBonus = isPerfect ? 5 : 0;
     const calculatedCoins = Math.max(15, earnedCoins + 8 + perfectCoinsBonus);
     const streakDays = (userState?.streakDays || 0) + 1;
-    const cleanLessonNumber = lessonId.replace('lesson-', '').replace('-', '.');
+    // np. "math-lesson-9-2" → "9.2" (wcześniej uczeń widział techniczne "math.9-2")
+    const lessonNumberMatch = String(lessonId).match(/(\d+)-(\d+)$/);
+    const cleanLessonNumber = lessonNumberMatch
+      ? `${lessonNumberMatch[1]}.${lessonNumberMatch[2]}`
+      : lessonId.replace('lesson-', '').replace('-', '.');
 
     const accuracyPct = sessionMistakesCount === 0 
       ? 100 
@@ -5161,7 +5235,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                       style={{ WebkitMaskImage: 'linear-gradient(to right, black 88%, transparent 100%)', maskImage: 'linear-gradient(to right, black 88%, transparent 100%)' }}
                                     >
                                       <div className="inline-block w-fit min-w-full mx-auto text-center">
-                                        <MathRenderer content={item.latex} displayMode={true} />
+                                        <MathRenderer content={toFormulaBoxContent(item.latex, isPolishSession)} displayMode={true} />
                                       </div>
                                     </div>
                                   )}
@@ -5431,7 +5505,14 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                             if (steps.length > 0) {
                               const lastText = steps[steps.length - 1]?.text || '';
                               const eqMatch = lastText.match(/=\s*([^=.,;]+)[.,;]?\s*$/);
-                              if (eqMatch) return eqMatch[1].trim();
+                              if (eqMatch) {
+                                const piece = eqMatch[1].trim();
+                                // Wycinek z kroku zapisanego w KaTeX-ie może zgubić otwierający lub zamykający znak $ –
+                                // domykamy go, żeby wynik nie wyświetlił się jako surowy LaTeX.
+                                const dollars = (piece.match(/\$/g) || []).length;
+                                if (dollars % 2 === 1) return piece.endsWith('$') ? `$${piece}` : `${piece}$`;
+                                return piece;
+                              }
                             }
                             return null;
                           })();
@@ -5914,6 +5995,16 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               hideWhiteboard={isPolishSession || isEnglishSession}
               mode={(isPolishSession || isEnglishSession) ? 'text' : 'math'}
             />
+
+            {!isEvaluated && !isTutorScanning && Array.isArray(currentTask?.rubric_stages) && currentTask.rubric_stages.length > 0 && (
+              <RubricSelfAssessment
+                key={String(currentTask?.id || '')}
+                stages={currentTask.rubric_stages}
+                zeroRules={currentTask?.zero_rules}
+                maxPoints={currentTask?.points || currentTask.rubric_stages[currentTask.rubric_stages.length - 1].points}
+                onConfirm={handleRubricSelfAssessment}
+              />
+            )}
 
             {/* AI Tutor Scanning State (pulsujący gradient bursztynowy) */}
             {isTutorScanning && (
@@ -7544,7 +7635,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                             style={{ WebkitMaskImage: 'linear-gradient(to right, black 88%, transparent 100%)', maskImage: 'linear-gradient(to right, black 88%, transparent 100%)' }}
                           >
                             <div className="inline-block w-fit min-w-full mx-auto text-center font-mono text-amber-200 font-bold text-base sm:text-lg leading-relaxed tracking-wide">
-                              <MathRenderer content={f.latex} displayMode={!isPolishSession} />
+                              <MathRenderer content={toFormulaBoxContent(f.latex, isPolishSession)} displayMode={!isPolishSession} />
                             </div>
                           </div>
                         )}
@@ -7557,7 +7648,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                   {sub.label}
                                 </span>
                                 <div className="text-amber-200 text-xs sm:text-sm font-mono overflow-x-auto custom-scrollbar">
-                                  <MathRenderer content={sub.formula} displayMode={!isPolishSession} />
+                                  <MathRenderer content={toFormulaBoxContent(sub.formula, isPolishSession)} displayMode={!isPolishSession} />
                                 </div>
                               </div>
                             ))}
@@ -7770,7 +7861,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 <p className="text-sm font-bold text-amber-200">Egzaminator AI jest chwilowo niedostępny</p>
                 <p className="mt-0.5 text-xs leading-relaxed text-amber-100/70">
                   Twoja odpowiedź <span className="font-semibold">nie została oceniona</span> i nie stracisz za nią serca.
-                  Spróbuj ponownie za moment.
+                  {Array.isArray(currentTask?.rubric_stages) && currentTask.rubric_stages.length > 0
+                    ? ' Możesz spróbować ponownie albo ocenić się sam etapami CKE.'
+                    : ' Spróbuj ponownie za moment.'}
                 </p>
                 <div className="flex items-center gap-2 mt-2.5">
                   <button
