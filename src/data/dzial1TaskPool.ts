@@ -149,7 +149,8 @@ export function drawSessionTasks(
 ): SessionTasksDrawResult {
   const isEng = String(lessonId || '').startsWith('eng-');
   const isPol = String(lessonId || '').startsWith('pol-');
-  const subjectId = isEng ? 'jezyk-angielski' : isPol ? 'jezyk-polski' : 'matematyka-podstawowa';
+  const isMathRoz = String(lessonId || '').startsWith('math-pr-');
+  const subjectId = isEng ? 'jezyk-angielski' : isPol ? 'jezyk-polski' : isMathRoz ? 'matematyka-rozszerzona' : 'matematyka-podstawowa';
   let lesson = curriculumRepository.getCachedLesson(lessonId, subjectId);
   if (!lesson && !isEng && !isPol) {
     lesson = getMathLessonDocument(undefined, lessonId);
@@ -241,11 +242,17 @@ export function drawSessionTasks(
       }
     }
 
-    // Dokładnie 3 zamknięte i 2 otwarte, wymieszane losowo
+    // Dokładnie 3 zamknięte i 2 otwarte. Pierwsze otwarte stoi na 3. pozycji: sesja kończy się
+    // po 3 poprawnych odpowiedziach, więc otwarte na końcu kolejki często nie byłoby pokazane.
     const selectedClosed = shuffle(closedTasks).slice(0, 3);
     const selectedOpen = shuffle(openTasks).slice(0, 2);
 
-    let drawnTasks = shuffle([...selectedClosed, ...selectedOpen]);
+    let drawnTasks = [
+      ...selectedClosed.slice(0, 2),
+      ...selectedOpen.slice(0, 1),
+      ...selectedClosed.slice(2),
+      ...selectedOpen.slice(1)
+    ];
 
     // Uzupełnienie do 5 zadań jeśli pula była mniejsza
     if (drawnTasks.length < 5 && pool.length > 0) {

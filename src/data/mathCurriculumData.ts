@@ -1,28 +1,57 @@
 /**
  * mathCurriculumData.ts
- * 
- * 15 Oficjalnych Działów CKE Matematyki Podstawowej (Formuła 2023)
- * z pełnym kurikulum Core-4 Bento dla silnika nauki LearnView (Trophy Road),
- * 75 autentycznymi mikrolekcjami (po dokładnie 5 na każdy dział)
- * oraz mapą lekcji opartą o bazę 1500 zweryfikowanych zadań CKE.
+ *
+ * 15 działów matematyki na poziomie podstawowym (wymagania egzaminacyjne CKE obowiązujące od 2025 r.)
+ * z kurikulum Core-4 Bento dla silnika nauki LearnView: 75 mikrolekcji (po 5 na dział).
+ *
+ * Treść (pigułki teorii i zadania) NIE jest pisana ręcznie w tym pliku – powstaje w generatorze
+ * `scripts/math_pp/` (`node scripts/math_pp/build.js`), który zapisuje:
+ *   - src/data/math/generated/math_blueprints.json  (działy, lekcje, pigułki),
+ *   - src/data/math/generated/all_1500_tasks.json   (75 lekcji × 20 unikalnych zadań).
+ * Każde zadanie jest przypisane do lekcji przez pole `lessonId`.
  */
 
 import { TopicDocument, LessonDocument, LessonMetadataItem } from '../schema_firestore';
+import { LessonTheoryPill } from '../types';
 import rawGeneratedTasks from './math/generated/all_1500_tasks.json';
+import rawBlueprints from './math/generated/math_blueprints.json';
 import { enrichTaskWithVisual } from './mathVisualRegistry';
-import { shuffleTaskOptions } from '../utils/taskShuffler';
-import { MathTopicBlueprint, MathLessonDefinition } from './math/mathBlueprintTypes';
-import { DZIAL_1_TO_5 } from './math/blueprints/dzial1to5';
-import { DZIAL_6_TO_10 } from './math/blueprints/dzial6to10';
-import { DZIAL_11_TO_15 } from './math/blueprints/dzial11to15';
 
-export type { MathLessonDefinition, MathTopicBlueprint };
+export interface MathLessonDefinition {
+  id: string;
+  order: number;
+  title: string;
+  short_title: string;
+  badge: string;
+  archetypeCode: string;
+  estimated_time_formatted: string;
+  theory_pill: LessonTheoryPill;
+  formula_sheet?: {
+    lessonId: string;
+    title: string;
+    formulas: { title: string; latex: string }[];
+    goldenRule: string;
+    ckeTrap?: { error: string; correct: string; description: string } | null;
+  };
+}
 
-export const MATH_TOPIC_BLUEPRINTS: MathTopicBlueprint[] = [
-  ...DZIAL_1_TO_5,
-  ...DZIAL_6_TO_10,
-  ...DZIAL_11_TO_15
-];
+export interface MathTopicBlueprint {
+  id: string;
+  numericId: number;
+  title: string;
+  short_title: string;
+  description: string;
+  icon: string;
+  color: string;
+  matura_points_range: string;
+  importance: 'CRITICAL_PEWNIAK' | 'HIGH';
+  cke_formula_page?: string;
+  lessons: MathLessonDefinition[];
+}
+
+export const MATH_TOPIC_BLUEPRINTS: MathTopicBlueprint[] = rawBlueprints as unknown as MathTopicBlueprint[];
+
+
 
 export function getMathTopicBlueprint(topicId: string): MathTopicBlueprint | undefined {
   return MATH_TOPIC_BLUEPRINTS.find(b => b.id === topicId);
@@ -41,6 +70,10 @@ export function normalizeMathTaskForRunner(task: any, lessonId: string, topicId:
   const rawCorrect = task.correct_answer || task.correctAnswer || 'A';
   const isSingle = task.type === 'SINGLE_CHOICE' || !task.type;
   const isNumeric = task.type === 'NUMERIC_INPUT';
+  // Zadania prawda/fałsz: SessionRunner ocenia każde stwierdzenie osobno (pole `statements`)
+  const isTrueFalse = task.type === 'TRUE_FALSE' && Array.isArray(task.statements);
+  // Zadania otwarte (poziom rozszerzony): ocena etapami CKE (`rubric_stages`) – samoocena albo egzaminator AI
+  const isOpen = task.type === 'OPEN_CALCULATION' || task.type === 'OPEN_PROOF';
 
   // Format options
   let options = undefined;
@@ -58,13 +91,29 @@ export function normalizeMathTaskForRunner(task: any, lessonId: string, topicId:
   }
 
   const questionText = task.content || task.question || '';
+  const lessonLabel = task.lessonKey ? `Lekcja ${task.lessonKey}` : task.archetypeCode;
+  // Druga podpowiedź = pierwszy krok rozwiązania (cały, bez ucinania w środku wzoru)
+  const firstStep = String(task.explanation || '').match(/\*\*Krok 1:\*\*\s*([\s\S]*?)(?:\n\n|$)/);
+  const secondHint = firstStep ? `Pierwszy krok: ${firstStep[1].trim()}` : 'Sprawdź kolejność działań i założenia zadania.';
 
   const taskObj = {
     id: task.id || `math-task-${lessonId}-${Math.random().toString(36).substring(7)}`,
     lessonId,
     topicId,
-    type: isNumeric ? 'NUMERIC_INPUT' : 'SINGLE_CHOICE',
-    title: task.title || 'Zadanie Maturalne CKE',
+    type: isOpen ? task.type : isNumeric ? 'NUMERIC_INPUT' : isTrueFalse ? 'TRUE_FALSE' : 'SINGLE_CHOICE',
+    statements: isTrueFalse ? task.statements : undefined,
+    ...(isOpen
+      ? {
+          rubric_stages: task.rubric_stages,
+          zero_rules: task.zero_rules,
+          scoring_key: task.scoring_key,
+          officialKey: task.scoring_key,
+          official_solution_steps: task.official_solution_steps,
+          maxPoints: task.points
+        }
+      : {}),
+    requirements: task.requirements,
+    title: task.title || 'Zadanie w stylu maturalnym',
     question: questionText,
     content: questionText,
     math_statement: questionText,
@@ -73,206 +122,67 @@ export function normalizeMathTaskForRunner(task: any, lessonId: string, topicId:
     correctAnswer: rawCorrect,
     numeric_correct_answer: isNumeric ? rawCorrect : undefined,
     explanation: task.explanation || '',
-    matura_tip: task.matura_tip || 'Zwróć uwagę na założenia i wzory z oficjalnych tablic CKE.',
-    cke_tag: task.archetypeCode,
-    badge: task.archetypeCode,
+    matura_tip: task.matura_tip || 'Zwróć uwagę na założenia i wzory z karty wzorów CKE.',
+    cke_tag: lessonLabel,
+    badge: lessonLabel,
     points: task.points || 1,
-    source: 'CKE Formuła 2023 • Baza Zadań JASNE',
+    source: 'JASNE • zadanie autorskie w stylu CKE',
     diagram: task.diagram,
     plot: task.plot,
+    numberLine: task.numberLine,
     hints: {
-      level_1: task.matura_tip || 'Zwróć uwagę na podstawowe tożsamości z karty wzorów CKE.',
-      level_2: task.explanation ? `Wskazówka: ${task.explanation.slice(0, 180)}...` : 'Uważnie podstaw dane.'
+      level_1: task.matura_tip || 'Zwróć uwagę na wzory z karty wzorów CKE.',
+      level_2: secondHint
     },
-    hint_1: task.matura_tip || 'Zwróć uwagę na podstawowe tożsamości z karty wzorów CKE.',
-    hint_2: 'Sprawdź kolejność działań i dziedzinę wyrażenia.'
-  };
-
-  return shuffleTaskOptions(enrichTaskWithVisual(taskObj, lessonId));
-}
-
-// Mapowanie 75 lekcji do zweryfikowanych 32 archetypów w all_1500_tasks.json
-export const LESSON_ARCHETYPE_MAP: Record<string, string> = {
-  // Dział 1: Liczby rzeczywiste, procenty i błędy przybliżeń
-  'math-lesson-1-1': 'ARCH-03', // Wartość bezwzględna i nierówności na osi liczbowej
-  'math-lesson-1-2': 'ARCH-04', // Obliczenia procentowe, podatki i wielokrotne obniżki
-  'math-lesson-1-3': 'ARCH-05', // Błąd bezwzględny i błąd względny przybliżenia
-  'math-lesson-1-4': 'ARCH-01', // Potęgi o wykładnikach całkowitych i wymiernych
-  'math-lesson-1-5': 'ARCH-02', // Logarytmy i ich własności w zadaniach CKE
-
-  // Dział 2: Wyrażenia algebraiczne i wzory skróconego mnożenia
-  'math-lesson-2-1': 'ARCH-06', // Wzory skróconego mnożenia: kwadrat sumy i różnicy
-  'math-lesson-2-2': 'ARCH-06', // Różnica kwadratów
-  'math-lesson-2-3': 'ARCH-09', // Grupowanie wyrazów i wyłączanie wspólnego czynnika
-  'math-lesson-2-4': 'ARCH-07', // Ułamki algebraiczne i dziedzina wyrażenia
-  'math-lesson-2-5': 'ARCH-06', // Wzory skróconego mnożenia w dowodach algebraicznych
-
-  // Dział 3: Równania i nierówności liniowe oraz kwadratowe
-  'math-lesson-3-1': 'ARCH-07', // Równania liniowe i wymierne
-  'math-lesson-3-2': 'ARCH-08', // Równania kwadratowe: wyróżnik delta i pierwiastki
-  'math-lesson-3-3': 'ARCH-08', // Nierówności kwadratowe: szkicowanie paraboli
-  'math-lesson-3-4': 'ARCH-07', // Równania wymierne i wyznaczanie dziedziny
-  'math-lesson-3-5': 'ARCH-09', // Równania wielomianowe w postaci iloczynowej
-
-  // Dział 4: Układy równań liniowych z dwiema niewiadomymi
-  'math-lesson-4-1': 'ARCH-13', // Układy równań: metoda podstawiania
-  'math-lesson-4-2': 'ARCH-13', // Układy równań: metoda przeciwnych współczynników
-  'math-lesson-4-3': 'ARCH-13', // Interpretacja geometryczna układu równań
-  'math-lesson-4-4': 'ARCH-04', // Zadania tekstowe prowadzące do układu równań
-  'math-lesson-4-5': 'ARCH-13', // Układy równań z parametrem
-
-  // Dział 5: Funkcje – pojęcie, własności i odczytywanie z wykresu
-  'math-lesson-5-1': 'ARCH-10', // Dziedzina i zbiór wartości funkcji z wykresu
-  'math-lesson-5-2': 'ARCH-10', // Miejsca zerowe i punkty przecięcia z osiami
-  'math-lesson-5-3': 'ARCH-10', // Monotoniczność i przedziały stałego znaku
-  'math-lesson-5-4': 'ARCH-10', // Wartość największa i najmniejsza w przedziale
-  'math-lesson-5-5': 'ARCH-11', // Przekształcenia wykresów: translacja i symetrie
-
-  // Dział 6: Funkcja liniowa i jej zastosowania
-  'math-lesson-6-1': 'ARCH-13', // Współczynnik kierunkowy a i wyraz wolny b
-  'math-lesson-6-2': 'ARCH-24', // Wyznaczanie wzoru prostej przez dwa punkty
-  'math-lesson-6-3': 'ARCH-13', // Warunek równoległości i prostopadłości prostych
-  'math-lesson-6-4': 'ARCH-13', // Miejsce zerowe funkcji liniowej i nierówności
-  'math-lesson-6-5': 'ARCH-13', // Zastosowania praktyczne funkcji liniowej
-
-  // Dział 7: Funkcja kwadratowa
-  'math-lesson-7-1': 'ARCH-12', // Postać ogólna, kanoniczna i iloczynowa paraboli
-  'math-lesson-7-2': 'ARCH-12', // Wierzchołek paraboli W = (p, q) i oś symetrii
-  'math-lesson-7-3': 'ARCH-12', // Wartość najmniejsza i największa w przedziale domkniętym
-  'math-lesson-7-4': 'ARCH-08', // Wzory Viete'a i pierwiastki
-  'math-lesson-7-5': 'ARCH-32', // Zadania optymalizacyjne z funkcją kwadratową
-
-  // Dział 8: Funkcja wykładnicza i logarytmiczna
-  'math-lesson-8-1': 'ARCH-01', // Wykres i własności funkcji wykładniczej
-  'math-lesson-8-2': 'ARCH-01', // Proste równania i nierówności wykładnicze
-  'math-lesson-8-3': 'ARCH-02', // Wykres i własności funkcji logarytmicznej
-  'math-lesson-8-4': 'ARCH-02', // Równania logarytmiczne i warunki dziedziny
-  'math-lesson-8-5': 'ARCH-01', // Zastosowania funkcji wykładniczej (kapitalizacja odsetek)
-
-  // Dział 9: Ciągi liczbowe – arytmetyczny i geometryczny
-  'math-lesson-9-1': 'ARCH-14', // Wzór ogólny i badanie monotoniczności ciągu
-  'math-lesson-9-2': 'ARCH-14', // Ciąg arytmetyczny: różnica r i wzór na n-ty wyraz
-  'math-lesson-9-3': 'ARCH-15', // Suma n początkowych wyrazów ciągu arytmetycznego
-  'math-lesson-9-4': 'ARCH-16', // Ciąg geometryczny: iloraz q, n-ty wyraz i suma
-  'math-lesson-9-5': 'ARCH-16', // Warunek trzech kolejnych wyrazów i zadania mieszane
-
-  // Dział 10: Trygonometria kąta ostrego i wypukłego
-  'math-lesson-10-1': 'ARCH-18', // Definicje sin, cos, tg w trójkącie prostokątnym
-  'math-lesson-10-2': 'ARCH-18', // Wartości funkcji dla kątów 30, 45 i 60 stopni
-  'math-lesson-10-3': 'ARCH-17', // Jedynka trygonometryczna i tożsamości kąta ostrego
-  'math-lesson-10-4': 'ARCH-17', // Wzory redukcyjne dla kątów wypukłych
-  'math-lesson-10-5': 'ARCH-18', // Twierdzenie sinusów i cosinusów w trójkątach
-
-  // Dział 11: Planimetria – trójkąty, czworokąty i okręgi
-  'math-lesson-11-1': 'ARCH-20', // Pola trójkątów i twierdzenie Pitagorasa
-  'math-lesson-11-2': 'ARCH-21', // Cechy podobieństwa i przystawania trójkątów
-  'math-lesson-11-3': 'ARCH-21', // Własności czworokątów: trapez, romb, równoległobok
-  'math-lesson-11-4': 'ARCH-19', // Kąty środkowe i wpisane oparte na tym samym łuku
-  'math-lesson-11-5': 'ARCH-22', // Okrąg wpisany i opisany na wielokątach
-
-  // Dział 12: Geometria analityczna na płaszczyźnie kartezjańskiej
-  'math-lesson-12-1': 'ARCH-23', // Odległość dwóch punktów i współrzędne środka odcinka
-  'math-lesson-12-2': 'ARCH-24', // Równanie prostej przechodzącej przez dwa punkty
-  'math-lesson-12-3': 'ARCH-13', // Proste prostopadłe i równoległe na płaszczyźnie
-  'math-lesson-12-4': 'ARCH-25', // Równanie okręgu w postaci kanonicznej
-  'math-lesson-12-5': 'ARCH-25', // Punkty wspólne prostej i okręgu oraz pola figur
-
-  // Dział 13: Stereometria – graniastosłupy, ostrosłupy i bryły
-  'math-lesson-13-1': 'ARCH-26', // Graniastosłupy proste i prawidłowe: pole i objętość
-  'math-lesson-13-2': 'ARCH-27', // Ostrosłupy prawidłowe: krawędzie i ściany boczne
-  'math-lesson-13-3': 'ARCH-26', // Kąty w stereometrii: kąt nachylenia krawędzi i ściany
-  'math-lesson-13-4': 'ARCH-28', // Bryły obrotowe: walec, stożek i kula
-  'math-lesson-13-5': 'ARCH-28', // Przekroje brył płaszczyznami w arkuszu CKE
-
-  // Dział 14: Kombinatoryka i rachunek prawdopodobieństwa
-  'math-lesson-14-1': 'ARCH-29', // Reguła mnożenia i reguła dodawania w zliczaniu
-  'math-lesson-14-2': 'ARCH-29', // Silnia, permutacje i kombinacje w praktyce
-  'math-lesson-14-3': 'ARCH-30', // Klasyczna definicja prawdopodobieństwa
-  'math-lesson-14-4': 'ARCH-30', // Drzewo stochastyczne w doświadczeniach wieloetapowych
-  'math-lesson-14-5': 'ARCH-30', // Własności prawdopodobieństwa i zdarzenie przeciwne
-
-  // Dział 15: Statystyka opisowa i optymalizacja
-  'math-lesson-15-1': 'ARCH-31', // Średnia arytmetyczna i średnia ważona danych
-  'math-lesson-15-2': 'ARCH-31', // Mediana i dominanta (moda) zestawu liczb
-  'math-lesson-15-3': 'ARCH-31', // Odchylenie standardowe i wariancja próby
-  'math-lesson-15-4': 'ARCH-31', // Interpretacja diagramów słupkowych, kołowych i tabel
-  'math-lesson-15-5': 'ARCH-32'  // Optymalizacja z użyciem funkcji kwadratowej w CKE
-};
-
-export function cleanMathTargetValue(raw: any): string {
-  if (!raw) return '';
-  let s = String(raw).trim();
-  if (s.startsWith('$') && s.endsWith('$')) {
-    s = s.slice(1, -1).trim();
-  }
-  return s;
-}
-
-/**
- * Przekształca zadanie maturalne w zadanie otwarte (NUMERIC_INPUT)
- */
-export function convertMathTaskToOpen(task: any, lessonId: string, topicId: string): any {
-  if (!task) return null;
-
-  let targetVal = '';
-  if (task.numeric_correct_answer) {
-    targetVal = cleanMathTargetValue(task.numeric_correct_answer);
-  } else if (task.correct_answer && Array.isArray(task.options) && task.options.length > 0) {
-    const rawKey = String(task.correct_answer || 'A').toUpperCase().trim();
-    const idx = rawKey.charCodeAt(0) - 65;
-    const opt = (idx >= 0 && idx < task.options.length) ? task.options[idx] : task.options[0];
-    const rawText = typeof opt === 'string' ? opt : (opt.text || opt.content_latex || '');
-    targetVal = cleanMathTargetValue(rawText);
-  } else {
-    targetVal = cleanMathTargetValue(task.correct_answer || task.correctAnswer || '0');
-  }
-
-  let qText = task.content || task.question || '';
-  qText = qText.replace(/Dokończ zdanie\.\s*Wybierz właściwą odpowiedź spośród podanych\.\s*/i, 'Dokończ zdanie i wpisz wynik w pole poniżej:\n\n');
-  qText = qText.replace(/Wybierz właściwą odpowiedź spośród podanych\.\s*/i, 'Wpisz poprawny wynik w pole poniżej:\n\n');
-
-  const taskObj = {
-    id: `${task.id}_open`,
-    lessonId,
-    topicId,
-    type: 'NUMERIC_INPUT',
-    title: task.title ? `${task.title} (Zadanie otwarte)` : 'Zadanie otwarte CKE',
-    question: qText,
-    content: qText,
-    math_statement: qText,
-    options: undefined, // Brak kafelków ABCD — zadanie otwarte
-    correct_answer: targetVal,
-    correctAnswer: targetVal,
-    numeric_correct_answer: targetVal,
-    input_placeholder: 'Wpisz wynik (np. 12, 3/4, -5)...',
-    explanation: task.explanation || '',
-    matura_tip: task.matura_tip || 'Wpisz dokładną liczbę lub ułamek.',
-    cke_tag: task.archetypeCode || task.cke_tag,
-    badge: task.archetypeCode || task.badge,
-    points: 2,
-    source: 'CKE Formuła 2023 • Zadanie otwarte JASNE',
-    diagram: task.diagram,
-    plot: task.plot,
-    hints: {
-      level_1: task.matura_tip || 'Zwróć uwagę na wzory z tablic CKE.',
-      level_2: task.explanation ? `Wskazówka: ${task.explanation.slice(0, 180)}...` : 'Uważnie podstaw dane.'
-    },
-    hint_1: task.matura_tip || 'Zwróć uwagę na wzory z tablic CKE.',
-    hint_2: 'Sprawdź kolejność działań i wykonaj obliczenia krok po kroku.'
+    hint_1: task.matura_tip || 'Zwróć uwagę na wzory z karty wzorów CKE.',
+    hint_2: secondHint,
+    // Etykieta używana przez SessionRunner w tytule zadania powtórkowego po błędzie
+    tierLabel: 'ta sama lekcja'
   };
 
   return enrichTaskWithVisual(taskObj, lessonId);
 }
 
-// Mapowanie zadań z all_1500_tasks.json do archetypów
-const tasksByArchetype: Record<string, any[]> = {};
+// Mapowanie zadań z all_1500_tasks.json do lekcji (pole lessonId, np. "math-lesson-6-2")
+const tasksByLesson: Record<string, any[]> = {};
 (rawGeneratedTasks as any[]).forEach(task => {
-  const code = task.archetypeCode || 'ARCH-01';
-  if (!tasksByArchetype[code]) {
-    tasksByArchetype[code] = [];
+  const key = task.lessonId;
+  if (!key) return;
+  if (!tasksByLesson[key]) {
+    tasksByLesson[key] = [];
   }
-  tasksByArchetype[code].push(task);
+  tasksByLesson[key].push(task);
 });
+
+/** Liczba zadań w jednej sesji mikrolekcji (Core-4: 4–6 minut). */
+export const MATH_LESSON_SESSION_SIZE = 5;
+
+/**
+ * Pełne pule zadań lekcji (po 20), znormalizowane dla SessionRunnera.
+ * Generator układa zadania rotacyjnie po typach, więc każde kolejne 5 zadań to przekrój lekcji.
+ */
+const MATH_LESSON_TASK_POOLS: Map<string, any[]> = new Map();
+
+/** Zwraca pełną pulę zadań lekcji (np. do powtórek i sprawdzianów). */
+export function getMathLessonTaskPool(lessonId: string): any[] {
+  return MATH_LESSON_TASK_POOLS.get(lessonId) || [];
+}
+
+/**
+ * Okno 5 zadań z puli, zmieniane raz na dobę – dla widoków, które pokazują stały zestaw
+ * (MathStudyHub). Silnik sesji (drawSessionTasks) sam losuje 5 zadań z pełnej puli lekcji.
+ */
+function pickSessionTasks(pool: any[], rotation: number = 0): any[] {
+  if (pool.length <= MATH_LESSON_SESSION_SIZE) return pool;
+  const windows = Math.floor(pool.length / MATH_LESSON_SESSION_SIZE);
+  const start = (((rotation % windows) + windows) % windows) * MATH_LESSON_SESSION_SIZE;
+  return pool.slice(start, start + MATH_LESSON_SESSION_SIZE);
+}
+
+function currentRotation(): number {
+  const now = new Date();
+  return Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 86400000);
+}
 
 /**
  * Cache pełnych dokumentów lekcji dla Matematyki
@@ -286,42 +196,21 @@ export const MATH_CURRICULUM_TOPICS: TopicDocument[] = MATH_TOPIC_BLUEPRINTS.map
   const topicTasksAll: any[] = [];
 
   const lessonsMetadata: LessonMetadataItem[] = bp.lessons.map(l => {
-    // Rozpoznaj przypisany archetyp dla lekcji
-    const mappedArch = LESSON_ARCHETYPE_MAP[l.id] || (tasksByArchetype[l.archetypeCode] ? l.archetypeCode : 'ARCH-01');
-    const rawArchetypeTasks = tasksByArchetype[mappedArch] || tasksByArchetype['ARCH-01'] || [];
+    const pool = (tasksByLesson[l.id] || []).map(t => normalizeMathTaskForRunner(t, l.id, bp.id));
+    MATH_LESSON_TASK_POOLS.set(l.id, pool);
+    // Dokument lekcji niesie PEŁNĄ pulę 20 zadań: drawSessionTasks losuje z niej 5 na sesję,
+    // a SessionRunner po błędnej odpowiedzi dobiera z reszty puli nowe zadanie powtórkowe.
+    const sessionTasks = pool;
 
-    // Jeśli archetyp składa się z zadań otwartych (np. ARCH-32), dobierz zadania zamknięte z pokrewnego archetypu
-    let closedBaseTasks = rawArchetypeTasks;
-    if (mappedArch === 'ARCH-32') {
-      const companionArch = l.id.startsWith('math-lesson-7-') ? 'ARCH-12' : 'ARCH-31';
-      closedBaseTasks = tasksByArchetype[companionArch] || rawArchetypeTasks;
-    }
-
-    // Przygotuj pulę zadań zamkniętych i otwartych
-    const closedCandidates = closedBaseTasks.slice(0, 10).map(t => normalizeMathTaskForRunner(t, l.id, bp.id));
-    const openCandidates = rawArchetypeTasks.slice(0, 10).map(t => convertMathTaskToOpen(t, l.id, bp.id));
-
-    // Dokładnie 3 zamknięte i 2 otwarte w sesji startowej, wymieszane losowo
-    const selectedClosed = closedCandidates.slice(0, 3);
-    const selectedOpen = openCandidates.slice(0, 2);
-    const initialSessionTasks = [...selectedClosed, ...selectedOpen].sort(() => 0.5 - Math.random());
-
-    // Cała pula lekcji: wylosowane 5 zadań na początku, po nich reszta puli dla kolejnych losowań
-    const fullLessonTasks = [
-      ...initialSessionTasks,
-      ...closedCandidates.slice(3),
-      ...openCandidates.slice(2)
-    ];
-
-    topicTasksAll.push(...initialSessionTasks);
+    topicTasksAll.push(...pool);
 
     const lessonDoc: LessonDocument = {
       id: l.id,
       topic_id: bp.id,
       title: l.title,
       theory_pill: l.theory_pill,
-      tasks: fullLessonTasks,
-      required_correct_tasks: 3,
+      tasks: sessionTasks,
+      required_correct_tasks: Math.min(3, sessionTasks.length || 3),
       estimated_time_formatted: l.estimated_time_formatted
     };
 
@@ -341,7 +230,7 @@ export const MATH_CURRICULUM_TOPICS: TopicDocument[] = MATH_TOPIC_BLUEPRINTS.map
       title: l.title,
       short_title: l.short_title,
       badge: l.badge,
-      tasks_count: 5,
+      tasks_count: Math.min(MATH_LESSON_SESSION_SIZE, sessionTasks.length),
       estimated_time_formatted: l.estimated_time_formatted,
       points_to_unlock: l.order === 1 ? 0 : 15,
       required_correct_tasks: 3
@@ -379,6 +268,91 @@ export const ALL_MATH_LESSONS = MATH_TOPIC_BLUEPRINTS.flatMap(bp =>
   }))
 );
 
+export function cleanMathTargetValue(raw: any): string {
+  if (!raw) return '';
+  let s = String(raw).trim();
+  if (s.startsWith('$') && s.endsWith('$')) {
+    s = s.slice(1, -1).trim();
+  }
+  return s;
+}
+
+const NUM = String.raw`-?\d+(?:,\d+)?`;
+
+/**
+ * Wynik, który uczeń wpisze jednoznacznie w pole odpowiedzi: liczba (także z jednostką
+ * albo procentem, np. „$540$ zł”), prosty ułamek, „$m = 4$” albo punkt „$(2, -3)$”.
+ * Wyrażeń algebraicznych i opisów słownych nie zamieniamy – mają wiele poprawnych zapisów.
+ */
+function toNumericAnswer(value: string): { answer: string; unit?: string } | null {
+  const m = value.trim().match(/^\$([^$]+)\$\s*([a-ząćęłńóśźżA-Z²³]{1,3})?$/);
+  const math = (m ? m[1] : value).replace(/\{,\}/g, ',').replace(/\\%/g, '%').replace(/\s+/g, '');
+  const unit = m?.[2];
+  const body = math.replace(/^[a-z]=/, '');
+  if (new RegExp(`^${NUM}%?$`).test(body)) {
+    const isPct = body.endsWith('%');
+    return { answer: body.replace('%', ''), unit: isPct ? '%' : unit };
+  }
+  const frac = body.match(/^(-?)\\[dt]?frac\{(\d+)\}\{(\d+)\}$/);
+  if (frac) return { answer: `${frac[1]}${frac[2]}/${frac[3]}`, unit };
+  if (/^-?\d+\/\d+$/.test(body)) return { answer: body, unit };
+  // Punkt (x, y) da się wpisać z klawiatury telefonu; przedziałów z ⟨ ⟩ – nie, więc ich nie zamieniamy.
+  if (!unit && new RegExp(`^\\(${NUM},${NUM}\\)$`).test(math)) return { answer: math };
+  return null;
+}
+
+/**
+ * Przekształca zadanie zamknięte w zadanie otwarte (NUMERIC_INPUT), gdy w puli lekcji
+ * brakuje zadań otwartych. Zwraca null, jeśli poprawna odpowiedź nie jest liczbą
+ * (np. „ma dokładnie dwa rozwiązania”) – takiego zadania nie da się sensownie wpisać.
+ */
+export function convertMathTaskToOpen(task: any, lessonId: string, topicId: string): any {
+  if (!task) return null;
+
+  let targetVal = '';
+  if (task.numeric_correct_answer) {
+    targetVal = cleanMathTargetValue(task.numeric_correct_answer);
+  } else if (task.correct_answer && Array.isArray(task.options) && task.options.length > 0) {
+    const rawKey = String(task.correct_answer || 'A').toUpperCase().trim();
+    const idx = rawKey.charCodeAt(0) - 65;
+    const opt = (idx >= 0 && idx < task.options.length) ? task.options[idx] : task.options[0];
+    const rawText = typeof opt === 'string' ? opt : (opt.text || opt.content_latex || '');
+    targetVal = cleanMathTargetValue(rawText);
+  } else {
+    targetVal = cleanMathTargetValue(task.correct_answer || task.correctAnswer || '');
+  }
+
+  const numeric = toNumericAnswer(targetVal);
+  if (!numeric) return null;
+  const numericVal = numeric.answer;
+  const isPair = numericVal.includes(',') && /[()[\]]|langle/.test(numericVal);
+
+  let qText = task.content || task.question || '';
+  qText = qText.replace(/Dokończ zdanie\.\s*Wybierz właściwą odpowiedź spośród podanych\.\s*/i, 'Dokończ zdanie i wpisz wynik w pole poniżej:\n\n');
+  qText = qText.replace(/Wybierz właściwą odpowiedź spośród podanych\.\s*/i, 'Wpisz poprawny wynik w pole poniżej:\n\n');
+
+  const taskObj = {
+    ...task,
+    id: `${task.id}_open`,
+    lessonId,
+    topicId,
+    type: 'NUMERIC_INPUT',
+    title: task.title ? `${task.title} (zadanie otwarte)` : 'Zadanie otwarte',
+    question: qText,
+    content: qText,
+    math_statement: qText,
+    options: undefined, // brak kafelków ABCD – zadanie otwarte
+    correct_answer: numericVal,
+    correctAnswer: numericVal,
+    numeric_correct_answer: numericVal,
+    input_placeholder: isPair ? 'Wpisz wynik, np. (2, -3)' : 'Wpisz wynik (np. 12, 3/4, -5)...',
+    unit: numeric.unit,
+    points: Math.max(2, task.points || 1)
+  };
+
+  return enrichTaskWithVisual(taskObj, lessonId);
+}
+
 /**
  * Pobiera dokument lekcji matematyki
  */
@@ -398,6 +372,15 @@ export function getMathLessonDocument(topicId?: string, lessonId?: string): Less
 }
 
 /**
+ * Stały na dany dzień zestaw 5 zadań lekcji (dla widoków bez własnego losowania).
+ */
+export function getMathLessonSessionTasks(lessonId: string): any[] {
+  const doc = MATH_LESSON_DOCUMENTS.get(String(lessonId).trim());
+  const pool = doc ? MATH_LESSON_TASK_POOLS.get(doc.id) || [] : [];
+  return pickSessionTasks(pool, currentRotation());
+}
+
+/**
  * Generuje Boss Exam dla wybranego działu Matematyki
  */
 export function loadMathTopicBossExam(topicId: string, topicTitle?: string): any {
@@ -406,18 +389,31 @@ export function loadMathTopicBossExam(topicId: string, topicTitle?: string): any
     b.numericId === parseInt(String(topicId).replace(/\D/g, '') || '1', 10)
   ) || MATH_TOPIC_BLUEPRINTS[0];
 
-  // Zbierz zadania ze wszystkich lekcji/archetypów tego działu
-  const topicArchetypes = bp.lessons.map(l => l.archetypeCode);
+  // Zbierz zadania ze wszystkich lekcji tego działu
   const candidatePool: any[] = [];
-  topicArchetypes.forEach(arch => {
-    const list = tasksByArchetype[arch] || [];
-    candidatePool.push(...list);
+  bp.lessons.forEach(l => {
+    candidatePool.push(...(tasksByLesson[l.id] || []));
   });
 
   const available = candidatePool.length > 0 ? candidatePool : (rawGeneratedTasks as any[]);
-  // Wymieszaj i wybierz 5 zadań
-  const shuffled = [...available].sort(() => 0.5 - Math.random());
-  const chosen = shuffled.slice(0, 5);
+  // Po jednym losowym zadaniu z każdej lekcji działu (pełny przekrój), a w razie braków – dobór z całej puli
+  const shuffle = <T,>(arr: T[]): T[] => {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
+  const chosen: any[] = [];
+  bp.lessons.forEach(l => {
+    const list = tasksByLesson[l.id] || [];
+    if (list.length > 0) chosen.push(list[Math.floor(Math.random() * list.length)]);
+  });
+  if (chosen.length < 5) {
+    const used = new Set(chosen.map(t => t.id));
+    chosen.push(...shuffle(available.filter(t => !used.has(t.id))).slice(0, 5 - chosen.length));
+  }
 
   const examTasks = chosen.map((t, idx) => {
     const norm = normalizeMathTaskForRunner(t, `${bp.id}-boss`, bp.id);
@@ -438,7 +434,8 @@ export function loadMathTopicBossExam(topicId: string, topicTitle?: string): any
       matura_tip: norm.matura_tip || '',
       hint_1: norm.hint_1 || '',
       hint_2: norm.hint_2 || '',
-      source: 'CKE Formuła 2023 • Egzamin Działowy JASNE',
+      source: 'JASNE • Sprawdzian działowy (zadania w stylu CKE)',
+      numberLine: norm.numberLine,
       type: norm.type || 'SINGLE_CHOICE',
       points: norm.points || 1,
       diagram: norm.diagram,
@@ -453,7 +450,7 @@ export function loadMathTopicBossExam(topicId: string, topicTitle?: string): any
     id: `BOSS-EXAM-${String(bp.id).toUpperCase()}`,
     title: `Sprawdzian: ${bp.short_title}`,
     subtitle: `Ostateczne starcie z materiałem: ${bp.title}. Rozwiąż ${totalQuestions} zadań z tego działu.`,
-    boss_name: `Egzaminator CKE: ${bp.short_title}`,
+    boss_name: `Egzaminator: ${bp.short_title}`,
     boss_message: `Egzaminator czeka! Wykaż się wiedzą z działu: ${bp.short_title}. Zdobądź minimum 70%!`,
     timeLimitMinutes: 20,
     passingScore,
