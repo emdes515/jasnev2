@@ -59,7 +59,7 @@ import { CkeFormulasModal } from './components/CkeFormulasModal';
 import { EnglishDictionaryModal } from './components/english/EnglishDictionaryModal';
 import { ScratchpadModal } from './components/ScratchpadModal';
 import { DevHubModal } from './components/DevHubModal';
-import { applyFullDeveloperAccess, isDevModeActive, getAllDevTaskIds } from './services/devService';
+import { applyFullDeveloperAccess, isDevModeActive, isDevAccessAllowed, getAllDevTaskIds } from './services/devService';
 import { SubjectId, SubjectKey } from './types';
 import { PolishPartNumber, PolishEpoch, PolishTaskType } from './types/maturaTypes';
 
@@ -251,16 +251,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  useEffect(() => {
-    // Pokazuj po 1.2s od wejścia tylko jeśli użytkownik nie przechodzi akurat onboarding
-    if (isGuest && !hasSeenGuestPromoModal() && guestPromoSecondsLeft > 0 && !showGuestPrompt && !isNewUser) {
-      const timeout = setTimeout(() => {
-        setShowGuestPromoModal(true);
-        markGuestPromoModalSeen();
-      }, 1200);
-      return () => clearTimeout(timeout);
-    }
-  }, [isGuest, guestPromoSecondsLeft, showGuestPrompt, isNewUser]);
+  // Voucher powitalny NIE wyskakuje przy wejściu ani tuż po onboardingu (zero tarcia, Time-to-Value < 30 s).
+  // Pokazujemy go raz, po pierwszej ukończonej sesji – w momencie satysfakcji. Stałym przypomnieniem
+  // jest pływająca pigułka z odliczaniem (PromoFloatingPill).
   const [currentSubject, setCurrentSubject] = useState<SubjectId>(() => {
     try {
       const stored = localStorage.getItem('matura_quest_current_subject');
@@ -401,10 +394,10 @@ export default function App() {
           perks: { ...defaultState.perks, ...(parsed.perks || {}) }
         };
       }
-      return applyFullDeveloperAccess(state);
+      return isDevAccessAllowed() ? applyFullDeveloperAccess(state) : state;
     } catch {}
 
-    return applyFullDeveloperAccess(defaultState);
+    return isDevAccessAllowed() ? applyFullDeveloperAccess(defaultState) : defaultState;
   });
 
   useEffect(() => {
@@ -665,11 +658,7 @@ export default function App() {
 
     if (shouldOpenAuth) {
       setTimeout(() => setShowAuthModal(true), 400);
-    } else if (isGuest && guestPromoSecondsLeft > 0) {
-      setTimeout(() => {
-        setShowGuestPromoModal(true);
-        markGuestPromoModalSeen();
-      }, 350);
+
     } else {
       setReward({
         xp: 15,
@@ -1034,9 +1023,10 @@ export default function App() {
       const origin = (rawOrigin === 'nauka' ? 'learn' : rawOrigin === 'profile' ? 'profil' : rawOrigin) as TabState;
       setCurrentTab(origin);
       setActiveTaskData(null);
-      if (isGuest && guestPromoSecondsLeft > 0) {
+      if (isGuest && guestPromoSecondsLeft > 0 && !hasSeenGuestPromoModal()) {
         setTimeout(() => {
           setShowGuestPromoModal(true);
+          markGuestPromoModalSeen();
         }, 600);
       }
     }
@@ -1437,7 +1427,7 @@ export default function App() {
             onLoginClick={handleLoginClick}
             guestPromoSecondsLeft={isGuest ? guestPromoSecondsLeft : 0}
             onOpenGuestPromo={() => setShowGuestPromoModal(true)}
-            onOpenDevHub={() => setShowDevModal(true)}
+            onOpenDevHub={isDevAccessAllowed() ? () => setShowDevModal(true) : undefined}
             onOpenBlikModal={() => setShowBlikCoinModal(true)}
             onUpdateUserState={(updater) => {
               setUserState(prev => {
@@ -1449,7 +1439,7 @@ export default function App() {
           />
         )}
 
-        {/* Powiększona Złota Pływająca Pastylka Promocji -50% PRO (top-26 right-3 dla widoków głównych) */}
+        {/* Pływająca pigułka promocji -50% PRO (prawy dolny róg) */}
         <PromoFloatingPill
           secondsLeft={guestPromoSecondsLeft}
           onClick={() => {
@@ -1677,7 +1667,7 @@ export default function App() {
                     onUseStreakFreeze={handleUseStreakFreeze}
                     onOpenAuthModal={() => setShowAuthModal(true)}
                     onOpenOnboarding={() => setShowGuestPrompt(true)}
-                    onOpenDevHub={() => setShowDevModal(true)}
+                    onOpenDevHub={isDevAccessAllowed() ? () => setShowDevModal(true) : undefined}
                     onOpenBlikModal={() => setShowBlikCoinModal(true)}
                     initialTab={profileInitialTab}
                   />
@@ -1738,7 +1728,7 @@ export default function App() {
         }} 
         promoContext={activeAuthPromo ? {
           promoConfig: activeAuthPromo,
-          timeLeftFormatted: formatPromoSeconds(guestPromoSecondsLeft)
+          timeLeftFormatted: undefined
         } : undefined}
       />
       <DiagnosticTestModal

@@ -928,7 +928,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                                     {l.title.replace(/^Lekcja \d+:\s*/i, '')}
                                   </span>
                                 </div>
-                                <span className="text-[10px] text-[#94a3b8]/80 font-mono shrink-0">{l.durationMinutes || 45} min</span>
+                                <span className="text-[10px] text-[#94a3b8]/80 font-mono shrink-0">~{l.durationMinutes || 5} min</span>
                               </div>
                             );
                           })}
@@ -1176,7 +1176,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                                 <div className="flex items-center gap-2.5 mt-2 text-xs text-[#94a3b8] flex-wrap min-w-0">
                                   <span className="flex items-center gap-1 text-[#dfe2f1] font-medium">
                                     <Clock className="w-3.5 h-3.5 text-[#ffb800] shrink-0" />
-                                    <span>~{lesson.durationMinutes || 45} min</span>
+                                    <span>~{lesson.durationMinutes || 5} min</span>
                                   </span>
                                   <span>•</span>
                                   <span className="text-white font-medium">

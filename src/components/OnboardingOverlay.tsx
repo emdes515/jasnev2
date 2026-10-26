@@ -93,7 +93,7 @@ export function OnboardingOverlay({
       exam: 'matura_2025',
       score: '70',
       title: '70%+ • Solidny wynik',
-      subtitle: 'Studia dzienne • Pewne schematy z 14 działów maturalnych',
+      subtitle: 'Studia dzienne • Pewne schematy z 15 działów maturalnych',
       icon: GraduationCap,
       badgeText: 'NAJPOPULARNIEJSZY',
       badgeVariant: 'jasne'
@@ -211,7 +211,7 @@ export function OnboardingOverlay({
     {
       id: 'learn',
       title: 'Mapa Nauki & Bento',
-      badge: '14 DZIAŁÓW',
+      badge: '15 DZIAŁÓW',
       icon: BookOpen,
       desc: 'Drzewo powtórek podzielone na mikro-lekcje (4–6 min). Pigułka teorii, oficjalne wzory i zadania ze schematów CKE.',
       color: '#10B981'
@@ -413,7 +413,7 @@ export function OnboardingOverlay({
                   Rozwiąż 1 pewniaka z wykresu i poczuj satysfakcję
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">
-                  Zadanie z oficjalnej puli CKE Formuła 2023. Zobacz, jak działa odczytywanie zbioru wartości:
+                  Zadanie w stylu CKE (Formuła 2023). Zobacz, jak działa odczytywanie zbioru wartości:
                 </p>
               </div>
 
@@ -640,11 +640,11 @@ export function OnboardingOverlay({
                           Baza Wszystkich Zadań CKE
                         </h4>
                         <Badge variant="jasne">
-                          14 DZIAŁÓW CKE
+                          15 DZIAŁÓW CKE
                         </Badge>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
-                        Przerobisz oficjalne zadania z arkuszy 2015–2025. Każde zadanie z pigułką Core-4, wzorami z tablic i ostrzeżeniem o pułapce.
+                        Przerobisz zadania z arkuszy CKE 2023–2024 i 1500 zadań w stylu CKE. Każde zadanie z pigułką Core-4, wzorami z tablic i ostrzeżeniem o pułapce.
                       </p>
                     </div>
                   </div>

@@ -2187,7 +2187,7 @@ export function LearnView({
                           </span>
                         </div>
                         <p className="text-xs text-[#8B8D98] truncate">
-                          22 działy • 3 moduły CKE • 132 lekcje • 28 lektur
+                          15 działów • 75 lekcji • 2 części CKE
                         </p>
                         <div className="mt-2.5 flex items-center gap-2.5">
                           <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
@@ -2249,7 +2249,7 @@ export function LearnView({
                           </span>
                         </div>
                         <p className="text-xs text-[#8B8D98] truncate">
-                          15 działów • 45 lekcji • 1500 zadań CKE
+                          15 działów • 49 lekcji • 1500 zadań
                         </p>
                         <div className="mt-2.5 flex items-center gap-2.5">
                           <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">

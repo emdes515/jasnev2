@@ -80,17 +80,7 @@ export function GuestPromoModal({ isOpen, onClose, onClaimPromo, promoConfig }: 
                 <span>VOUCHER POWITALNY</span>
               </span>
 
-              <div 
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-mono font-black tabular-nums ${
-                  isUrgent 
-                    ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.3)]' 
-                    : 'bg-white/5 border-[#FFB800]/30 text-[#FFB800]'
-                }`}
-                title="Czas na zabezpieczenie zniżki"
-              >
-                <Clock size={12} className={isUrgent ? 'text-rose-300' : 'text-[#FFB800]'} />
-                <span>{remainingSeconds > 0 ? formatPromoSeconds(remainingSeconds) : 'WYGASŁA'}</span>
-              </div>
+
             </div>
 
             {/* Nagłówek i Obietnica */}
@@ -99,7 +89,7 @@ export function GuestPromoModal({ isOpen, onClose, onClaimPromo, promoConfig }: 
                 Zdobądź <span className="text-[#FFB800] underline decoration-[#FFB800]/50">-{promoConfig.discountPercent}%</span> na JASNE PRO
               </h2>
               <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                Tylko teraz przy utworzeniu darmowego konta. Zapisz swoje postępy i ucz się bez ograniczeń.
+                Zniżka powitalna dla nowych kont. Załóż darmowe konto, zapisz postępy i ucz się bez ograniczeń.
               </p>
             </div>
 
@@ -111,17 +101,17 @@ export function GuestPromoModal({ isOpen, onClose, onClaimPromo, promoConfig }: 
               </div>
 
               <div className="flex items-center justify-between gap-3 relative z-10">
-                <div className="flex flex-col text-left">
+                <div className="flex flex-col text-left min-w-0">
                   <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#FFB800]">
                     <Tag size={11} />
                     <span>Cena gwarantowana do matury</span>
                   </div>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-3xl font-display font-black text-[#FFB800] tracking-tight">
+                  <div className="flex items-baseline flex-wrap gap-x-2 gap-y-0.5 mt-1">
+                    <span className="text-2xl sm:text-3xl font-display font-black text-[#FFB800] tracking-tight whitespace-nowrap">
                       {promoConfig.discountedPriceMonthly.toFixed(2).replace('.', ',')} zł
                     </span>
-                    <span className="text-xs font-semibold text-slate-400">/ miesiąc</span>
-                    <span className="text-xs line-through text-slate-500 font-bold ml-1">
+                    <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">/ miesiąc</span>
+                    <span className="text-xs line-through text-slate-500 font-bold whitespace-nowrap">
                       {promoConfig.originalPriceMonthly.toFixed(2).replace('.', ',')} zł
                     </span>
                   </div>

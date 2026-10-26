@@ -13,7 +13,7 @@ import {
   Lock
 } from 'lucide-react';
 import { PredictorResult } from '../types';
-import { triggerHaptic } from '../utils';
+import { triggerHaptic, formatPoints } from '../utils';
 import { getCkeAvailableSubjects, useCkeCatalogs } from '../services/ckeCatalogRepository';
 
 interface PredictorDetailsModalProps {
@@ -54,12 +54,12 @@ export const PredictorDetailsModal: React.FC<PredictorDetailsModalProps> = ({
   // Krótki, zwięzły komentarz dopasowany do aktualnego wyniku
   const commentText = (() => {
     if (!baseResult.isPassing) {
-      return `Do zdania matury potrzebujesz minimum 30% (${baseResult.passingThresholdPoints} pkt). Do progu brakuje Ci jeszcze ${pointsMissing.toFixed(1)} pkt. Rozwiązuj kolejne lekcje w aplikacji, aby wejść w bezpieczną strefę punktową.`;
+      return `Do zdania matury potrzebujesz minimum 30% (${baseResult.passingThresholdPoints} pkt). Do progu brakuje Ci jeszcze ${formatPoints(pointsMissing)} pkt. Rozwiązuj kolejne lekcje w aplikacji, aby wejść w bezpieczną strefę punktową.`;
     }
     if (baseResult.predictedPercent >= 70) {
       return `Bardzo wysoki wynik (${baseResult.predictedPercent}%). Masz solidnie opanowane kluczowe tematy. Utrzymuj regularny kontakt z zadaniami, by powtórzyć ten wynik na egzaminie.`;
     }
-    return `Ten wynik (${baseResult.predictedPercent}%) gwarantuje zdanie matury (+${pointsOver.toFixed(1)} pkt ponad próg 30%). Aby zdobyć więcej punktów pod kątem rekrutacji na studia, przerób dział: ${baseResult.nextBestTopic.topicName}.`;
+    return `Ten wynik (${baseResult.predictedPercent}%) gwarantuje zdanie matury (+${formatPoints(pointsOver)} pkt ponad próg 30%). Aby zdobyć więcej punktów pod kątem rekrutacji na studia, przerób dział: ${baseResult.nextBestTopic.topicName}.`;
   })();
 
   return (
