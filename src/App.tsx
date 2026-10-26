@@ -48,7 +48,10 @@ import { handleFirestoreError, OperationType } from './lib/firestoreErrors';
 import { migrateGuestProgressToUser, hasGuestProgress } from './lib/guestMigration';
 import { normalizeSubjectFirestoreId } from './services/ckeCatalogRepository';
 import { initTheme } from './services/themeManager';
+import { loadEnglishCurriculum } from './data/englishDataLoader';
+import { loadMathCurriculum } from './data/mathDataLoader';
 import { BrandBackgroundPattern } from './components/BrandBackgroundPattern';
+import { ToastHost } from './components/ToastHost';
 import { SubjectLobbyModal } from './components/SubjectLobbyModal';
 import { PolishStudyHub } from './components/polish/PolishStudyHub';
 import { EnglishStudyHub } from './components/english';
@@ -281,14 +284,29 @@ export default function App() {
     return 'math';
   });
 
+  // Dane matematyki (domyślny przedmiot) dociągamy w tle zaraz po pierwszym renderze
+  useEffect(() => {
+    loadMathCurriculum().catch(() => {});
+  }, []);
+
+  // Dane angielskiego dociągamy w tle, gdy tylko ten przedmiot staje się aktywny
+  useEffect(() => {
+    if (selectedSubjectKey === 'eng' || selectedSubjectKey === 'eng-roz') {
+      loadEnglishCurriculum().catch(() => {});
+    }
+  }, [selectedSubjectKey]);
+
   const handleSelectSubject = (key: SubjectKey) => {
     setSelectedSubjectKey(key);
     const subId: SubjectId = key === 'pol' ? 'polski' : key === 'eng' ? 'angielski' : 'matematyka';
     setCurrentSubject(subId);
     try {
+      // Zdarzenie emitujemy tylko przy realnej zmianie – inaczej nasłuch w DashboardView
+      // (ze starą wartością w domknięciu) odbija wywołanie w nieskończoność.
+      const changed = localStorage.getItem('matura_quest_selected_subject') !== key;
       localStorage.setItem('matura_quest_selected_subject', key);
       localStorage.setItem('matura_quest_current_subject', subId);
-      window.dispatchEvent(new Event('storage'));
+      if (changed) window.dispatchEvent(new Event('storage'));
     } catch {}
     setUserState(prev => ({
       ...prev,
@@ -301,9 +319,10 @@ export default function App() {
     const subKey: SubjectKey = subId === 'polski' ? 'pol' : subId === 'angielski' ? 'eng' : 'math';
     setSelectedSubjectKey(subKey);
     try {
+      const changed = localStorage.getItem('matura_quest_selected_subject') !== subKey;
       localStorage.setItem('matura_quest_current_subject', subId);
       localStorage.setItem('matura_quest_selected_subject', subKey);
-      window.dispatchEvent(new Event('storage'));
+      if (changed) window.dispatchEvent(new Event('storage'));
     } catch {}
     setUserState(prev => ({
       ...prev,
@@ -1373,6 +1392,7 @@ export default function App() {
   return (
     <div className="h-full h-[100dvh] w-full bg-surface-bg text-text-primary font-sans flex flex-col md:flex-row overflow-hidden selection:bg-primary/20 relative">
       <BrandBackgroundPattern />
+      <ToastHost />
       <AnimatePresence>
         {loading && (
           <LoadingScreen 
@@ -1570,10 +1590,11 @@ export default function App() {
                 )}
                 {(currentTab === 'nauka' || (currentTab as string) === 'learn') && (
                   <AnimatePresence mode="wait">
+                    {/* transitionEnd czyści filtr: pozostawiony blur(0px) tworzy kontekst pozycjonowania i wyrzuca modale `fixed` poza ekran */}
                     <motion.div
                       key={`study-hub-${selectedSubjectKey || 'math'}`}
                       initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
                       exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
                       transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                       className="w-full flex-1 flex flex-col"
@@ -1772,7 +1793,7 @@ export default function App() {
           setShowSubjectLobbyModal(false);
         }}
         polishStats={{ total: 1056, epochs: 11, lektury: 10 }}
-        mathStats={{ total: 1006, topics: 15 }}
+        mathStats={{ total: 1500, topics: 15 }}
       />
       <CkeFormulasModal
         isOpen={showFormulasModal}

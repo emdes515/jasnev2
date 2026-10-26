@@ -559,7 +559,7 @@ export function DashboardView({
               <motion.div
                 key={`hero-${selectedSubjectKey}`}
                 initial={{ y: 8, opacity: 0, filter: 'blur(4px)' }}
-                animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+                animate={{ y: 0, opacity: 1, filter: 'blur(0px)', transitionEnd: { filter: 'none' } }}
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 onClick={handleResumeClick}
                 className="bg-surface-card border rounded-2xl p-5 sm:p-6 relative overflow-hidden transition-colors shadow-lg group cursor-pointer"
@@ -612,7 +612,7 @@ export function DashboardView({
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-bg border border-surface-border text-xs font-medium text-text-secondary">
                       <FileText size={13} className="text-text-muted" />
-                      <span>{nextUp ? `${nextUp.totalCount} zadania` : '4 zadania'}</span>
+                      <span>{nextUp ? `Cel: ${nextUp.totalCount} poprawne` : 'Powtórka'}</span>
                     </span>
                     <span 
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold"
@@ -690,7 +690,7 @@ export function DashboardView({
                   </span>
                 </div>
                 <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full tabular-nums">
-                  {selectedSubjectKey === 'pol' ? '1056 zadań z kluczem' : selectedSubjectKey === 'eng' ? '780 zadań z kluczem' : '1006 zadań z kluczem'}
+                  {selectedSubjectKey === 'pol' ? '1056 zadań z kluczem' : selectedSubjectKey === 'eng' ? '780 zadań z kluczem' : '211 zadań CKE z kluczem'}
                 </span>
               </div>
 
@@ -774,7 +774,7 @@ export function DashboardView({
                     {selectedSubjectKey === 'pol' ? 'Pełny Egzamin (240m)' : 'Pełne Arkusze'}
                   </div>
                   <div className="text-[11px] text-text-muted mt-0.5">
-                    {selectedSubjectKey === 'pol' ? 'Test + Wypracowanie • 60 pkt' : 'Maj/Czerwiec 2015–2024'}
+                    {selectedSubjectKey === 'pol' ? 'Test + Wypracowanie • 60 pkt' : 'Maj, czerwiec i sierpień 2023–2024'}
                   </div>
                 </button>
               </div>

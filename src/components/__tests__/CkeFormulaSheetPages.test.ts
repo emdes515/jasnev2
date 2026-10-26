@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CKE_FORMULAS_DATA } from '../../data/ckeFormulasData';
+import { CKE_FORMULAS_DATA, CKE_FORMULA_TOPICS, withLocalCkeFormulas, withLocalCkeFormulaTopics } from '../../data/ckeFormulasData';
 import fs from 'fs';
 import path from 'path';
 
@@ -37,14 +37,14 @@ describe('CKE 2023 Formula Sheet Verification', () => {
     expect(kwadratowa?.cke_page).toBe('str. 7–8');
     expect(kwadratowa?.pageNumber).toBe(7);
 
-    // Ciągi arytmetyczne i geometryczne - Strona 9-10 z 34
+    // Ciągi arytmetyczne i geometryczne - Strona 9 z 34 (na str. 10 jest już tylko procent składany)
     const arytmetyczny = formulasMap.get('f-ciag-arytmetyczny');
     expect(arytmetyczny?.cke_page).toBe('str. 9');
     expect(arytmetyczny?.pageNumber).toBe(9);
 
     const geometryczny = formulasMap.get('f-ciag-geometryczny');
-    expect(geometryczny?.cke_page).toBe('str. 10');
-    expect(geometryczny?.pageNumber).toBe(10);
+    expect(geometryczny?.cke_page).toBe('str. 9');
+    expect(geometryczny?.pageNumber).toBe(9);
 
     // Trygonometria - Strona 10-15 z 34
     const trygoDef = formulasMap.get('f-trygo-definicje');
@@ -57,8 +57,8 @@ describe('CKE 2023 Formula Sheet Verification', () => {
 
     // Planimetria i analityczna
     const rownoboczny = formulasMap.get('f-geo-trojkat-rownoboczny');
-    expect(rownoboczny?.cke_page).toBe('str. 16');
-    expect(rownoboczny?.pageNumber).toBe(16);
+    expect(rownoboczny?.cke_page).toBe('str. 15');
+    expect(rownoboczny?.pageNumber).toBe(15);
 
     const okrag = formulasMap.get('f-geo-okrag');
     expect(okrag?.cke_page).toBe('str. 23');
@@ -69,13 +69,18 @@ describe('CKE 2023 Formula Sheet Verification', () => {
     expect(prostopadloscian?.cke_page).toBe('str. 24–25');
     expect(prostopadloscian?.pageNumber).toBe(24);
 
-    // Prawdopodobieństwo i statystyka
+    // Stożek i kula są na str. 26, walec na str. 25
+    const bryly = formulasMap.get('f-stereo-bryly');
+    expect(bryly?.cke_page).toBe('str. 25–26');
+    expect(bryly?.pageNumber).toBe(25);
+
+    // Prawdopodobieństwo (klasyczna definicja: str. 27) i statystyka (średnie: str. 29, mediana: str. 30)
     const prawd = formulasMap.get('f-komb-prawd');
-    expect(prawd?.cke_page).toBe('str. 28');
-    expect(prawd?.pageNumber).toBe(28);
+    expect(prawd?.cke_page).toBe('str. 27');
+    expect(prawd?.pageNumber).toBe(27);
 
     const srednia = formulasMap.get('f-stat-srednia');
-    expect(srednia?.cke_page).toBe('str. 29');
+    expect(srednia?.cke_page).toBe('str. 29–30');
     expect(srednia?.pageNumber).toBe(29);
   });
 
@@ -132,10 +137,51 @@ describe('CKE 2023 Formula Sheet Verification', () => {
     const data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
     expect(data.formulas).toBeDefined();
     expect(data.formulas.length).toBe(CKE_FORMULAS_DATA.length);
-    expect(data.topics.length).toBe(10);
+    expect(data.topics.length).toBe(11);
 
     const jsonDiagrams = data.formulas.filter((f: any) => f.diagram !== undefined);
     expect(jsonDiagrams.length).toBe(12);
+  });
+
+  it('PR formulas carry page numbers verified against wybrane_wzory_matematyczne_EM2023.pdf', () => {
+    const expected: Record<string, [string, number]> = {
+      'f-pr-log-zamiana': ['str. 6', 6],
+      'f-pr-symbol-newtona': ['str. 6', 6],
+      'f-pr-dwumian-szesciany': ['str. 7', 7],
+      'f-pr-szereg-geometryczny': ['str. 9', 9],
+      'f-pr-granice-ciagow': ['str. 10', 10],
+      'f-pr-trygo-suma-katow': ['str. 12', 12],
+      'f-pr-trygo-podwojony': ['str. 13', 13],
+      'f-pr-tw-sinusow': ['str. 14', 14],
+      'f-pr-czworokat-okrag': ['str. 20', 20],
+      'f-pr-wektory': ['str. 23', 23],
+      'f-pr-kombinatoryka': ['str. 26–27', 26],
+      'f-pr-bernoulli': ['str. 27–28', 28],
+      'f-pr-prawd-warunkowe': ['str. 28', 28],
+      'f-pr-pochodna-reguly': ['str. 30', 30],
+      'f-pr-pochodne-styczna': ['str. 31', 31]
+    };
+    const prFormulas = CKE_FORMULAS_DATA.filter(f => f.level === 'PR');
+    expect(prFormulas.map(f => f.id).sort()).toEqual(Object.keys(expected).sort());
+    for (const f of prFormulas) {
+      expect(f.cke_page, f.id).toBe(expected[f.id][0]);
+      expect(f.pageNumber, f.id).toBe(expected[f.id][1]);
+      expect(CKE_FORMULA_TOPICS.some(t => t.id === f.topicId), `${f.id} topic`).toBe(true);
+    }
+  });
+
+  it('withLocalCkeFormulas fills gaps in the Firestore catalog without overriding it', () => {
+    expect(withLocalCkeFormulas([])).toBe(CKE_FORMULAS_DATA);
+
+    const remoteOld = { ...CKE_FORMULAS_DATA[0], title: 'Wersja z Firestore' };
+    const merged = withLocalCkeFormulas([remoteOld]);
+    expect(merged.length).toBe(CKE_FORMULAS_DATA.length);
+    expect(merged.find(f => f.id === remoteOld.id)?.title).toBe('Wersja z Firestore');
+    expect(merged.some(f => f.id === 'f-pr-pochodna-reguly')).toBe(true);
+
+    const topics = withLocalCkeFormulaTopics([{ id: 'all', name: 'Wszystkie działy' }, { id: 'ciagi', name: 'Ciągi' }]);
+    expect(topics.some(t => t.id === 'analiza')).toBe(true);
+    expect(topics.filter(t => t.id === 'ciagi').length).toBe(1);
   });
 
   it('No formula in CKE_FORMULAS_DATA contains forbidden \\iff symbol', () => {

@@ -1583,7 +1583,7 @@ export function MaturaSimulatorView({
       ) : loading && examSubject === 'matematyka' && tasks.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center py-20">
           <Loader2 className="w-10 h-10 text-[#FFB800] animate-spin mb-4" />
-          <p className="text-text-secondary text-sm font-medium">Wczytywanie 1006 oficjalnych zadań CKE...</p>
+          <p className="text-text-secondary text-sm font-medium">Wczytywanie zadań z arkuszy CKE...</p>
         </div>
       ) : loadError ? (
         <div className="flex-1 flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -1705,7 +1705,7 @@ export function MaturaSimulatorView({
                       }`}
                     >
                       <Layers size={13} className={randomScope === 'all' ? 'text-black' : 'text-blue-400'} />
-                      <span>Wszystkie (1006)</span>
+                      <span>Wszystkie ({effectiveTasks.length})</span>
                     </button>
                     <button
                       type="button"
