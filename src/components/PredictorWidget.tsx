@@ -7,7 +7,7 @@ import {
   Award
 } from 'lucide-react';
 import { PredictorResult } from '../types';
-import { triggerHaptic } from '../utils';
+import { triggerHaptic, formatPoints } from '../utils';
 import { getSubjectMetaByKey } from '../services/ckeCatalogRepository';
 
 interface PredictorWidgetProps {
@@ -224,12 +224,12 @@ export const PredictorWidget: React.FC<PredictorWidgetProps> = ({
             {!result.isPassing ? (
               <>
                 Do zdania matury ({result.passingThresholdPoints} pkt) brakuje Ci{' '}
-                <strong className="text-rose-300 font-bold">{pointsMissingToPass.toFixed(1)} pkt</strong>.
+                <strong className="text-rose-300 font-bold">{formatPoints(pointsMissingToPass)} pkt</strong>.
               </>
             ) : (
               <>
                 Wynik powyżej progu 30%. Zapas nad progiem zdania:{' '}
-                <strong className="text-emerald-300 font-bold">+{pointsOverPass.toFixed(1)} pkt</strong>.
+                <strong className="text-emerald-300 font-bold">+{formatPoints(pointsOverPass)} pkt</strong>.
               </>
             )}
           </p>

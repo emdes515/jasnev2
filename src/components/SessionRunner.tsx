@@ -1254,14 +1254,15 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
   const isTheoryStep = currentStep === 0;
 
-  // Synchronizacja liczby serc z animacją – w trybie teorii nielimitowane (∞), zmiana dopiero w momencie uderzenia komety
+  // Synchronizacja liczby serc z animacją – zmiana dopiero w momencie uderzenia komety.
+  // Zawsze pokazujemy realny stan (∞ tylko w PRO), żeby licznik zgadzał się z nagłówkiem aplikacji.
   const displayedHeartsCount = useMemo(() => {
-    if (isTheoryStep || heartsData.isPro) return '∞';
+    if (heartsData.isPro) return '∞';
     if (heartFlyAnim?.active && !pillImpactDone) {
       return heartFlyAnim.currentHearts;
     }
     return heartsData.hearts;
-  }, [isTheoryStep, heartsData, heartFlyAnim, pillImpactDone]);
+  }, [heartsData, heartFlyAnim, pillImpactDone]);
 
   // Bieżąca wartość isEvaluated dostępna także dla handlerów z poprzedniego renderu (patrz handleNextStep)
   const isEvaluatedLiveRef = React.useRef(false);
@@ -2317,6 +2318,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     if (typeof currentTask?.cke_trap === 'string' && currentTask.cke_trap.trim()) return currentTask.cke_trap;
     if (typeof currentTask?.trap === 'string' && currentTask.trap.trim()) return currentTask.trap;
     if (typeof currentTask?.exam_trap === 'string' && currentTask.exam_trap.trim()) return currentTask.exam_trap;
+    // Pułapka zapisana w wyjaśnieniu tego zadania ma pierwszeństwo przed ogólną pułapką lekcji
+    const ownTrap = String(currentTask?.explanation || '').match(/\*\*Pułapka CKE:\*\*\s*([\s\S]*?)(?:\n\n|$)/);
+    if (ownTrap && ownTrap[1].trim()) return ownTrap[1].trim();
     if (currentTask?.type === 'OPEN_PROOF' && (currentTask?.question?.includes('\\sqrt') || currentTask?.question?.includes('pierwiastek')) && currentTask?.question?.includes('^2')) {
       return 'Błędne podniesienie dwumianu do kwadratu: $(\\sqrt{7}-1)^2 \\neq 7 - 1$. Należy zastosować wzór skróconego mnożenia: $(a-b)^2 = a^2 - 2ab + b^2 = 7 - 2\\sqrt{7} + 1$.';
     }
@@ -4934,7 +4938,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                             <span>Z polskiego na nasze (Intuicja bez żargonu)</span>
                           </div>
                           <div className="text-sm sm:text-base text-amber-100/90 leading-relaxed font-medium">
-                            <MathRenderer content={theoryPill.plain_polish} />
+                            <MathRenderer content={String(theoryPill.plain_polish).replace(/^\s*Z polskiego na nasze\s*[:–-]\s*/i, '')} />
                           </div>
                         </section>
                       )}
@@ -6782,16 +6786,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
           </>
         )}
 
-        {/* Baner promocyjny -50% PRO w dolnej strefie sesji nauki (pod opcjami w przewijalnym kontenerze) */}
-        {guestPromoSecondsLeft && guestPromoSecondsLeft > 0 && onOpenGuestPromo && (
-          <div className="pt-6 pb-6 flex justify-center w-full">
-            <PromoFloatingPill
-              secondsLeft={guestPromoSecondsLeft}
-              onClick={onOpenGuestPromo}
-              variant="bottom-inline"
-            />
-          </div>
-        )}
+        {/* Sesja nauki jest strefą skupienia: żadnych banerów sprzedażowych obok zadania.
+            Oferta PRO pojawia się na Dashboardzie i raz po ukończonej sesji. */}
       </main>
 
       {/* ================= STICKY BOTTOM CTA FOR THEORY STEP ================= */}

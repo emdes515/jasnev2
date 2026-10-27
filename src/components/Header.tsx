@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { triggerHaptic } from '../utils';
 import { getSyncedHearts, refillHeartsWithCoins, HEARTS_REFILL_COIN_COST } from '../lib/heartsManager';
 import { formatPromoSeconds } from '../services/promotionService';
-import { useTheme } from '../services/themeManager';
+import { useTheme, LIGHT_THEME_READY } from '../services/themeManager';
 import { JasneLogo } from './ui/JasneLogo';
 
 export interface HeaderProps {
@@ -110,7 +110,8 @@ export function Header({
         aria-label="Pulpit główny JASNE."
       >
         <JasneLogo variant="icon" size={24} glow={true} className="group-hover:scale-105 transition-transform duration-200 shrink-0" />
-        <div className="flex flex-col text-left min-w-0">
+        {/* Na wąskich telefonach samo logo-żarówka: napis nie mieści się obok przełącznika i liczników */}
+        <div className="hidden min-[400px]:flex flex-col text-left min-w-0">
           <span className="text-xs sm:text-base font-black tracking-wider text-text-primary group-hover:text-primary transition-colors leading-none">
             JASNE<span className="text-primary">.</span>
           </span>
@@ -122,8 +123,8 @@ export function Header({
 
       {/* CENTRUM: Selektor przedmiotu + Przycisk Lobby */}
       <div className="flex items-center gap-1 sm:gap-1.5 min-w-0 shrink">
-        {/* MOBILNY KOMPAKTOWY PRZEŁĄCZNIK PRZEDMIOTU (< 640px) */}
-        <div className="sm:hidden relative shrink-0">
+        {/* MOBILNY KOMPAKTOWY PRZEŁĄCZNIK PRZEDMIOTU (< 1024px) */}
+        <div className="lg:hidden relative shrink-0">
           <button
             type="button"
             onClick={() => {
@@ -132,14 +133,15 @@ export function Header({
             }}
             className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-surface-card border border-primary/40 text-text-primary text-xs font-bold transition-all active:scale-95 shadow-xs shrink-0"
           >
-            {isMathActive ? (
+            {/* Ikona wg aktywnej etykiety – ta sama kolejność co activeSubjectInfo */}
+            {activeSubjectInfo.key === 'math' ? (
               <span className="w-[18px] h-[13px] rounded-[3px] bg-[#070A0F] border border-[#FFB800] text-[#FFB800] inline-flex items-center justify-center shrink-0 select-none shadow-xs">
                 <svg className="w-3.5 h-2.5 text-[#FFB800]" viewBox="0 0 24 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2 11.5l3 4 4.5-12.5h12.5" />
                   <text x="14" y="14.5" fill="currentColor" stroke="none" fontSize="8.5" fontWeight="bold" fontFamily="serif" fontStyle="italic">x</text>
                 </svg>
               </span>
-            ) : isPolActive ? (
+            ) : activeSubjectInfo.key === 'pol' ? (
               <span
                 className="w-[18px] h-[13px] inline-flex items-center justify-center shrink-0 select-none text-[12px] font-bold leading-none italic text-[#FFB800]"
                 style={{
@@ -159,13 +161,13 @@ export function Header({
                 </svg>
               </span>
             )}
-            <span className="text-amber-200 font-extrabold text-[11px] truncate max-w-[70px] xs:max-w-[95px]">{activeSubjectInfo.shortLabel}</span>
+            <span className="text-text-accent font-extrabold text-[11px] truncate max-w-[70px] xs:max-w-[95px]">{activeSubjectInfo.shortLabel}</span>
             <ChevronDown size={11} className="text-text-muted shrink-0" />
           </button>
         </div>
 
-        {/* DESKTOP PEŁNY PRZEŁĄCZNIK PRZEDMIOTÓW (>= 640px) */}
-        <div className="hidden sm:flex relative items-center bg-surface-card border border-surface-border rounded-full p-0.5 shadow-inner">
+        {/* DESKTOP PEŁNY PRZEŁĄCZNIK PRZEDMIOTÓW (>= 1024px) */}
+        <div className="hidden lg:flex relative items-center bg-surface-card border border-surface-border rounded-full p-0.5 shadow-inner">
           <button
             type="button"
             onClick={() => {
@@ -275,11 +277,11 @@ export function Header({
               triggerHaptic('medium');
               onOpenLobby();
             }}
-            className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+            className="hidden xl:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
             title="Lobby wyboru przedmiotów"
           >
             <LayoutGrid size={13} className="text-primary" />
-            <span className="hidden sm:inline">Lobby</span>
+            <span className="hidden 2xl:inline">Lobby</span>
           </button>
         )}
 
@@ -291,11 +293,11 @@ export function Header({
               triggerHaptic('light');
               onOpenFormulas();
             }}
-            className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] font-bold transition-all cursor-pointer"
+            className="hidden xl:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] font-bold transition-all cursor-pointer"
             title="Tablice Wzorów CKE (Matematyka)"
           >
             <BookOpen size={13} className="text-primary" />
-            <span>Wzory</span>
+            <span className="hidden 2xl:inline">Wzory</span>
           </button>
         )}
 
@@ -307,11 +309,11 @@ export function Header({
               triggerHaptic('light');
               onOpenDictionary();
             }}
-            className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] font-bold transition-all cursor-pointer"
+            className="hidden xl:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] font-bold transition-all cursor-pointer"
             title="Oficjalny Słownik Maturalny CKE (Język Angielski)"
           >
             <BookOpen size={13} className="text-primary" />
-            <span>Słownik</span>
+            <span className="hidden 2xl:inline">Słownik</span>
           </button>
         )}
 
@@ -323,11 +325,11 @@ export function Header({
               triggerHaptic('light');
               onOpenScratchpad();
             }}
-            className="hidden md:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] font-bold transition-all cursor-pointer"
+            className="hidden xl:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 text-text-secondary hover:text-primary text-[11px] font-bold transition-all cursor-pointer"
             title="Otwórz brudnopis"
           >
             <Edit3 size={13} className="text-primary" />
-            <span>Brudnopis</span>
+            <span className="hidden 2xl:inline">Brudnopis</span>
           </button>
         )}
       </div>
@@ -549,7 +551,7 @@ export function Header({
               triggerHaptic('medium');
               onLoginClick?.();
             }}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold transition-all cursor-pointer active:scale-95 shadow-sm"
+            className="hidden 2xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold transition-all cursor-pointer active:scale-95 shadow-sm"
             title="Kliknij, aby się zalogować i zapisać postępy w chmurze"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0" />
@@ -558,6 +560,7 @@ export function Header({
         )}
 
         {/* Przełącznik Motywu (Szybki 1-tap na desktopie, na mobile w profilu) */}
+        {LIGHT_THEME_READY && (
         <button 
           id="header-theme-toggle"
           type="button"
@@ -575,6 +578,7 @@ export function Header({
             <Moon size={15} className="text-amber-600 hover:-rotate-12 transition-transform duration-200" />
           )}
         </button>
+        )}
 
         {/* Wskaźnik 3: Profil & Poziom Gracza */}
         <button 
@@ -681,7 +685,7 @@ export function Header({
       {/* Mobilny BottomSheet wyboru przedmiotu */}
       <AnimatePresence>
         {isMobileSubjectSheetOpen && (
-          <div className="fixed inset-0 z-50 flex items-end sm:hidden">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center sm:p-6 lg:hidden">
             {/* Tło przyciemnione */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -697,7 +701,7 @@ export function Header({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-              className="relative z-10 w-full bg-[#0E1522] border-t border-white/10 rounded-t-3xl p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl space-y-3.5"
+              className="relative z-10 w-full sm:max-w-md bg-[#0E1522] border-t sm:border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-5 shadow-2xl space-y-3.5"
             >
               {/* Uchwyt do przeciągania */}
               <div className="w-10 h-1 bg-white/20 rounded-full mx-auto -mt-1 mb-1" />

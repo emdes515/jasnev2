@@ -8,7 +8,7 @@ import React from 'react';
 export function BrandBackgroundPattern() {
   return (
     <div 
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-[#070A0F]"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-surface-bg"
       aria-hidden="true"
       style={{
         transform: 'translate3d(0, 0, 0)',

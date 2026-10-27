@@ -415,3 +415,8 @@ export function filterActualTaskIds(taskIds: (string | undefined | null)[]): str
 }
 
 export * from './utils/taskShuffler';
+
+/** Punkty w zapisie polskim: przecinek dziesiętny i bez zbędnego „,0” (np. 9 → „9”, 8.5 → „8,5”). */
+export function formatPoints(value: number): string {
+  return value.toLocaleString('pl-PL', { maximumFractionDigits: 1 });
+}

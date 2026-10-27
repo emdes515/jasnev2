@@ -30,7 +30,7 @@ import { PerksVaultSection } from './PerksVaultSection';
 import { JasneLogo } from './ui/JasneLogo';
 import { ShopItem, countTotalClaimable } from '../data/achievements';
 import { triggerHaptic, getLocalDateString, filterActualTaskIds } from '../utils';
-import { useTheme, ThemeMode } from '../services/themeManager';
+import { useTheme, ThemeMode, LIGHT_THEME_READY } from '../services/themeManager';
 
 interface ProfileViewProps {
   userState: UserState;
@@ -143,7 +143,7 @@ export function ProfileView({
   };
 
   return (
-    <div className="flex flex-col p-4 sm:p-6 pt-6 pb-28 sm:pb-32 md:pb-8 max-w-xl mx-auto w-full">
+    <div className="flex flex-col p-4 sm:p-6 pt-6 pb-28 sm:pb-32 md:pb-24 max-w-xl mx-auto w-full">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}>
         {/* Top Header */}
         <div className="flex items-center justify-between mb-4">
@@ -267,6 +267,7 @@ export function ProfileView({
             </div>
 
             {/* Motyw Aplikacji (Szybki Wybór: Ciemny / Jasny / System) */}
+            {LIGHT_THEME_READY && (
             <div className="bg-surface-card border border-surface-border rounded-[24px] p-4 sm:p-5 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -326,6 +327,7 @@ export function ProfileView({
                 </div>
               </div>
             </div>
+            )}
 
             {/* Dynamic Activity Chart (14 Dni Aktywności) */}
             <div className="bg-surface-card border border-surface-border rounded-[24px] p-5 sm:p-6 overflow-hidden shadow-md">

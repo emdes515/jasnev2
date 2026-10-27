@@ -28,7 +28,7 @@ import { ExamHubModal } from './ExamHubModal';
 import { POLISH_EPOCHS, POLISH_LESSONS } from '../data/polish';
 import { MATURA_LEKTURY } from '../data/maturaLektury';
 
-import { getLessonsForTopic } from '../utils/lessonGrouping';
+import { getLessonsForTopic, formatLessonDuration } from '../utils/lessonGrouping';
 import { drawSessionTasks } from '../data/dzial1TaskPool';
 import { curriculumRepository } from '../services/curriculumRepository';
 import { PredictorWidget } from './PredictorWidget';
@@ -457,7 +457,7 @@ export function DashboardView({
   return (
     <div 
       id="dashboard-scroll-content"
-      className="flex flex-col p-4 sm:p-6 lg:p-8 pt-5 pb-28 sm:pb-32 md:pb-8 max-w-6xl xl:max-w-7xl mx-auto w-full"
+      className="flex flex-col p-4 sm:p-6 lg:p-8 pt-5 pb-28 sm:pb-32 md:pb-24 max-w-6xl xl:max-w-7xl mx-auto w-full"
     >
       {/* 0. PASEK WYBORU PRZEDMIOTU (SEGMENTED CONTROL, CYBER-TACTILE) */}
       <div className="w-full shrink-0 mb-6 select-none flex justify-center">
@@ -608,7 +608,7 @@ export function DashboardView({
                   <div className="flex items-center gap-2 flex-wrap pt-0.5">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-bg border border-surface-border text-xs font-medium text-text-secondary">
                       <Clock size={13} className="text-text-muted" />
-                      <span>~8 min</span>
+                      <span>{nextUp ? formatLessonDuration(nextUp.incompleteLesson) : '~5 min'}</span>
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-bg border border-surface-border text-xs font-medium text-text-secondary">
                       <FileText size={13} className="text-text-muted" />

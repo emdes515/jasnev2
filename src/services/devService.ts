@@ -69,6 +69,23 @@ export function isDevModeActive(): boolean {
   }
 }
 
+/**
+ * Czy wolno automatycznie nadać pełny dostęp deweloperski przy starcie aplikacji.
+ * Na produkcji nowy użytkownik MUSI startować z prawdziwą ekonomią (5 serc, 0 monet,
+ * zablokowane lekcje) – inaczej PRO, serca i doładowania BLIK nie mają żadnej wartości.
+ * Dostęp dev dostaje tylko: lokalny serwer deweloperski, urządzenie z już aktywną
+ * flagą albo wejście z parametrem ?dev=1 (testy na telefonie). ?dev=0 wyłącza go zawsze.
+ */
+export function isDevAccessAllowed(): boolean {
+  let devParam: string | null = null;
+  try {
+    devParam = new URLSearchParams(window.location.search).get('dev');
+  } catch {}
+  // ?dev=0 – podgląd doświadczenia prawdziwego, nowego użytkownika także lokalnie
+  if (devParam === '0') return false;
+  return import.meta.env.DEV || isDevModeActive() || devParam === '1';
+}
+
 export function applyFullDeveloperAccess(currentState: UserState): UserState {
   const mathLessons = getAllDevMathLessons();
   const polishLessons = getAllDevPolishLessons();

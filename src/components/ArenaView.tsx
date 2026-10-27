@@ -264,7 +264,7 @@ export function ArenaView({ userState, onUpdateUserState, saveUserData, onNaviga
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="font-bold tracking-wide uppercase text-[11px]">Arena 2.0 • Tryb Multiplayer Live</span>
+            <span className="font-bold tracking-wide uppercase text-[11px]">Arena 2.0 • Tryb 1v1 wkrótce</span>
           </div>
 
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10 text-slate-400 text-xs font-mono">
@@ -370,7 +370,7 @@ export function ArenaView({ userState, onUpdateUserState, saveUserData, onNaviga
         >
           <div className="inline-flex items-center gap-2 text-xs font-mono text-emerald-400/90 bg-emerald-950/40 border border-emerald-500/20 px-3 py-1 rounded-lg mb-3">
             <Radio size={13} className="text-emerald-400 animate-pulse" />
-            <span>Radar aktywacji: Wyszukiwanie rywali w całej Polsce...</span>
+            <span>Radar aktywacji: start Sezonu 1 wkrótce</span>
           </div>
 
           <h1 className="font-display font-black text-2xl sm:text-4xl text-white tracking-tight leading-tight mb-3">
