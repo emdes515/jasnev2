@@ -1290,7 +1290,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
                 Gratulacje! Lekcja zaliczona pomyślnie.
               </h2>
               <p className="text-xs sm:text-sm text-[#94a3b8] max-w-md mx-auto">
-                Świetna robota. Zrealizowałeś wymogi CKE Formuła 2023 dla lekcji: <strong>{lesson.title}</strong>.
+                Świetna robota. Wymogi CKE Formuła 2023 spełnione dla lekcji: <strong>{lesson.title}</strong>.
               </p>
             </div>
 

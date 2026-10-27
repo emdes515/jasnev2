@@ -47,7 +47,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { playSuccessSound, playErrorSound, triggerHaptic, isActualTaskId } from '../utils';
+import { playSuccessSound, playErrorSound, triggerHaptic, isActualTaskId, calculateStreakOnTaskCompletion } from '../utils';
 import { MathRenderer, formatMathAnswer } from './MathRenderer';
 import { Badge } from './Badge';
 
@@ -3134,7 +3134,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
             ? (currentTask?.ai_tutor_rubric?.criterion_2_points || 'Perfekcyjne rozwiązanie! Odpowiedź w pełni zgodna ze schematem maturalnym.')
             : (currentTask?.ai_tutor_rubric?.criterion_1_point || 'Częściowo poprawna odpowiedź. Wskaż dodatkowy element z tekstu.'),
           mentorComment: fallbackScore === targetPts
-            ? 'Znakomicie odczytałeś intencję polecenia i przedstawiłeś precyzyjne uzasadnienie.'
+            ? 'Intencja polecenia trafnie odczytana, uzasadnienie precyzyjne.'
             : 'Twoja odpowiedź idzie w dobrym kierunku, ale pamiętaj o precyzyjniejszym odwołaniu do tekstu.',
           strengths: fallbackScore > 0 
             ? ['Poprawnie zidentyfikowano kluczowe cechy wypowiedzi', 'Trafna argumentacja w kontekście polecenia'] 
@@ -3539,7 +3539,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     const isPerfect = sessionMistakesCount === 0;
     const perfectCoinsBonus = isPerfect ? 5 : 0;
     const calculatedCoins = Math.max(15, earnedCoins + 8 + perfectCoinsBonus);
-    const streakDays = (userState?.streakDays || 0) + 1;
+    // Ta sama reguła co przy zapisie postępu: druga lekcja tego samego dnia nie zwiększa serii
+    const streakDays = calculateStreakOnTaskCompletion(userState?.streakDays || 0, userState?.lastStreakDate, userState?.streakActiveDates || []).newStreakDays;
     // np. "math-lesson-9-2" → "9.2" (wcześniej uczeń widział techniczne "math.9-2")
     const lessonNumberMatch = String(lessonId).match(/(\d+)-(\d+)$/);
     const cleanLessonNumber = lessonNumberMatch
@@ -3598,7 +3599,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               className="text-slate-300 text-sm sm:text-base max-w-sm mb-5 leading-relaxed font-medium"
             >
               {sessionMistakesCount === 0 
-                ? 'Perfekcyjna runda! Opanowałeś wszystkie zadania za pierwszym podejściem.'
+                ? 'Perfekcyjna runda! Wszystkie zadania za pierwszym podejściem.'
                 : 'Lekcja zaliczona. Materiał opanowany.'
               }
             </motion.p>
@@ -7858,7 +7859,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 <p className="mt-0.5 text-xs leading-relaxed text-amber-100/70">
                   Twoja odpowiedź <span className="font-semibold">nie została oceniona</span> i nie stracisz za nią serca.
                   {Array.isArray(currentTask?.rubric_stages) && currentTask.rubric_stages.length > 0
-                    ? ' Możesz spróbować ponownie albo ocenić się sam etapami CKE.'
+                    ? ' Możesz spróbować ponownie albo użyć samooceny etapami CKE.'
                     : ' Spróbuj ponownie za moment.'}
                 </p>
                 <div className="flex items-center gap-2 mt-2.5">

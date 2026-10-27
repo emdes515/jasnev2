@@ -502,7 +502,7 @@ export const TaskMatchingInteractive: React.FC<TaskMatchingInteractiveProps> = (
           <div className="text-xs text-slate-500 dark:text-slate-400">
             {allAssigned ? (
               <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                ✓ Wszystkie sloty obsadzone. Gotowy do zatwierdzenia.
+                ✓ Wszystkie sloty obsadzone. Możesz zatwierdzić.
               </span>
             ) : (
               <span>Pozostało kafelków do przypisania: {originalPairs.length - Object.keys(pairs).length}</span>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Trophy, 
@@ -59,7 +60,7 @@ export function AchievementsSection({
   let totalTiersUnlocked = 0;
   let totalTiersCount = 0;
 
-  const achievementsWithProgress = ACHIEVEMENTS.map(ach => {
+  const achievementsWithProgress = ACHIEVEMENTS.filter(ach => ARENA_ENABLED || ach.category !== 'arena').map(ach => {
     const info = getAchievementProgress(ach, context, claimedAchievements);
     totalTiersCount += ach.tiers.length;
     totalTiersUnlocked += info.claimedTier;
@@ -70,6 +71,8 @@ export function AchievementsSection({
   });
 
   const filtered = achievementsWithProgress.filter(item => {
+    // Odznak Areny nie da się zdobyć, dopóki Arena jest wyłączona
+    if (!ARENA_ENABLED && item.achievement.category === 'arena') return false;
     if (selectedCategory === 'claimable') return item.canClaim;
     if (selectedCategory === 'all') return true;
     return item.achievement.category === selectedCategory;
@@ -186,6 +189,7 @@ export function AchievementsSection({
           Zadania Maturalne
         </button>
 
+        {ARENA_ENABLED && (
         <button
           onClick={() => setSelectedCategory('arena')}
           className={`shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
@@ -196,6 +200,7 @@ export function AchievementsSection({
         >
           Arena 1v1
         </button>
+        )}
 
         <button
           onClick={() => setSelectedCategory('streak')}

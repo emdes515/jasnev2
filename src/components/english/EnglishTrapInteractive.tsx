@@ -527,7 +527,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-rose-400 text-xs font-black uppercase tracking-wider">
                   <AlertTriangle className="w-4 h-4 stroke-[2.5]" />
-                  <span>Uważaj! Wpadłeś w pułapkę egzaminatora</span>
+                  <span>Uważaj! To pułapka egzaminatora</span>
                 </div>
                 <span className="text-[10px] text-rose-300/80 font-semibold">
                   (0 serc utraconych)

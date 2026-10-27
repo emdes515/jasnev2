@@ -1287,7 +1287,7 @@ export const MathLessonView: React.FC<MathLessonViewProps> = ({
                   Lekcja Opanowana!
                 </h2>
                 <p className="text-xs text-[#94a3b8] max-w-md mx-auto mt-1">
-                  Świetna robota. Zrealizowałeś wymogi CKE Formuła 2023 dla lekcji: <strong>{lesson.title}</strong>.
+                  Świetna robota. Wymogi CKE Formuła 2023 spełnione dla lekcji: <strong>{lesson.title}</strong>.
                 </p>
               </div>
 

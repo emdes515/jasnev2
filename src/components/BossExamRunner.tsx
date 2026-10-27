@@ -278,7 +278,7 @@ export const BossExamRunner: React.FC<BossExamRunnerProps> = ({
 
             <p className="text-sm sm:text-base text-slate-300 mb-6 max-w-md leading-relaxed">
               {isPassed 
-                ? 'Gratulacje! Osiągnąłeś próg egzaminacyjny z Działu 1: Liczby Rzeczywiste. Złota Odznaka Mistrza Działu oraz Dział 2 zostały odblokowane!' 
+                ? 'Gratulacje! Próg egzaminacyjny zaliczony z Działu 1: Liczby Rzeczywiste. Złota Odznaka Mistrza Działu oraz Dział 2 zostały odblokowane!' 
                 : `Do zaliczenia wymagane jest min. ${examData.passingScore} z ${examData.totalQuestions} punktów (${Math.round((examData.passingScore / examData.totalQuestions) * 100)}%). Przeanalizuj poniższe tematy z błędami i spróbuj ponownie.`}
             </p>
 

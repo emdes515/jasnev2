@@ -328,7 +328,7 @@ const MaturalnyDuetGame: React.FC<MaturalnyDuetGameProps> = ({ lessonId, topicId
                 </span>
               </div>
               <p className="text-xs text-[#94a3b8] mt-0.5 leading-relaxed">
-                Wzorowo sparowano wszystkie reguły. Jesteś w pełni gotowy na właściwą misję!
+                Wzorowo sparowano wszystkie reguły. Czas na właściwą misję!
               </p>
             </div>
           </div>

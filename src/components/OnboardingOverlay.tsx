@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { InlineMath } from 'react-katex';
@@ -33,7 +34,8 @@ export interface OnboardingPreferences {
 interface OnboardingOverlayProps {
   onClose: () => void;
   onNavigate?: (tab: 'nauka' | 'dashboard' | 'arena' | 'profile' | 'simulator') => void;
-  onComplete?: (prefs: OnboardingPreferences, shouldOpenAuth?: boolean) => void;
+  /** solvedDemoTask: czy uczeń rozwiązał zadanie z kroku 2 (tylko wtedy należy się XP i dzień serii) */
+  onComplete?: (prefs: OnboardingPreferences, shouldOpenAuth?: boolean, solvedDemoTask?: boolean) => void;
   onOpenAuthModal?: () => void;
   hasProgress?: boolean;
   onLogin?: () => void;
@@ -178,7 +180,7 @@ export function OnboardingOverlay({
     };
 
     if (onComplete) {
-      onComplete(prefs, openAuth);
+      onComplete(prefs, openAuth, isTaskSolved);
     } else {
       onClose();
       if (openAuth && (onOpenAuthModal || onLogin)) {
@@ -197,7 +199,7 @@ export function OnboardingOverlay({
       title: 'Nawigacja & Menu',
       badge: 'SZYBKI DOSTĘP',
       icon: Compass,
-      desc: 'Intuicyjny dock u dołu ekranu. Błyskawicznie przełączaj się między nauką, arkuszami CKE i pojedynkami 1v1.',
+      desc: 'Intuicyjny dock u dołu ekranu. Błyskawicznie przełączaj się między nauką, arkuszami CKE i profilem.',
       color: '#FFB800'
     },
     {
@@ -401,7 +403,7 @@ export function OnboardingOverlay({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -18 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="flex flex-col gap-3 flex-1 justify-between"
+              className="flex flex-col gap-3 flex-1 justify-start [&>*:last-child]:mt-auto"
             >
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
@@ -455,9 +457,9 @@ export function OnboardingOverlay({
                     <line x1="148" y1="88" x2="148" y2="92" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
                     <text x="145" y="103" fill="#94A3B8" fontSize="9">1</text>
                     <line x1="204" y1="88" x2="204" y2="92" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                    <text x="201" y="103" fill="#94A3B8" fontSize="9">3</text>
+                    <text x="209" y="103" fill="#94A3B8" fontSize="9">3</text>
                     <line x1="92" y1="88" x2="92" y2="92" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                    <text x="85" y="103" fill="#94A3B8" fontSize="9">-1</text>
+                    <text x="74" y="103" fill="#94A3B8" fontSize="9">-1</text>
 
                     {/* Rzędna wierzchołka y = -4 (Y_pixel = 90 + 4*16 = 154) */}
                     <line x1="117" y1="154" x2="123" y2="154" stroke="#FFB800" strokeWidth="1.5" />
@@ -479,10 +481,10 @@ export function OnboardingOverlay({
                     {/* Punkt wierzchołka W = (1, -4) */}
                     <circle cx="148" cy="154" r="4.5" fill="#FFB800" stroke="#070A0F" strokeWidth="1.5" />
                     <circle cx="148" cy="154" r="8" fill="none" stroke="#FFB800" strokeWidth="1" opacity="0.5" />
-                    <text x="156" y="157" fill="#FFB800" fontSize="10" fontWeight="bold">W = (1, -4)</text>
+                    <text x="160" y="168" fill="#FFB800" fontSize="10" fontWeight="bold">W = (1, -4)</text>
 
                     {/* Podpis wykresu */}
-                    <text x="225" y="40" fill="#FBBF24" fontSize="11" fontWeight="bold">y = f(x)</text>
+                    <text x="234" y="40" fill="#FBBF24" fontSize="11" fontWeight="bold">y = f(x)</text>
                   </svg>
                 </div>
 
@@ -558,7 +560,7 @@ export function OnboardingOverlay({
                           Świetnie! Zbiór wartości to <InlineMath math="\\langle -4, +\\infty)" />.
                         </span>
                         <span className="text-[11px] text-emerald-300">
-                          Rozpracowałeś pułapkę CKE na domknięty nawias.
+                          Pułapka CKE z domkniętym nawiasem rozpracowana.
                         </span>
                       </div>
                     </div>
@@ -599,7 +601,7 @@ export function OnboardingOverlay({
                   Wszystko, czego potrzebujesz do matury
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                  Połączyliśmy autentyczne arkusze CKE, mikronaukę i AI, abyś uczył się bez stresu:
+                  Połączyliśmy autentyczne arkusze CKE, mikronaukę i AI – nauka bez stresu:
                 </p>
               </div>
 
@@ -700,7 +702,7 @@ export function OnboardingOverlay({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -18 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="flex flex-col gap-3.5 flex-1 justify-between"
+              className="flex flex-col gap-3.5 flex-1 justify-start [&>*:last-child]:mt-auto"
             >
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
@@ -743,7 +745,7 @@ export function OnboardingOverlay({
                           <Icon size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-xs font-bold block truncate leading-tight">
+                          <span className="text-xs font-bold block leading-tight line-clamp-2 break-words">
                             {hs.title}
                           </span>
                           <span className="text-[10px] opacity-70 block truncate">
@@ -822,7 +824,7 @@ export function OnboardingOverlay({
                   Twój plan nauki z matematyki jest gotowy!
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
-                  Zdobyłeś już pierwsze <strong>15 XP</strong> i odblokowałeś <strong className="text-amber-400">Dzień 1 Serii</strong>.
+                  Masz już pierwsze <strong>15 XP</strong> i <strong className="text-amber-400">Dzień 1 Serii</strong>.
                 </p>
               </div>
 

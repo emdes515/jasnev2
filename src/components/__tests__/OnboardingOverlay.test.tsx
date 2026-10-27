@@ -119,7 +119,8 @@ describe('OnboardingOverlay Component', () => {
         targetExam: 'matura_2025',
         targetScore: '70'
       }),
-      false
+      false,
+      true // zadanie demo rozwiązane – należy się XP i dzień serii
     );
   });
 });

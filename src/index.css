@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Adapter motywu jasnego: jasne odpowiedniki kolorów wpisanych na sztywno w komponentach (plik generowany) */
+@import "./theme-light-adapter.css";
 
 @theme {
   --font-sans: 'DM Sans', sans-serif;

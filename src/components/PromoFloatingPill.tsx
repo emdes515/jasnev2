@@ -9,13 +9,16 @@ interface PromoFloatingPillProps {
   onClick: () => void;
   isVisible?: boolean;
   variant?: 'floating' | 'bottom-inline';
+  /** Wysokość realnego rabatu z konfiguracji promocji */
+  discountPercent?: number;
 }
 
 export function PromoFloatingPill({
   secondsLeft,
   onClick,
   isVisible = true,
-  variant = 'floating'
+  variant = 'floating',
+  discountPercent = 0
 }: PromoFloatingPillProps) {
   if (!isVisible || secondsLeft <= 0) return null;
 
@@ -47,8 +50,8 @@ export function PromoFloatingPill({
           ? 'bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 text-white border border-rose-300/80 shadow-[0_4px_0_#9F1239,0_8px_25px_rgba(244,63,94,0.5)] active:translate-y-1 active:shadow-[0_1px_0_#9F1239]'
           : 'bg-gradient-to-r from-[#FFB800] via-[#FFA000] to-[#FF8C00] text-[#070A0F] border border-amber-200/90 shadow-[0_4px_0_#B37F00,0_8px_25px_rgba(255,184,0,0.45)] active:translate-y-1 active:shadow-[0_1px_0_#B37F00]'
       }`}
-      title={isUrgent ? 'Twoja zniżka -50% zaraz wygaśnie! Kliknij, aby odebrać.' : 'Kliknij, aby odebrać 50% zniżki na JASNE PRO'}
-      aria-label="Odbierz zniżkę -50% na pakiet PRO"
+      title={`Rabat -${discountPercent}% na JASNE PRO`}
+      aria-label={`Rabat -${discountPercent}% na JASNE PRO`}
     >
       {/* Dynamiczna ikona / wskaźnik */}
       <div className="flex items-center justify-center shrink-0">
@@ -64,7 +67,7 @@ export function PromoFloatingPill({
 
       <div className="flex items-center gap-1 font-mono text-xs sm:text-sm font-black tracking-tight whitespace-nowrap tabular-nums">
         <span className={isUrgent ? 'text-rose-100 font-black uppercase text-[10px] sm:text-[11px] tracking-wider' : 'text-[#070A0F] font-black'}>
-          -50% PRO
+          -{discountPercent}% PRO
         </span>
       </div>
 

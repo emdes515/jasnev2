@@ -64,6 +64,7 @@ import { ALL_POLISH_TASKS } from '../data/polish';
 import { MathDiagram } from './MathDiagram';
 import { NumberLineDiagram } from './NumberLineDiagram';
 import { enrichTaskWithVisual } from '../data/mathVisualRegistry';
+import { showToast } from '../lib/toast';
 
 interface ExamTaskCardProps {
   task: MaturaTask;
@@ -934,7 +935,7 @@ export function MaturaSimulatorView({
   // Uruchomienie Pełnego Arkusza CKE
   const startFullExam = (examName: string, sheetTasks: MaturaTask[], timed: boolean) => {
     if (sheetTasks.length === 0) {
-      alert('Brak zadań w wybranym arkuszu!');
+      showToast('Brak zadań w wybranym arkuszu.', 'warning');
       return;
     }
     const duration = 180 * 60; // 3 godziny
@@ -1106,7 +1107,7 @@ export function MaturaSimulatorView({
 
   const startMaraton = (taskList: MaturaTask[], startIndex: number = 0) => {
     if (taskList.length === 0) {
-      alert('Brak zadań w wybranej grupie!');
+      showToast('Brak zadań w wybranej grupie.', 'warning');
       return;
     }
     setMaratonList(taskList);
@@ -1136,7 +1137,7 @@ export function MaturaSimulatorView({
     }
 
     if (pool.length === 0) {
-      alert('Gratulacje! Wszystkie zadania zostały już zaliczone.');
+      showToast('Gratulacje! Wszystkie zadania zostały już zaliczone.', 'success');
       pool = tasks;
     }
 
@@ -1265,7 +1266,7 @@ export function MaturaSimulatorView({
       setMaratonOpenText(effectiveAnswer);
     }
     if (!effectiveAnswer.trim() && (!rawCanvasUrl || rawCanvasUrl.length < 50)) {
-      alert('Wpisz swoje rozwiązanie lub rozrysuj je w brudnopisie przed oddaniem do sprawdzenia.');
+      showToast('Wpisz rozwiązanie albo rozrysuj je w brudnopisie, zanim oddasz je do sprawdzenia.', 'warning');
       return;
     }
 
@@ -1376,7 +1377,7 @@ export function MaturaSimulatorView({
       setMaratonIsHintLoading(false);
       setMaratonClosedHintOpen(false);
     } else {
-      alert('Świetna robota! Ukończyłeś tę serię zadań.');
+      showToast('Świetna robota! Seria zadań ukończona.', 'success');
       setView('hub');
     }
   };
@@ -1934,7 +1935,7 @@ export function MaturaSimulatorView({
                   onClick={() => {
                     const errorTasks = effectiveTasks.filter(t => mistakesBank.includes(t.id));
                     if (errorTasks.length === 0) {
-                      alert('Świetnie! Nie masz obecnie żadnych zadań w Bazie Błędów.');
+                      showToast('Świetnie! Baza Błędów jest pusta.', 'success');
                       return;
                     }
                     startMaraton(errorTasks, 0);
@@ -1955,7 +1956,7 @@ export function MaturaSimulatorView({
                         Baza Twoich Błędów
                       </h4>
                       <p className="text-text-muted text-[11px]">
-                        Powtórz zadania, w których popełniłeś pomyłkę
+                        Powtórz zadania, w których była pomyłka
                       </p>
                     </div>
                   </div>

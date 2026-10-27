@@ -2,6 +2,19 @@
 <html lang="pl">
   <head>
     <meta charset="UTF-8" />
+    <!-- Motyw ustawiany przed pierwszym renderem (bez mignięcia ciemnego tła przy motywie jasnym).
+         Logika jak w src/services/themeManager.ts: zapisany tryb albo ustawienie systemu. -->
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem('jasne_theme_mode') || 'dark';
+          var light = mode === 'light' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
+          var root = document.documentElement;
+          root.classList.add(light ? 'light' : 'dark');
+          root.setAttribute('data-theme', light ? 'light' : 'dark');
+        } catch (e) {}
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>JASNE. - Matura staje się prosta</title>
     <meta name="description" content="JASNE. - Nowoczesna platforma do nauki i symulator egzaminu maturalnego CKE. Inteligentny tutor AI, generator zadań, arkusze i predyktor wyniku." />

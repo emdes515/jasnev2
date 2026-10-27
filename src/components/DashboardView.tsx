@@ -580,7 +580,7 @@ export function DashboardView({
                     <span 
                       className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-md uppercase tracking-wider"
                       style={{
-                        color: accentColor,
+                        color: accentColor === '#FFB800' ? 'var(--text-accent)' : `color-mix(in srgb, ${accentColor} 65%, var(--text-primary))`,
                         backgroundColor: `${accentColor}18`,
                         border: `1px solid ${accentColor}35`
                       }}
@@ -617,7 +617,7 @@ export function DashboardView({
                     <span 
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold"
                       style={{
-                        color: accentColor,
+                        color: accentColor === '#FFB800' ? 'var(--text-accent)' : `color-mix(in srgb, ${accentColor} 65%, var(--text-primary))`,
                         backgroundColor: `${accentColor}12`,
                         border: `1px solid ${accentColor}25`
                       }}
