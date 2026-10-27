@@ -82,7 +82,7 @@ describe('EnglishTrapInteractive & englishTrapData', () => {
       expect(optionBButton).toBeDefined();
       fireEvent.click(optionBButton!);
 
-      expect(container.textContent).toContain('Uważaj! Wpadłeś w pułapkę egzaminatora');
+      expect(container.textContent).toContain('Uważaj! To pułapka egzaminatora');
       expect(container.textContent).toContain('0 serc utraconych');
       expect(onPassedMock).not.toHaveBeenCalled();
 

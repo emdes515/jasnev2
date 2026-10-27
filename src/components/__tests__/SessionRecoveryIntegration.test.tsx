@@ -330,10 +330,11 @@ describe('Session Recovery Component Integration', () => {
       expect(document.getElementById('learn-scroll-content')).not.toBeNull();
       unmount();
 
-      // 2. Test 'arena' tab restoration
+      // 2. Zapisana zakładka 'arena' – Arena jest wyłączona (ARENA_ENABLED), więc wracamy na Dashboard
       localStorage.setItem('jasne_active_tab_v1', 'arena');
       const { unmount: unmountArena } = render(<App />);
-      expect(screen.getAllByText(/Arena/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Główny panel|Dashboard/i).length).toBeGreaterThan(0);
+      expect(screen.queryByText(/Szybkie starcia 1v1/i)).toBeNull();
       unmountArena();
 
       // 3. Test 'simulator' tab restoration

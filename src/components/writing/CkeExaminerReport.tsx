@@ -391,7 +391,7 @@ export const CkeExaminerReport: React.FC<CkeExaminerReportProps> = ({
               <div className="p-4 sm:p-5 rounded-2xl bg-surface-card border border-emerald-500/20 space-y-2.5">
                 <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                   <CheckCircle2 size={15} />
-                  Co zrobiłeś świetnie:
+                  Co wyszło świetnie:
                 </h4>
                 <ul className="space-y-1.5 text-xs sm:text-sm text-text-secondary">
                   {strengths.map((str, idx) => (

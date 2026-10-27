@@ -1,4 +1,5 @@
 import React from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { LayoutDashboard, GraduationCap, Swords, FileText, User, Trophy, Flame } from 'lucide-react';
 import { motion } from 'motion/react';
 import { TabState, UserState } from '../types';
@@ -27,7 +28,7 @@ export function Navigation({ currentTab, setTab, userState, onProfileClick }: Na
     { id: 'simulator' as TabState, label: 'Matura', sublabel: 'Symulator arkusza', icon: FileText },
     { id: 'arena' as TabState, label: 'Arena', sublabel: 'Wkrótce: Live 1v1', icon: Swords },
     { id: 'profile' as TabState, label: 'Profil', sublabel: 'Skarbiec & Odznaki', icon: User },
-  ];
+  ].filter(item => ARENA_ENABLED || item.id !== 'arena');
 
   const currentLevel = userState?.level || 1;
   const currentXp = userState?.xp || 0;
@@ -53,6 +54,8 @@ export function Navigation({ currentTab, setTab, userState, onProfileClick }: Na
               <motion.button 
                 key={item.id}
                 id={`mobile-nav-${item.id}`}
+                aria-label={item.label}
+                aria-current={isActive ? 'page' : undefined}
                 whileTap={{ scale: 0.93 }}
                 onClick={() => handleTabChange(item.id)}
                 className={`relative flex items-center justify-center gap-1.5 min-h-[48px] py-2.5 px-3 rounded-2xl transition-colors duration-200 select-none ${
@@ -114,6 +117,8 @@ export function Navigation({ currentTab, setTab, userState, onProfileClick }: Na
               <motion.button
                 key={item.id}
                 id={`rail-nav-${item.id}`}
+                aria-label={item.label}
+                aria-current={isActive ? 'page' : undefined}
                 whileTap={{ scale: 0.94 }}
                 onClick={() => {
                   if (item.id === 'profile' && onProfileClick) {

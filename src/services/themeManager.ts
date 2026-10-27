@@ -7,13 +7,12 @@ export const THEME_STORAGE_KEY = 'jasne_theme_mode';
 const THEME_CHANGE_EVENT = 'jasne:theme-change';
 
 /**
- * Motyw jasny (Solar Luminary) nie jest jeszcze gotowy produkcyjnie: setki komponentów mają
- * na sztywno wpisane kolory ciemnego motywu (text-white, bg-[#0E1522]…), przez co w jasnym
- * tytuły znikają na białym tle. Dopóki komponenty nie przejdą na tokeny (text-text-primary,
- * bg-surface-card), przełączniki motywu są ukryte, a aplikacja startuje w Nocturne Luminary.
- * Po migracji wystarczy ustawić tę flagę na true.
+ * Motyw jasny (Solar Luminary). Kolory ciemnego motywu wpisane na sztywno w komponentach
+ * (text-white, bg-[#0E1522]…) mają jasne odpowiedniki w src/theme-light-adapter.css
+ * (generowany: node scripts/generate_light_theme_adapter.cjs – uruchom po zmianach klas).
+ * false = przełączniki ukryte, a aplikacja zawsze startuje w Nocturne Luminary.
  */
-export const LIGHT_THEME_READY = false;
+export const LIGHT_THEME_READY = true;
 
 /**
  * Returns the currently stored user theme mode ('dark' | 'light' | 'system').

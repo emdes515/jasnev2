@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   ChevronRight, 
-  ShieldAlert, 
+  ShieldAlert,
+  Target, 
   ShieldCheck, 
   Award
 } from 'lucide-react';
@@ -60,7 +61,21 @@ export const PredictorWidget: React.FC<PredictorWidgetProps> = ({
   const animatedPercent = useAnimatedCounter(result.predictedPercent);
 
   // Status configuration: refined, single-purpose, calm
+  // Za mało danych (< 5 zadań, brak prób matury): nie straszymy wynikiem „poniżej progu” z samego modelu
+  const isCalibrating = result.isCalibrating;
+  const tasksToCalibrate = Math.max(0, result.calibrationProgress.required - result.calibrationProgress.current);
+
   const statusConfig = (() => {
+    if (isCalibrating) {
+      return {
+        badgeClass: 'bg-sky-500/10 border-sky-500/25 text-sky-300',
+        ringColor: '#38BDF8',
+        gradientId: 'grad-calib',
+        gradientStops: ['#0EA5E9', '#38BDF8'],
+        icon: Target,
+        statusLabel: `Kalibracja ${result.calibrationProgress.current}/${result.calibrationProgress.required}`
+      };
+    }
     if (!result.isPassing) {
       return {
         badgeClass: 'bg-rose-500/10 border-rose-500/25 text-rose-300',
@@ -99,11 +114,11 @@ export const PredictorWidget: React.FC<PredictorWidgetProps> = ({
   const radius = 36;
   const center = size / 2;
   const circumference = 2 * Math.PI * radius;
-  const progressRatio = Math.min(1, Math.max(0, result.predictedPercent / 100));
+  const progressRatio = isCalibrating ? result.calibrationProgress.percentage / 100 : Math.min(1, Math.max(0, result.predictedPercent / 100));
   const strokeDashoffset = circumference - progressRatio * circumference;
 
   // Milestone bar calculations
-  const currentPointsClamped = Math.min(result.totalExamPoints, Math.max(0, result.predictedPoints));
+  const currentPointsClamped = isCalibrating ? 0 : Math.min(result.totalExamPoints, Math.max(0, result.predictedPoints));
   const pointsPercentOfTotal = (currentPointsClamped / result.totalExamPoints) * 100;
   const passThresholdPercentOfTotal = (result.passingThresholdPoints / result.totalExamPoints) * 100; // 30%
 
@@ -201,7 +216,7 @@ export const PredictorWidget: React.FC<PredictorWidgetProps> = ({
           {/* Center Metric */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center select-none">
             <span className="font-display text-3xl font-black text-text-primary tracking-tight tabular-nums leading-none">
-              {animatedPercent}%
+              {isCalibrating ? '–' : `${animatedPercent}%`}
             </span>
             <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider mt-1">
               PROGNOZA
@@ -213,7 +228,7 @@ export const PredictorWidget: React.FC<PredictorWidgetProps> = ({
         <div className="min-w-0 flex-1 flex flex-col justify-center">
           <div className="flex items-baseline gap-1.5">
             <span className="font-display text-3xl sm:text-4xl font-black text-text-primary tracking-tight tabular-nums leading-none">
-              {result.predictedPoints}
+              {isCalibrating ? '–' : result.predictedPoints}
             </span>
             <span className="text-text-muted font-medium text-sm">
               / {result.totalExamPoints} pkt
@@ -221,7 +236,11 @@ export const PredictorWidget: React.FC<PredictorWidgetProps> = ({
           </div>
 
           <p className="text-xs text-text-secondary leading-relaxed mt-1.5">
-            {!result.isPassing ? (
+            {isCalibrating ? (
+              <>
+                Rozwiąż jeszcze <strong className="text-sky-300 font-bold">{tasksToCalibrate} {tasksToCalibrate === 1 ? 'zadanie' : tasksToCalibrate < 5 ? 'zadania' : 'zadań'}</strong>, a prognoza oprze się na Twoich wynikach.
+              </>
+            ) : !result.isPassing ? (
               <>
                 Do zdania matury ({result.passingThresholdPoints} pkt) brakuje Ci{' '}
                 <strong className="text-rose-300 font-bold">{formatPoints(pointsMissingToPass)} pkt</strong>.

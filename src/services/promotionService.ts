@@ -13,17 +13,32 @@ export interface PromotionConfig {
   badgeText?: string;
 }
 
+/**
+ * Domyślnie BEZ rabatu: po pierwszej sesji gość widzi propozycję zapisania postępów i uczciwy cennik.
+ * Prawdziwą, czasową promocję można włączyć w Firestore (system/promotions) – wtedy discountPercent > 0.
+ */
 export const DEFAULT_GUEST_PROMOTION: PromotionConfig = {
-  id: 'guest_welcome_50',
-  title: 'Oferta Powitalna: -50% na JASNE PRO',
-  subtitle: 'Zaloguj się teraz, aby zabezpieczyć 50% zniżki i zapisać swoje postępy w chmurze.',
-  discountPercent: 50,
+  id: 'guest_save_progress',
+  title: 'Zapisz serię i postępy',
+  subtitle: 'Załóż darmowe konto, żeby nie stracić serii i uczyć się na telefonie i komputerze.',
+  discountPercent: 0,
   durationMinutes: 30,
   originalPriceMonthly: 29,
-  discountedPriceMonthly: 14.5,
-  isActive: true,
-  badgeText: 'TYLKO DLA NOWYCH KONT'
+  discountedPriceMonthly: 29,
+  isActive: true
 };
+
+/** Cennik JASNE PRO (Baza Wiedzy: 06 Biznes & Sprzedaż / Model Biznesowy i Cennik). */
+export const PRO_PLANS = [
+  { id: 'pass', name: 'Pass Maturalny', price: 89, period: 'jednorazowo, do 31 maja', highlight: true },
+  { id: 'monthly', name: 'PRO miesięczny', price: 29, period: 'za miesiąc, anulujesz kiedy chcesz', highlight: false },
+  { id: 'rescue', name: 'Pakiet Ratunkowy', price: 49, period: 'jednorazowo, ostatnie 30 dni', highlight: false }
+] as const;
+
+/** Czy konfiguracja to realny rabat (a nie domyślna zachęta do założenia konta). */
+export function hasRealDiscount(promo: PromotionConfig): boolean {
+  return promo.isActive && promo.discountPercent > 0 && promo.discountedPriceMonthly < promo.originalPriceMonthly;
+}
 
 const PROMO_STORAGE_KEY = 'jasne_guest_promo_start';
 const PROMO_SEEN_KEY = 'jasne_guest_promo_modal_seen';

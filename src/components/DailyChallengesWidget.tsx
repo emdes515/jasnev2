@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Flame, 
@@ -80,7 +81,7 @@ export const DailyChallengesWidget: React.FC<DailyChallengesWidgetProps> = ({
     {
       id: 'maintenance',
       title: 'Konserwacja',
-      description: 'Bank Błędów lub walka Areny',
+      description: ARENA_ENABLED ? 'Bank Błędów lub walka Areny' : 'Powtórka z Banku Błędów',
       target: 1,
       current: isMaintenanceCompleted ? 1 : 0,
       rewardCoins: 10,

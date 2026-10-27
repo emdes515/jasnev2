@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { Flame, Clock, Trophy, Check, ArrowRight, Target, Swords, FileText, Zap, Coins, Gift } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserState } from '../types';
@@ -360,6 +361,7 @@ export const GamificationSidebar: React.FC<GamificationSidebarProps> = ({
           <ArrowRight size={14} className="text-text-muted group-hover:text-text-primary group-hover:translate-x-1 transition-all" />
         </button>
 
+        {ARENA_ENABLED && (
         <button
           id="gamification-sidebar-arena-btn"
           onClick={() => onNavigate?.('arena')}
@@ -383,6 +385,7 @@ export const GamificationSidebar: React.FC<GamificationSidebarProps> = ({
           </div>
           <ArrowRight size={14} className="text-text-muted group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
         </button>
+        )}
 
         <div className="pt-2 border-t border-surface-border flex items-center justify-between text-[11px] text-text-muted px-1">
           <span>Zrobione zadania maturalne:</span>

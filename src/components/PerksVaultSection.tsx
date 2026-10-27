@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { motion } from 'motion/react';
 import { 
   Shield, 
@@ -106,12 +107,12 @@ export function PerksVaultSection({
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="bg-white/5 rounded-2xl p-3.5 flex flex-col border border-white/5">
             <span className="text-[10px] uppercase font-black text-[#8B8D98] mb-1 flex items-center gap-1.5">
-              <Crown size={12} className="text-amber-400" /> Żetony Areny
+              <Crown size={12} className="text-amber-400" /> {ARENA_ENABLED ? 'Żetony Areny' : 'Żetony Mistrzostwa'}
             </span>
             <span className="text-2xl font-display font-black text-amber-400 leading-tight">
               {masteryTokens}
             </span>
-            <span className="text-[10px] text-amber-200/60 mt-1">Z walk 1v1 i odznak</span>
+            <span className="text-[10px] text-amber-200/60 mt-1">{ARENA_ENABLED ? 'Z walk 1v1 i odznak' : 'Z odznak'}</span>
           </div>
 
           <div className="bg-white/5 rounded-2xl p-3.5 flex flex-col border border-white/5">
@@ -146,7 +147,7 @@ export function PerksVaultSection({
           <h3 className="text-sm font-display font-black text-white flex items-center gap-2">
             <Zap size={16} className="text-[#FFB800]" /> Sloty Ekwipunku & Wzmocnienia
           </h3>
-          <span className="text-[10px] uppercase tracking-wider font-bold text-[#8B8D98]">3 Gniazda RPG</span>
+          <span className="text-[10px] uppercase tracking-wider font-bold text-[#8B8D98]">{ARENA_ENABLED ? 3 : 2} Gniazda RPG</span>
         </div>
 
         <div className="flex flex-col gap-3.5">
@@ -206,6 +207,8 @@ export function PerksVaultSection({
             </div>
           </div>
 
+          {ARENA_ENABLED && (
+          <>
           {/* SLOT 2: TARCZA ELO ARENY */}
           <div className="relative group bg-[#141A23] border border-emerald-500/20 rounded-[22px] p-4 sm:p-5 overflow-hidden shadow-[0_4px_20px_rgba(16,185,129,0.08)] transition-all duration-150 active:scale-[0.98]">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-[35px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
@@ -255,6 +258,8 @@ export function PerksVaultSection({
               </div>
             </div>
           </div>
+          </>
+          )}
 
           {/* SLOT 3: DOŁADOWANIE XP (PULSUJĄCE ZŁOTYM ŚWIATŁEM) */}
           <div className="relative group bg-[#141A23] border border-amber-500/25 rounded-[22px] p-4 sm:p-5 overflow-hidden shadow-[0_4px_25px_rgba(245,158,11,0.12)] transition-all duration-150 active:scale-[0.98]">
@@ -360,7 +365,7 @@ export function PerksVaultSection({
         </div>
 
         <div className="space-y-3">
-          {SHOP_ITEMS.map(item => {
+          {SHOP_ITEMS.filter(item => ARENA_ENABLED || item.effectType !== 'arenaShield').map(item => {
             const canAffordTokens = masteryTokens >= item.tokenPrice;
             const canAffordCoins = coins >= item.coinPrice;
 

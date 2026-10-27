@@ -8,6 +8,7 @@ import { UserState, TabState, UserPerks, BlikCoinPack, DailyChallengeId } from '
 import { DashboardView } from './components/DashboardView';
 import { LearnView } from './components/LearnView';
 import { ArenaView } from './components/ArenaView';
+import { ARENA_ENABLED } from './config/features';
 import { MaturaSimulatorView } from './components/MaturaSimulatorView';
 import { ProfileView } from './components/ProfileView';
 import { Navigation } from './components/Navigation';
@@ -30,6 +31,7 @@ import { GuestPromoModal } from './components/GuestPromoModal';
 import { PromoFloatingPill } from './components/PromoFloatingPill';
 import { 
   fetchPromotionConfig, 
+  hasRealDiscount,
   PromotionConfig, 
   DEFAULT_GUEST_PROMOTION, 
   getGuestPromoRemainingSeconds, 
@@ -152,12 +154,17 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<TabState>(() => {
     try {
       const saved = localStorage.getItem('jasne_active_tab_v1');
-      if (saved && ['dashboard', 'learn', 'nauka', 'simulator', 'arena', 'profil', 'profile'].includes(saved)) {
+      if (saved && ['dashboard', 'learn', 'nauka', 'simulator', ...(ARENA_ENABLED ? ['arena'] : []), 'profil', 'profile'].includes(saved)) {
         return (saved === 'nauka' ? 'learn' : saved === 'profile' ? 'profil' : saved) as TabState;
       }
     } catch {}
     return 'dashboard';
   });
+
+  // Arena jest ukryta do premiery – każde przejście do niej (DevHub, stare linki) wraca na Dashboard
+  useEffect(() => {
+    if (!ARENA_ENABLED && currentTab === 'arena') setCurrentTab('dashboard');
+  }, [currentTab]);
 
   useEffect(() => {
     try {
@@ -251,9 +258,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Voucher powitalny NIE wyskakuje przy wejściu ani tuż po onboardingu (zero tarcia, Time-to-Value < 30 s).
-  // Pokazujemy go raz, po pierwszej ukończonej sesji – w momencie satysfakcji. Stałym przypomnieniem
-  // jest pływająca pigułka z odliczaniem (PromoFloatingPill).
+  // Propozycja konta i PRO NIE wyskakuje przy wejściu ani tuż po onboardingu (zero tarcia, Time-to-Value < 30 s).
+  // Pokazujemy ją raz, po pierwszej ukończonej sesji – w momencie satysfakcji. Pływająca pigułka
+  // (PromoFloatingPill) pojawia się tylko przy realnym rabacie skonfigurowanym w Firestore.
   const [currentSubject, setCurrentSubject] = useState<SubjectId>(() => {
     try {
       const stored = localStorage.getItem('matura_quest_current_subject');
@@ -613,7 +620,7 @@ export default function App() {
     };
   }, [user, loading]);
 
-  const handleOnboardingComplete = async (prefs: OnboardingPreferences, shouldOpenAuth: boolean = false) => {
+  const handleOnboardingComplete = async (prefs: OnboardingPreferences, shouldOpenAuth: boolean = false, solvedDemoTask: boolean = true) => {
     triggerHaptic('success');
     const todayStr = getTodayDateString();
 
@@ -628,7 +635,8 @@ export default function App() {
       [todayStr]: (currentDailyCounts[todayStr] || 0) + 1
     };
 
-    const updatedState: UserState = {
+    // Nagroda (XP, monety, dzień serii, zadanie dnia) tylko za rozwiązane zadanie demo – samo „Pomiń” jej nie daje
+    const updatedState: UserState = solvedDemoTask ? {
       ...userState,
       xp: (userState.xp || 0) + 15,
       coins: (userState.coins || 0) + 10,
@@ -636,6 +644,10 @@ export default function App() {
       lastStreakDate: todayStr,
       streakActiveDates: updatedStreakDates,
       dailyTaskCounts: updatedDailyCounts,
+      hasCompletedOnboarding: true,
+      onboardingPreferences: prefs
+    } : {
+      ...userState,
       hasCompletedOnboarding: true,
       onboardingPreferences: prefs
     };
@@ -659,7 +671,7 @@ export default function App() {
     if (shouldOpenAuth) {
       setTimeout(() => setShowAuthModal(true), 400);
 
-    } else {
+    } else if (solvedDemoTask) {
       setReward({
         xp: 15,
         coins: 10,
@@ -1442,11 +1454,13 @@ export default function App() {
         {/* Pływająca pigułka promocji -50% PRO (prawy dolny róg) */}
         <PromoFloatingPill
           secondsLeft={guestPromoSecondsLeft}
+          discountPercent={promoConfig.discountPercent}
           onClick={() => {
             setShowGuestPromoModal(true);
           }}
           isVisible={
             isGuest && 
+            hasRealDiscount(promoConfig) &&
             guestPromoSecondsLeft > 0 && 
             !showGuestPromoModal && 
             !showAuthModal && 
@@ -1650,7 +1664,7 @@ export default function App() {
                     onNavigateBack={() => setCurrentTab('dashboard')}
                   />
                 )}
-                {currentTab === 'arena' && (
+                {ARENA_ENABLED && currentTab === 'arena' && (
                   <ArenaView 
                     userState={userState} 
                     onUpdateUserState={setUserState} 
@@ -1715,7 +1729,8 @@ export default function App() {
         onClose={() => setShowGuestPromoModal(false)}
         onClaimPromo={(promo) => {
           setShowGuestPromoModal(false);
-          setActiveAuthPromo(promo);
+          // Rabat przypisujemy do konta tylko wtedy, gdy promocja naprawdę istnieje
+          setActiveAuthPromo(hasRealDiscount(promo) ? promo : null);
           setShowAuthModal(true);
         }}
         promoConfig={promoConfig}

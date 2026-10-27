@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { ARENA_ENABLED } from '../config/features';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserState } from '../types';
 import { 
@@ -114,6 +115,14 @@ export function ProfileView({
     }
     return days;
   }, [userState?.dailyTaskCounts, userState?.streakActiveDates, completedTasks]);
+
+  // Jedna liczba „rozwiązanych zadań” w całym profilu: unikalne zadania albo suma dziennych liczników
+  // (obejmuje np. zadanie z onboardingu), zależnie od tego, która jest większa
+  const totalSolvedCount = useMemo(() => {
+    const distinct = filterActualTaskIds(completedTasks).length;
+    const daily = Object.values(userState?.dailyTaskCounts || {}).reduce((sum: number, n) => sum + (Number(n) || 0), 0);
+    return Math.max(distinct, daily);
+  }, [completedTasks, userState?.dailyTaskCounts]);
 
   const maxActivityCount = useMemo(() => {
     return Math.max(5, ...activityDays.map(d => d.count));
@@ -251,7 +260,7 @@ export function ProfileView({
                 </div>
                 <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
                   <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Zadania</span>
-                  <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{filterActualTaskIds(completedTasks).length}</span>
+                  <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{totalSolvedCount}</span>
                 </div>
                 <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
                   <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Seria Dni</span>
@@ -259,10 +268,17 @@ export function ProfileView({
                     <Flame size={16} className="fill-[#F97316]" /> {streakDays}
                   </span>
                 </div>
-                <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
-                  <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">ELO Areny</span>
-                  <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{userState.arenaRating || 1000}</span>
-                </div>
+                {ARENA_ENABLED ? (
+                  <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
+                    <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">ELO Areny</span>
+                    <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{userState.arenaRating || 1000}</span>
+                  </div>
+                ) : (
+                  <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
+                    <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Monety</span>
+                    <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{userState.coins || 0}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -334,7 +350,7 @@ export function ProfileView({
               <div className="flex justify-between items-end mb-4">
                 <div className="flex flex-col">
                   <span className="text-2xl font-display font-black text-text-primary mb-0.5">
-                    {filterActualTaskIds(completedTasks).length}
+                    {totalSolvedCount}
                   </span>
                   <span className="text-xs text-text-secondary">Rozwiązanych zadań ogółem</span>
                 </div>
