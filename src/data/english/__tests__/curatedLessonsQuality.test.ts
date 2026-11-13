@@ -3,13 +3,14 @@ import { ALL_ENGLISH_TASKS } from '../allEnglishTasks';
 import { ENGLISH_LESSONS } from '../englishLessonsData';
 import { CURATED_TENSE_TASKS } from '../../offline/english/curatedTenseTasks';
 import { CURATED_GRAMMAR_TASKS } from '../../offline/english/curatedGrammarTasks';
+import { CURATED_READING_TASKS } from '../../offline/english/curatedReadingTasks';
 import { taskProvenance } from '../../../lib/taskProvenance';
 
-const norm = (task: any) => `${String(task.question).replace(/\W+/g, ' ').toLowerCase()}|${String(task.correctAnswer).toLowerCase()}`;
-const CURATED = [...CURATED_TENSE_TASKS, ...CURATED_GRAMMAR_TASKS];
-const tenseLessons = ENGLISH_LESSONS.filter(l => ['eng-dzial-1', 'eng-dzial-2', 'eng-dzial-3', 'eng-dzial-4', 'eng-dzial-5'].includes(l.topicId));
+const norm = (task: any) => `${String(task.question).replace(/\W+/g, ' ').toLowerCase()}|${String(task.contextText ?? '').replace(/\W+/g, ' ').toLowerCase()}|${String(task.correctAnswer).toLowerCase()}`;
+const CURATED = [...CURATED_TENSE_TASKS, ...CURATED_GRAMMAR_TASKS, ...CURATED_READING_TASKS];
+const tenseLessons = ENGLISH_LESSONS.filter(l => ['eng-dzial-1', 'eng-dzial-2', 'eng-dzial-3', 'eng-dzial-4', 'eng-dzial-5', 'eng-dzial-9', 'eng-dzial-10', 'eng-dzial-11'].includes(l.topicId));
 
-describe('Działy 1–5: zadania autorskie zgodne z lekcjami', () => {
+describe('Działy 1–5 i 9–11: zadania autorskie zgodne z lekcjami', () => {
   it('każda lekcja ma 5 różnych zadań, a żadne nie powtarza się w innej lekcji', () => {
     const seen = new Map<string, string>();
     for (const lesson of tenseLessons) {
@@ -41,7 +42,10 @@ describe('Działy 1–5: zadania autorskie zgodne z lekcjami', () => {
 
   it('poprawna odpowiedź jest dokładnie jedną z opcji, a zadania z luką mają akceptowane warianty', () => {
     for (const task of CURATED) {
-      if (task.options) {
+      if (task.options && /^[A-E]$/.test(task.correctAnswer)) {
+        expect(task.options.filter(o => o.startsWith(`${task.correctAnswer}. `))).toHaveLength(1);
+        expect(task.options.map(o => o.slice(0, 3))).toEqual(['A. ', 'B. ', 'C. ', 'D. ', 'E. '].slice(0, task.options.length));
+      } else if (task.options) {
         expect(task.options.filter(o => o.toLowerCase() === task.correctAnswer.toLowerCase())).toHaveLength(1);
       } else {
         expect(task.acceptedVariants).toContain(task.correctAnswer);

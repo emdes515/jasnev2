@@ -1587,13 +1587,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wybór nagłówka na podstawie jednego pobocznego przykładu wymienionego w środku akapitu, ignorując ogólny sens topic sentence.",
       "matura_context": "Zadanie 4 CKE – 4 punkty."
     },
-    "taskIds": [
-      "eng_read_001",
-      "eng_read_002",
-      "eng_read_003",
-      "eng_read_004",
-      "eng_read_005"
-    ]
+    "taskIds": ["eng_cur_9_1_01", "eng_cur_9_1_02", "eng_cur_9_1_03", "eng_cur_9_1_04", "eng_cur_9_1_05"]
   },
   {
     "id": "eng-lesson-9-2",
@@ -1645,13 +1639,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wybieranie nagłówka ze słowem „cycling”, bo było w pierwszym zdaniu, pomimo że reszta tekstu omawiała inne środki transportu.",
       "matura_context": "Zadanie 4 CKE – 1–2 punkty."
     },
-    "taskIds": [
-      "eng_read_006",
-      "eng_read_007",
-      "eng_read_008",
-      "eng_read_009",
-      "eng_read_010"
-    ]
+    "taskIds": ["eng_cur_9_2_01", "eng_cur_9_2_02", "eng_cur_9_2_03", "eng_cur_9_2_04", "eng_cur_9_2_05"]
   },
   {
     "id": "eng-lesson-9-3",
@@ -1703,13 +1691,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Spędzanie 15 minut na analizowaniu jednego trudnego słówka w tekście, które nie ma żadnego wpływu na poprawność wyboru nagłówka.",
       "matura_context": "Zadania 4 i 5 – optymalizacja czasu egzaminu."
     },
-    "taskIds": [
-      "eng_read_011",
-      "eng_read_012",
-      "eng_read_013",
-      "eng_read_014",
-      "eng_read_015"
-    ]
+    "taskIds": ["eng_cur_9_3_01", "eng_cur_9_3_02", "eng_cur_9_3_03", "eng_cur_9_3_04", "eng_cur_9_3_05"]
   },
   {
     "id": "eng-lesson-10-1",
@@ -1761,13 +1743,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wstawienie zdania ze słowem „They”, gdy w zdaniu przed luką była mowa tylko o jednej osobie w liczbie pojedynczej.",
       "matura_context": "Zadanie 5 CKE – 3–4 punkty."
     },
-    "taskIds": [
-      "eng_read_131",
-      "eng_read_132",
-      "eng_read_133",
-      "eng_read_134",
-      "eng_read_135"
-    ]
+    "taskIds": ["eng_cur_10_1_01", "eng_cur_10_1_02", "eng_cur_10_1_03", "eng_cur_10_1_04", "eng_cur_10_1_05"]
   },
   {
     "id": "eng-lesson-10-2",
@@ -1819,13 +1795,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wstawienie zdania z łącznikiem kontrastu „However”, gdy drugie zdanie tak naprawdę potwierdza i kontynuuje pierwszą myśl.",
       "matura_context": "Zadanie 5 CKE – 1–2 punkty."
     },
-    "taskIds": [
-      "eng_read_136",
-      "eng_read_137",
-      "eng_read_138",
-      "eng_read_139",
-      "eng_read_140"
-    ]
+    "taskIds": ["eng_cur_10_2_01", "eng_cur_10_2_02", "eng_cur_10_2_03", "eng_cur_10_2_04", "eng_cur_10_2_05"]
   },
   {
     "id": "eng-lesson-10-3",
@@ -1877,13 +1847,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Ignorowanie zdania następującego bezpośrednio po luce. Zawsze czytaj pełne otoczenie luki!",
       "matura_context": "Zadanie 5 CKE – decydujący krok do 100% poprawności."
     },
-    "taskIds": [
-      "eng_read_141",
-      "eng_read_142",
-      "eng_read_143",
-      "eng_read_144",
-      "eng_read_145"
-    ]
+    "taskIds": ["eng_cur_10_3_01", "eng_cur_10_3_02", "eng_cur_10_3_03", "eng_cur_10_3_04", "eng_cur_10_3_05"]
   },
   {
     "id": "eng-lesson-11-1",
@@ -1935,13 +1899,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wpisanie odpowiedzi w złym języku (np. wpisanie angielskiego „November 15th” w polskiej notatce mediacyjnej).",
       "matura_context": "Zadanie 7 CKE – 3–4 punkty."
     },
-    "taskIds": [
-      "eng_read_251",
-      "eng_read_252",
-      "eng_read_253",
-      "eng_read_254",
-      "eng_read_255"
-    ]
+    "taskIds": ["eng_cur_11_1_01", "eng_cur_11_1_02", "eng_cur_11_1_03", "eng_cur_11_1_04", "eng_cur_11_1_05"]
   },
   {
     "id": "eng-lesson-11-2",
@@ -1993,13 +1951,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wybór odpowiedzi pochwalnej na podstawie wzmianki o „green initiatives”, ignorując słowa „empty slogans” na końcu zdania.",
       "matura_context": "Zadanie 6 CKE – 1 punkt."
     },
-    "taskIds": [
-      "eng_read_256",
-      "eng_read_257",
-      "eng_read_258",
-      "eng_read_259",
-      "eng_read_260"
-    ]
+    "taskIds": ["eng_cur_11_2_01", "eng_cur_11_2_02", "eng_cur_11_2_03", "eng_cur_11_2_04", "eng_cur_11_2_05"]
   },
   {
     "id": "eng-lesson-11-3",
@@ -2051,13 +2003,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Mylenie przedziałów wiekowych (np. 15–18 vs poniżej 15 roku życia).",
       "matura_context": "Zadanie 6 lub 7 CKE – 3–4 punkty."
     },
-    "taskIds": [
-      "eng_read_261",
-      "eng_read_262",
-      "eng_read_263",
-      "eng_read_264",
-      "eng_read_265"
-    ]
+    "taskIds": ["eng_cur_11_3_01", "eng_cur_11_3_02", "eng_cur_11_3_03", "eng_cur_11_3_04", "eng_cur_11_3_05"]
   },
   {
     "id": "eng-lesson-12-1",

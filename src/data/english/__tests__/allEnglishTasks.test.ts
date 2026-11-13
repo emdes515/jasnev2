@@ -67,7 +67,7 @@ describe('English 1500 Tasks and Sections Integration', () => {
     expect(uoeTasks.length).toBe(375 + 35 + 60); // bank historyczny + zadania autorskie z Działów 1–5
 
     const readingTasks = getEnglishTasksByPillar('pillar-reading');
-    expect(readingTasks.length).toBe(500); // 130 + 120 + 250
+    expect(readingTasks.length).toBe(500 + 45); // bank historyczny + zadania autorskie z Działów 9–11
 
     const writingTasks = getEnglishTasksByPillar('pillar-writing');
     expect(writingTasks.length).toBe(250); // 80 + 60 + 50 + 60
