@@ -190,16 +190,12 @@ describe('Polish Module Integration & Data Integrity', () => {
         />
       );
 
-      expect(screen.getByText('Centralne Lobby Maturalne')).toBeDefined();
-      expect(screen.getByText('Język Polski')).toBeDefined();
-      expect(screen.getByText('Matematyka')).toBeDefined();
+      expect(screen.getByRole('dialog', { name: 'Wybierz przedmiot i poziom' })).toBeDefined();
+      expect(screen.getByLabelText('Zmień przedmiot: Matematyka, Podstawa')).toBeDefined();
 
-      const polishCard = screen.getByText('Język Polski').closest('div[class*="rounded-xl"]');
-      expect(polishCard).toBeDefined();
-      if (polishCard) {
-        fireEvent.click(polishCard);
-        expect(onSelectSubject).toHaveBeenCalledWith('polski');
-      }
+      fireEvent.click(screen.getByRole('button', { name: 'Język polski, Podstawa' }));
+      expect(onSelectSubject).toHaveBeenCalledWith('polski');
+      expect(onClose).toHaveBeenCalled();
     });
 
     it('should call onClose when close button is clicked', () => {
@@ -215,7 +211,7 @@ describe('Polish Module Integration & Data Integrity', () => {
         />
       );
 
-      const closeButton = screen.getByTitle('Zamknij lobby');
+      const closeButton = screen.getByLabelText('Zamknij wybór przedmiotu');
       fireEvent.click(closeButton);
       expect(onClose).toHaveBeenCalled();
     });
