@@ -4,38 +4,12 @@
  * To zadania JASNE, a nie arkusze CKE — nie oznaczamy ich jako oficjalnych.
  */
 import type { EnglishTask } from '../../../types/englishTypes';
+import { createCuratedBuilders, lessonIdsOf } from './curatedBuilders';
 
-const SECTION = 'Dział 1: Czasy gramatyczne i aspekty w narracji i dialogu';
-const SOURCE = 'Autorskie zadanie JASNE';
-const GAP_INSTRUCTION = 'Uzupełnij lukę, wpisując właściwą formę czasownika z nawiasu:';
-const CHOICE_INSTRUCTION = 'Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu:';
-const TF_INSTRUCTION = 'Zdecyduj, czy poniższe stwierdzenie jest prawdziwe (TRUE), czy fałszywe (FALSE):';
-
-type Base = { lesson: string; n: number; title: string; explanation: string; trap: string };
-
-const base = (b: Base) => ({
-  id: `eng_cur_${b.lesson.replace('eng-lesson-', '').replace('-', '_')}_${String(b.n).padStart(2, '0')}`,
-  pillarId: 'pillar-use-of-english' as const,
-  pillarName: 'Znajomość środków językowych',
+const { choice, word, truth } = createCuratedBuilders({
   topicId: 'eng-dzial-1',
-  sectionTitle: SECTION,
+  sectionTitle: 'Dział 1: Czasy gramatyczne i aspekty w narracji i dialogu',
   sectionNumber: 1,
-  lessonId: b.lesson,
-  title: b.title,
-  explanation: b.explanation,
-  ckeTrap: b.trap,
-  source: SOURCE,
-  points: 1,
-});
-
-const choice = (b: Base, sentence: string, options: string[], correct: string): EnglishTask => ({
-  ...base(b), type: 'SINGLE_CHOICE', question: `${CHOICE_INSTRUCTION}\n\n"${sentence}"`, options, correctAnswer: correct,
-});
-const word = (b: Base, sentence: string, correct: string, variants: string[] = []): EnglishTask => ({
-  ...base(b), type: 'WORD_INPUT', question: `${GAP_INSTRUCTION}\n\n${sentence}`, correctAnswer: correct, acceptedVariants: [correct, ...variants],
-});
-const truth = (b: Base, statement: string, correct: 'TRUE' | 'FALSE'): EnglishTask => ({
-  ...base(b), type: 'TRUE_FALSE', question: `${TF_INSTRUCTION}\n\n${statement}`, options: ['TRUE', 'FALSE'], correctAnswer: correct,
 });
 
 const L = (a: number) => `eng-lesson-1-${a}`;
@@ -126,7 +100,4 @@ export const CURATED_TENSE_TASKS: EnglishTask[] = [
     '„I have been knowing him for years.” jest zdaniem poprawnym.', 'FALSE'),
 ];
 
-export const CURATED_TENSE_TASK_IDS: Record<string, string[]> = CURATED_TENSE_TASKS.reduce((acc, task) => {
-  (acc[task.lessonId] ||= []).push(task.id);
-  return acc;
-}, {} as Record<string, string[]>);
+export const CURATED_TENSE_TASK_IDS = lessonIdsOf(CURATED_TENSE_TASKS);

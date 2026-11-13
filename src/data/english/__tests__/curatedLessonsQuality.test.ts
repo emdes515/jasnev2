@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { ALL_ENGLISH_TASKS } from '../allEnglishTasks';
 import { ENGLISH_LESSONS } from '../englishLessonsData';
 import { CURATED_TENSE_TASKS } from '../../offline/english/curatedTenseTasks';
+import { CURATED_GRAMMAR_TASKS } from '../../offline/english/curatedGrammarTasks';
 import { taskProvenance } from '../../../lib/taskProvenance';
 
 const norm = (task: any) => `${String(task.question).replace(/\W+/g, ' ').toLowerCase()}|${String(task.correctAnswer).toLowerCase()}`;
-const tenseLessons = ENGLISH_LESSONS.filter(l => l.topicId === 'eng-dzial-1');
+const CURATED = [...CURATED_TENSE_TASKS, ...CURATED_GRAMMAR_TASKS];
+const tenseLessons = ENGLISH_LESSONS.filter(l => ['eng-dzial-1', 'eng-dzial-2', 'eng-dzial-3', 'eng-dzial-4', 'eng-dzial-5'].includes(l.topicId));
 
-describe('Dział 1: zadania zgodne z lekcjami o czasach', () => {
+describe('Działy 1–5: zadania autorskie zgodne z lekcjami', () => {
   it('każda lekcja ma 5 różnych zadań, a żadne nie powtarza się w innej lekcji', () => {
     const seen = new Map<string, string>();
     for (const lesson of tenseLessons) {
@@ -23,14 +25,14 @@ describe('Dział 1: zadania zgodne z lekcjami o czasach', () => {
 
   it('zadania należą do lekcji, w której występują, i używają różnych formatów', () => {
     for (const lesson of tenseLessons) {
-      const tasks = CURATED_TENSE_TASKS.filter(t => t.lessonId === lesson.id);
+      const tasks = CURATED.filter(t => t.lessonId === lesson.id);
       expect(tasks.map(t => t.id).sort()).toEqual([...lesson.taskIds].sort());
       expect(new Set(tasks.map(t => t.type)).size).toBeGreaterThanOrEqual(3);
     }
   });
 
   it('wyjaśnienie wskazuje pułapkę, a źródło nie udaje CKE', () => {
-    for (const task of CURATED_TENSE_TASKS) {
+    for (const task of CURATED) {
       expect(task.explanation.length).toBeGreaterThan(20);
       expect(task.ckeTrap.length).toBeGreaterThan(10);
       expect(taskProvenance(task)).toEqual({ official: false, label: 'Autorskie zadanie JASNE' });
@@ -38,7 +40,7 @@ describe('Dział 1: zadania zgodne z lekcjami o czasach', () => {
   });
 
   it('poprawna odpowiedź jest dokładnie jedną z opcji, a zadania z luką mają akceptowane warianty', () => {
-    for (const task of CURATED_TENSE_TASKS) {
+    for (const task of CURATED) {
       if (task.options) {
         expect(task.options.filter(o => o.toLowerCase() === task.correctAnswer.toLowerCase())).toHaveLength(1);
       } else {

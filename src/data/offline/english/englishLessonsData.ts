@@ -451,13 +451,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Błąd przy konstrukcji „look forward to”! Maturzyści widzą „to” i myślą, że to bezokolicznik. W rzeczywistości „to” jest przyimkiem, dlatego poprawna forma to: „I look forward to hearing from you” (NIGDY: „to hear”).",
       "matura_context": "Pojawia się w każdym teście luk i parafraz – 1–2 punkty."
     },
-    "taskIds": [
-      "eng_uoe_001",
-      "eng_uoe_002",
-      "eng_uoe_003",
-      "eng_uoe_004",
-      "eng_uoe_005"
-    ]
+    "taskIds": ["eng_cur_2_1_01", "eng_cur_2_1_02", "eng_cur_2_1_03", "eng_cur_2_1_04", "eng_cur_2_1_05"]
   },
   {
     "id": "eng-lesson-2-2",
@@ -509,13 +503,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Mylenie „mustn't” z „don't have to”! Pamiętaj: „You don't have to go” = masz wybór. „You mustn't go” = nie wolno ci wyjść.",
       "matura_context": "Pewniak w parafrazach i minidialogach – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_006",
-      "eng_uoe_007",
-      "eng_uoe_008",
-      "eng_uoe_009",
-      "eng_uoe_010"
-    ]
+    "taskIds": ["eng_cur_2_2_01", "eng_cur_2_2_02", "eng_cur_2_2_03", "eng_cur_2_2_04", "eng_cur_2_2_05"]
   },
   {
     "id": "eng-lesson-2-3",
@@ -567,13 +555,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Kalka z języka polskiego: „Please” jako odpowiedź na „Thank you”! Po angielsku „Proszę” w odpowiedzi na podziękowanie to ZAWSZE „You're welcome”, a nigdy samo słowo „Please”.",
       "matura_context": "Zadanie 9 w arkuszu maturalnym – 3–4 punkty."
     },
-    "taskIds": [
-      "eng_uoe_011",
-      "eng_uoe_012",
-      "eng_uoe_013",
-      "eng_uoe_014",
-      "eng_uoe_015"
-    ]
+    "taskIds": ["eng_cur_2_3_01", "eng_cur_2_3_02", "eng_cur_2_3_03", "eng_cur_2_3_04", "eng_cur_2_3_05"]
   },
   {
     "id": "eng-lesson-3-1",
@@ -625,13 +607,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wstawianie „will” po „if”: „If it will rain tomorrow...” to błąd kardynalny! W części warunkowej po if zawsze stosujemy czas teraźniejszy (Present Simple).",
       "matura_context": "Pojawia się w niemal każdym arkuszu w zadaniach 8 i 11 – 1–2 punkty."
     },
-    "taskIds": [
-      "eng_uoe_331",
-      "eng_uoe_332",
-      "eng_uoe_333",
-      "eng_uoe_334",
-      "eng_uoe_335"
-    ]
+    "taskIds": ["eng_cur_3_1_01", "eng_cur_3_1_02", "eng_cur_3_1_03", "eng_cur_3_1_04", "eng_cur_3_1_05"]
   },
   {
     "id": "eng-lesson-3-2",
@@ -683,13 +659,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Mylenie First z Second Conditional! Zwróć uwagę na rezultat: jeśli w zdaniu głównym jest „will”, w warunku musi być Present Simple. Jeśli w zdaniu głównym jest „would”, w warunku musi być Past Simple!",
       "matura_context": "Pewniak w parafrazach ze słowem-kluczem i tłumaczeniach zdań – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_336",
-      "eng_uoe_337",
-      "eng_uoe_338",
-      "eng_uoe_339",
-      "eng_uoe_340"
-    ]
+    "taskIds": ["eng_cur_3_2_01", "eng_cur_3_2_02", "eng_cur_3_2_03", "eng_cur_3_2_04", "eng_cur_3_2_05"]
   },
   {
     "id": "eng-lesson-3-3",
@@ -741,13 +711,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Kalka ze słowem „until”! W języku polskim mówimy „poczekam, aż nie przyjdzie” (z przeczeniem). W angielskim „until” oznacza stan do momentu zajścia faktu: „Wait until he arrives” (twierdzenie!).",
       "matura_context": "Zadania 8 i 11 – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_341",
-      "eng_uoe_342",
-      "eng_uoe_343",
-      "eng_uoe_344",
-      "eng_uoe_345"
-    ]
+    "taskIds": ["eng_cur_3_3_01", "eng_cur_3_3_02", "eng_cur_3_3_03", "eng_cur_3_3_04", "eng_cur_3_3_05"]
   },
   {
     "id": "eng-lesson-4-1",
@@ -799,13 +763,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Niedokładne czytanie kontekstu! Jeśli uczeń wpisze słowo bazowe bez prefiksu zaprzeczającego, zdanie staje się nielogiczne i egzaminator przyznaje 0 punktów.",
       "matura_context": "Zadanie 10 lub 11 CKE (słowotwórstwo w tekście) – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_151",
-      "eng_uoe_152",
-      "eng_uoe_153",
-      "eng_uoe_154",
-      "eng_uoe_155"
-    ]
+    "taskIds": ["eng_cur_4_1_01", "eng_cur_4_1_02", "eng_cur_4_1_03", "eng_cur_4_1_04", "eng_cur_4_1_05"]
   },
   {
     "id": "eng-lesson-4-2",
@@ -857,13 +815,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Błędy literowe w pisowni sufiksów! CKE nie uznaje odpowiedzi z błędem ortograficznym, np. „developement” zamiast „development” lub „beautyful” zamiast „beautiful”.",
       "matura_context": "Zadania 10 i 11 – 1–2 punkty."
     },
-    "taskIds": [
-      "eng_uoe_156",
-      "eng_uoe_157",
-      "eng_uoe_158",
-      "eng_uoe_159",
-      "eng_uoe_160"
-    ]
+    "taskIds": ["eng_cur_4_2_01", "eng_cur_4_2_02", "eng_cur_4_2_03", "eng_cur_4_2_04", "eng_cur_4_2_05"]
   },
   {
     "id": "eng-lesson-4-3",
@@ -915,13 +867,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Kalka myślowa przy słowie „receipt” – uczeń widzi scenę u lekarza i wybiera „receipt”, podczas gdy lekarz wystawia „prescription”.",
       "matura_context": "Zadania 8 i 9 – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_161",
-      "eng_uoe_162",
-      "eng_uoe_163",
-      "eng_uoe_164",
-      "eng_uoe_165"
-    ]
+    "taskIds": ["eng_cur_4_3_01", "eng_cur_4_3_02", "eng_cur_4_3_03", "eng_cur_4_3_04", "eng_cur_4_3_05"]
   },
   {
     "id": "eng-lesson-5-1",
@@ -973,13 +919,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Niewłaściwa liczba czasownika „to be”! Gdy zamieniasz dopełnienie w liczbie mnogiej na podmiot, czasownik musi być w liczbie mnogiej (np. „The letters WERE sent”, a nie „was sent”).",
       "matura_context": "Pewniak Zadania 11 CKE (parafrazy) – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_211",
-      "eng_uoe_212",
-      "eng_uoe_213",
-      "eng_uoe_214",
-      "eng_uoe_215"
-    ]
+    "taskIds": ["eng_cur_5_1_01", "eng_cur_5_1_02", "eng_cur_5_1_03", "eng_cur_5_1_04", "eng_cur_5_1_05"]
   },
   {
     "id": "eng-lesson-5-2",
@@ -1031,13 +971,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Stosowanie inwersji i operatora did/does w pytaniu pośrednim: „Can you tell me where do you live?” to jeden z najczęstszych błędów na maturze!",
       "matura_context": "Zadania 9 i 11 – 1 punkt."
     },
-    "taskIds": [
-      "eng_uoe_216",
-      "eng_uoe_217",
-      "eng_uoe_218",
-      "eng_uoe_219",
-      "eng_uoe_220"
-    ]
+    "taskIds": ["eng_cur_5_2_01", "eng_cur_5_2_02", "eng_cur_5_2_03", "eng_cur_5_2_04", "eng_cur_5_2_05"]
   },
   {
     "id": "eng-lesson-5-3",
@@ -1079,13 +1013,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Błędny zapis w przeczeniu: „didn't used to”. Pamiętaj, że operator „did” przejmuje formę przeszłą, więc czasownik wraca do bezokolicznika: „didn't use to”.",
       "matura_context": "Zadanie 11 (tłumaczenie fragmentów zdań) – 1–2 punkty."
     },
-    "taskIds": [
-      "eng_uoe_221",
-      "eng_uoe_222",
-      "eng_uoe_223",
-      "eng_uoe_224",
-      "eng_uoe_225"
-    ]
+    "taskIds": ["eng_cur_5_3_01", "eng_cur_5_3_02", "eng_cur_5_3_03", "eng_cur_5_3_04", "eng_cur_5_3_05"]
   },
   {
     "id": "eng-lesson-6-1",
