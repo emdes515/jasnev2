@@ -624,7 +624,7 @@ export default function App() {
     };
   }, [user, loading]);
 
-  const handleOnboardingComplete = async (prefs: OnboardingPreferences, shouldOpenAuth: boolean = false, solvedDemoTask: boolean = true) => {
+  const handleOnboardingComplete = async (prefs: OnboardingPreferences, shouldOpenAuth: boolean = false, solvedDemoTask: boolean = true, chosenSubjectKey: SubjectKey = 'math') => {
     triggerHaptic('success');
     const todayStr = getTodayDateString();
 
@@ -662,11 +662,10 @@ export default function App() {
     try {
       localStorage.setItem('matura_quest_onboarding_completed', 'true');
       localStorage.setItem('matura_quest_onboarding_prefs', JSON.stringify(prefs));
-      localStorage.setItem('matura_quest_selected_subject', 'math');
     } catch (e) {}
 
-    // Domyślny przedmiot: Matematyka Podstawowa
-    setSelectedSubjectKey('math');
+    // Przedmiot i poziom wybrane w onboardingu (domyślnie Matematyka, podstawa)
+    handleSelectSubject(chosenSubjectKey);
 
     setShowGuestPrompt(false);
     setIsNewUser(false);

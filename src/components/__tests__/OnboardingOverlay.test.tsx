@@ -1,126 +1,120 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import React from 'react';
 
 vi.mock('motion/react', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    button: ({ children, ...props }: any) => <button {...props}>{children}</button>
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>
+  motion: new Proxy({}, {
+    get: (_t, tag: string) => ({ children, initial: _i, animate: _a, exit: _e, transition: _tr, ...props }: any) => React.createElement(tag, props, children),
+  }),
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+  useReducedMotion: () => true,
 }));
 
-vi.mock('canvas-confetti', () => ({
-  default: vi.fn()
-}));
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 vi.mock('../../utils', () => ({
   triggerHaptic: vi.fn(),
-  playSuccessSound: vi.fn()
+  playSuccessSound: vi.fn(),
 }));
 
-import { OnboardingOverlay } from '../OnboardingOverlay';
+import { OnboardingOverlay, DEFAULT_ONBOARDING_PREFERENCES } from '../OnboardingOverlay';
+import { SUBJECT_OPTIONS } from '../../lib/subjects';
+import { onboardingDemoFor } from '../../data/onboardingDemo';
 
-describe('OnboardingOverlay Component', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+afterEach(() => cleanup());
+
+const next = (name: RegExp | string = /^Dalej/) => fireEvent.click(screen.getByRole('button', { name }));
+
+describe('OnboardingOverlay', () => {
+  it('startuje od obietnicy wartości, bez pytania o cel', () => {
+    render(<OnboardingOverlay onClose={vi.fn()} onLogin={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: 'Matura w 5 minut dziennie' })).toBeDefined();
+    expect(screen.queryByText(/cel/i)).toBeNull();
+    expect(screen.getByRole('button', { name: /Zaczynam/ })).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Mam już konto' })).toBeDefined();
   });
 
-  afterEach(() => {
-    cleanup();
-    vi.clearAllTimers();
-    vi.useRealTimers();
+  it('Pomiń kończy bez nagrody i z domyślnym przedmiotem', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingOverlay onClose={vi.fn()} onComplete={onComplete} />);
+    fireEvent.click(screen.getByRole('button', { name: /Pomiń/ }));
+    expect(onComplete).toHaveBeenCalledWith(DEFAULT_ONBOARDING_PREFERENCES, false, false, 'math');
   });
 
-  it('renders Step 1 with default mathematics badge and 4 matura goals', () => {
+  it('pokazuje wszystkie przedmioty i poziomy ze wspólnego modelu', () => {
     render(<OnboardingOverlay onClose={vi.fn()} />);
-
-    expect(screen.getByText(/TWÓJ CEL MATURALNY • FORMUŁA 2023/i)).toBeDefined();
-    expect(screen.getByText('W co celujesz na maturze z matematyki?')).toBeDefined();
-    expect(screen.getByText('70%+ • Solidny wynik')).toBeDefined();
-    expect(screen.getByText('30%+ • Zdać na luzie')).toBeDefined();
-    expect(screen.getByText('100% • Top uczelnie')).toBeDefined();
-    expect(screen.getByText('Szybka Poprawka / Ekspres')).toBeDefined();
+    next(/Zaczynam/);
+    const radios = screen.getAllByRole('radio');
+    expect(radios).toHaveLength(SUBJECT_OPTIONS.length);
+    for (const option of SUBJECT_OPTIONS) {
+      expect(screen.getByRole('radio', { name: `${option.name}, ${option.level}` })).toBeDefined();
+    }
   });
 
-  it('advances from Step 1 to Step 2 with the CKE quadratic graph task', () => {
-    render(<OnboardingOverlay onClose={vi.fn()} />);
+  it('przechodzi cały przepływ i przekazuje wybrany przedmiot oraz nagrodę za zadanie', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingOverlay onClose={vi.fn()} onComplete={onComplete} />);
+    next(/Zaczynam/);
+    fireEvent.click(screen.getByRole('radio', { name: 'Język polski, Podstawa' }));
+    next();
 
-    const continueBtn = screen.getByRole('button', { name: /DALEJ/i });
-    fireEvent.click(continueBtn);
+    const demo = onboardingDemoFor('pol');
+    expect(screen.getByText(demo.prompt)).toBeDefined();
+    expect((screen.getByRole('button', { name: /^Dalej/ }) as HTMLButtonElement).disabled).toBe(true);
 
-    expect(screen.getByText('PEWNIAK CKE • ANALIZA WYKRESU')).toBeDefined();
-    expect(screen.getByText(/Wierzchołek paraboli: W = \(1, -4\)/i)).toBeDefined();
-    expect(screen.getByText(/Zbiorem wartości funkcji/i)).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'A. metafory' }));
+    expect(screen.getByText('Pułapka')).toBeDefined();
+    expect((screen.getByRole('button', { name: /^Dalej/ }) as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'B. porównania' }));
+    expect(screen.getByText(/Dobrze\. \+15 XP/)).toBeDefined();
+    next();
+
+    expect(screen.getByRole('heading', { name: 'Co jeszcze tu masz' })).toBeDefined();
+    expect(screen.getAllByRole('article')).toHaveLength(4);
+    next();
+
+    expect(screen.getByRole('heading', { name: 'Dzień 1 serii' })).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: /Zaczynam naukę/ }));
+    expect(onComplete).toHaveBeenCalledWith(DEFAULT_ONBOARDING_PREFERENCES, false, true, 'pol');
   });
 
-  it('handles wrong and correct answers in Step 2', () => {
-    render(<OnboardingOverlay onClose={vi.fn()} />);
-
-    // Go to step 2
-    fireEvent.click(screen.getByRole('button', { name: /DALEJ/i }));
-
-    // Click wrong answer B
-    const optB = screen.getByRole('button', { name: /B\./i });
-    fireEvent.click(optB);
-
-    expect(screen.getByText(/Pułapka CKE!/i)).toBeDefined();
-
-    // Click correct answer A
-    const optA = screen.getByRole('button', { name: /A\./i });
-    fireEvent.click(optA);
-
-    expect(screen.getByText(/\+15 XP NA START!/i)).toBeDefined();
-
-    // Advance timer
-    act(() => {
-      vi.advanceTimersByTime(1100);
-    });
-
-    // Should now be on Step 3 (Bento Ecosystem)
-    expect(screen.getByText('NAUKA Z JASNE')).toBeDefined();
-    expect(screen.getByText(/System Mini-matur CKE/i)).toBeDefined();
+  it('pominięcie zadania próbnego nie daje serii ani XP', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingOverlay onClose={vi.fn()} onComplete={onComplete} />);
+    next(/Zaczynam/);
+    next();
+    fireEvent.click(screen.getByRole('button', { name: 'Pomiń zadanie' }));
+    next();
+    expect(screen.getByRole('heading', { name: 'Wszystko gotowe' })).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: /Zaczynam naukę/ }));
+    expect(onComplete).toHaveBeenCalledWith(DEFAULT_ONBOARDING_PREFERENCES, false, false, 'math');
   });
 
-  it('completes the full flow and triggers onComplete', () => {
-    const handleComplete = vi.fn();
-    render(<OnboardingOverlay onClose={vi.fn()} onComplete={handleComplete} />);
+  it('opcjonalne konto otwiera logowanie i można wrócić do poprzedniego kroku', () => {
+    const onComplete = vi.fn();
+    render(<OnboardingOverlay onClose={vi.fn()} onComplete={onComplete} />);
+    next(/Zaczynam/);
+    fireEvent.click(screen.getByRole('button', { name: 'Wróć do poprzedniego kroku' }));
+    expect(screen.getByRole('heading', { name: 'Matura w 5 minut dziennie' })).toBeDefined();
+    next(/Zaczynam/);
+    next();
+    fireEvent.click(screen.getByRole('button', { name: 'Pomiń zadanie' }));
+    next();
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz postęp kontem' }));
+    expect(onComplete).toHaveBeenCalledWith(DEFAULT_ONBOARDING_PREFERENCES, true, false, 'math');
+  });
+});
 
-    // Step 1 -> Step 2
-    fireEvent.click(screen.getByRole('button', { name: /DALEJ/i }));
-
-    // Step 2 -> Solve task
-    fireEvent.click(screen.getByRole('button', { name: /A\./i }));
-    act(() => {
-      vi.advanceTimersByTime(1100);
-    });
-
-    // Step 3 -> Click continue
-    const step3Btn = screen.getByRole('button', { name: /ZOBACZ JAK WYGLĄDA KOKPIT/i });
-    fireEvent.click(step3Btn);
-
-    // Step 4 -> Interaktywny Kokpit
-    expect(screen.getByText('PRZEGLĄD INTERFEJSU')).toBeDefined();
-    const step4Btn = screen.getByRole('button', { name: /ODBIERZ SWÓJ PLAN NAUKI/i });
-    fireEvent.click(step4Btn);
-
-    // Step 5 -> Finałowy ekran
-    expect(screen.getByText('DZIEŃ 1 SERII ODBLOKOWANY')).toBeDefined();
-    expect(screen.getByText('Twój plan nauki z matematyki jest gotowy!')).toBeDefined();
-
-    // Click guest continue
-    const guestBtn = screen.getByRole('button', { name: /Zacznij naukę jako gość/i });
-    fireEvent.click(guestBtn);
-
-    expect(handleComplete).toHaveBeenCalledTimes(1);
-    expect(handleComplete).toHaveBeenCalledWith(
-      expect.objectContaining({
-        targetExam: 'matura_2025',
-        targetScore: '70'
-      }),
-      false,
-      true // zadanie demo rozwiązane – należy się XP i dzień serii
-    );
+describe('zadania próbne onboardingu', () => {
+  it('każde ma poprawną odpowiedź wśród opcji oraz wyjaśnienie pułapki', () => {
+    for (const option of SUBJECT_OPTIONS) {
+      const demo = onboardingDemoFor(option.key);
+      expect(demo.options.some(o => o.id === demo.correctId)).toBe(true);
+      expect(new Set(demo.options.map(o => o.text)).size).toBe(demo.options.length);
+      expect(demo.trap.length).toBeGreaterThan(20);
+      expect(demo.why.length).toBeGreaterThan(20);
+    }
   });
 });
