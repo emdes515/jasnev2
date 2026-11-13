@@ -87,7 +87,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Używanie Present Continuous z czasownikami statycznymi (np. „I am knowing him”, „She is wanting a coffee”) oraz błąd kalki językowej: „I live in Poland for 10 years” zamiast Present Perfect.",
       "matura_context": "Pojawia się w każdym arkuszu CKE w Zadaniach 8 i 9 (wybór wielokrotny leksykalno-gramatyczny) – waga: 1–2 pkt."
     },
-    "taskIds": ["eng_uoe_088", "eng_uoe_103", "eng_uoe_118", "eng_uoe_133", "eng_uoe_148"]
+    "taskIds": ["eng_cur_1_1_01", "eng_cur_1_1_02", "eng_cur_1_1_03", "eng_cur_1_1_04", "eng_cur_1_1_05"]
   },
   {
     "id": "eng-lesson-1-2",
@@ -139,7 +139,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Nieuważne stosowanie podwójnej formy przeszłej po operatorze didn't (np. „didn't went”, „didn't had”) oraz mylenie spójnika „during” (który jest przyimkiem i łączy się z rzeczownikiem: during the lesson) ze spójnikiem „while” (który łączy się z całym zdaniem: while I was studying).",
       "matura_context": "Stały element Zadań 8, 9 i 11 oraz klucz do zdobycia kompletu punktów za poprawność w opowiadaniu w Zadaniu 12 – waga: 2–3 pkt."
     },
-    "taskIds": ["eng_uoe_085", "eng_uoe_100", "eng_uoe_115", "eng_uoe_130", "eng_uoe_145"]
+    "taskIds": ["eng_cur_1_2_01", "eng_cur_1_2_02", "eng_cur_1_2_03", "eng_cur_1_2_04", "eng_cur_1_2_05"]
   },
   {
     "id": "eng-lesson-1-3",
@@ -191,7 +191,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Kalka z języka polskiego: tłumaczenie zdań typu „Mieszkam tu od roku” jako „I live here since a year” (błąd podwójny: zły czas Present Simple + słowo since zamiast for). Prawidłowo: „I have lived here for a year”.",
       "matura_context": "Bezwzględny pewniak w każdym arkuszu CKE (Zadania 8, 9 i 11) – waga: 2–3 pkt."
     },
-    "taskIds": ["eng_uoe_077", "eng_uoe_092", "eng_uoe_107", "eng_uoe_122", "eng_uoe_137"]
+    "taskIds": ["eng_cur_1_3_01", "eng_cur_1_3_02", "eng_cur_1_3_03", "eng_cur_1_3_04", "eng_cur_1_3_05"]
   },
   {
     "id": "eng-lesson-1-4",
@@ -243,7 +243,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Mylenie określnika „ago” z określnikiem „before” oraz wstawianie Present Perfect po pytaniu „When” (np. „When have you arrived?” zamiast „When did you arrive?”).",
       "matura_context": "Występuje w 100% arkuszy maturalnych CKE (Zadania 8, 9, 11) – waga: 2–3 pkt."
     },
-    "taskIds": ["eng_uoe_076", "eng_uoe_091", "eng_uoe_106", "eng_uoe_121", "eng_uoe_136"]
+    "taskIds": ["eng_cur_1_4_01", "eng_cur_1_4_02", "eng_cur_1_4_03", "eng_cur_1_4_04", "eng_cur_1_4_05"]
   },
   {
     "id": "eng-lesson-1-5",
@@ -295,7 +295,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Nadużywanie Past Perfect przy prostym wymienianiu kolejnych czynności w opowiadaniu oraz zapominanie o nieregularnej III formie czasownika (np. had went zamiast had gone).",
       "matura_context": "Kluczowe w Zadaniach 8, 9 i 11 (parafrazy oraz luki leksykalno-gramatyczne) – waga: 1–2 pkt."
     },
-    "taskIds": ["eng_uoe_082", "eng_uoe_097", "eng_uoe_112", "eng_uoe_127", "eng_uoe_142"]
+    "taskIds": ["eng_cur_1_5_01", "eng_cur_1_5_02", "eng_cur_1_5_03", "eng_cur_1_5_04", "eng_cur_1_5_05"]
   },
   {
     "id": "eng-lesson-1-6",
@@ -347,7 +347,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Wstawianie słowa „will” po spójnikach „when”, „as soon as”, „before” oraz mylenie zamiaru („I'm going to”) z oficjalnym rozkładem jazdy pociągu („The train leaves at 5:00”).",
       "matura_context": "Standardowe zagadnienie w Zadaniach 8, 9 i 10 CKE – waga: 1–2 pkt."
     },
-    "taskIds": ["eng_uoe_086", "eng_uoe_087", "eng_uoe_101", "eng_uoe_102", "eng_uoe_117"]
+    "taskIds": ["eng_cur_1_6_01", "eng_cur_1_6_02", "eng_cur_1_6_03", "eng_cur_1_6_04", "eng_cur_1_6_05"]
   },
   {
     "id": "eng-lesson-1-7",
@@ -399,7 +399,7 @@ export const ENGLISH_LESSONS: EnglishLessonData[] = [
       "exam_trap": "Stosowanie Present Perfect Continuous z czasownikami statycznymi (np. „I have been knowing him for years” zamiast „I have known him for years”) oraz pomijanie słowa „been” w konstrukcji (np. „I have running”).",
       "matura_context": "Zadania 8, 9 i 11 CKE (wybór wielokrotny i parafrazy ze słowem kluczem) – waga: 1–2 pkt."
     },
-    "taskIds": ["eng_uoe_079", "eng_uoe_094", "eng_uoe_109", "eng_uoe_124", "eng_uoe_139"]
+    "taskIds": ["eng_cur_1_7_01", "eng_cur_1_7_02", "eng_cur_1_7_03", "eng_cur_1_7_04", "eng_cur_1_7_05"]
   },
   {
     "id": "eng-lesson-2-1",

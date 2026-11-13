@@ -7,9 +7,12 @@
 
 import { EnglishTask, ENGLISH_SECTIONS } from '../../../types/englishTypes';
 import all1500EnglishTasksData from './generated/all_1500_english_tasks.json';
+import { CURATED_TENSE_TASKS } from './curatedTenseTasks';
 
-export const ALL_ENGLISH_TASKS: EnglishTask[] = all1500EnglishTasksData as EnglishTask[];
-export const all1500EnglishTasks = ALL_ENGLISH_TASKS;
+/** Wygenerowany bank historyczny (1500 rekordów, ok. 90 różnych treści). */
+export const all1500EnglishTasks = all1500EnglishTasksData as EnglishTask[];
+/** Bank historyczny + zredagowane zadania autorskie przypisane do lekcji. */
+export const ALL_ENGLISH_TASKS: EnglishTask[] = [...all1500EnglishTasks, ...CURATED_TENSE_TASKS];
 export { ENGLISH_SECTIONS };
 
 export function getEnglishTasksBySection(sectionId: string): EnglishTask[] {

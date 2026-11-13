@@ -60,6 +60,7 @@ import { MaturaExamReview, MaturaTaskReviewItem, MaturaAiEvaluation } from './Ma
 import { OpenTaskWorkspace, convertDataUrlToAiOptimized } from './OpenTaskWorkspace';
 import { WritingWorkspace } from './writing/WritingWorkspace';
 import { PolishExamSimulator } from './polish/PolishExamSimulator';
+import { dedupeTasksByContent } from '../lib/dedupeTasks';
 import { useTaskBank } from '../hooks/useTaskBank';
 import { setMaturaPracticePool } from '../services/maturaExamGenerator';
 import { MathDiagram } from './MathDiagram';
@@ -550,7 +551,7 @@ export function MaturaSimulatorView({
   // Zadania dla aktywnego przedmiotu w symulatorze
   const currentSubjectTasks = useMemo<MaturaTask[]>(() => {
     if (examSubject === 'angielski') {
-      return ALL_ENGLISH_TASKS.map(t => {
+      return dedupeTasksByContent(ALL_ENGLISH_TASKS).map(t => {
         let optLetter = t.correctAnswer;
         if (t.options && t.options.length > 0) {
           const idx = t.options.findIndex(o => o === t.correctAnswer || (t.optionsDetailed && t.optionsDetailed.find(od => od.is_correct)?.text === o));

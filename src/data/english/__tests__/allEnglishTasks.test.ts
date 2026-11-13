@@ -53,7 +53,7 @@ describe('English 1500 Tasks and Sections Integration', () => {
 
   it('retrieves tasks by section helper properly', () => {
     const d1Tasks = getEnglishTasksBySection('eng-dzial-1');
-    expect(d1Tasks.length).toBe(75);
+    expect(d1Tasks.length).toBe(75 + 35); // 75 historycznych + 35 zredagowanych zadań autorskich
     for (const t of d1Tasks) {
       expect(t.topicId).toBe('eng-dzial-1');
     }
@@ -64,7 +64,7 @@ describe('English 1500 Tasks and Sections Integration', () => {
     expect(listeningTasks.length).toBe(375); // 120 + 120 + 135
 
     const uoeTasks = getEnglishTasksByPillar('pillar-use-of-english');
-    expect(uoeTasks.length).toBe(375); // 75 + 75 + 45 + 60 + 120
+    expect(uoeTasks.length).toBe(375 + 35); // bank historyczny + zadania autorskie z Działu 1
 
     const readingTasks = getEnglishTasksByPillar('pillar-reading');
     expect(readingTasks.length).toBe(500); // 130 + 120 + 250
