@@ -1100,6 +1100,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
   });
   const [currentQueueIndex, setCurrentQueueIndex] = useState<number>(() => sessionData?.currentQueueIndex ?? 0);
   const [currentStep, setCurrentStep] = useState<number>(() => sessionData?.currentStep ?? 0); // 0: Pigułka wiedzy, 1: Zadania
+  // Powrót do teorii w trakcie zadań: zapamiętujemy niewysłaną odpowiedź i wracamy na to samo zadanie.
+  const [isTheoryReview, setIsTheoryReview] = useState<boolean>(false);
+  const theoryReturnRef = React.useRef<{ selectedOption: string | null; numericInput: string; tfSelections: Record<string, 'P' | 'F'>; twoPart1: string | null; twoPart2: string | null; openAnswerText: string; openCanvasDataUrl: string } | null>(null);
   const [theorySubStep, setTheorySubStep] = useState<number>(() => sessionData?.theorySubStep ?? 0); // 0: Istota i Strategia, 1: Wzory / Pojęcia, 2: Przykład / Analiza, 3: Pułapka CKE
   const [selectedOption, setSelectedOption] = useState<string | null>(() => sessionData?.selectedOption ?? null);
   const [isEvaluated, setIsEvaluated] = useState<boolean>(false);
@@ -2276,6 +2279,17 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     if (currentStep === 0) {
       setTheorySubStep(0);
     }
+    if (currentStep === 1 && theoryReturnRef.current) {
+      const saved = theoryReturnRef.current;
+      theoryReturnRef.current = null;
+      setSelectedOption(saved.selectedOption);
+      setNumericInput(saved.numericInput);
+      setTfSelections(saved.tfSelections);
+      setTwoPart1(saved.twoPart1);
+      setTwoPart2(saved.twoPart2);
+      setOpenAnswerText(saved.openAnswerText);
+      setOpenCanvasDataUrl(saved.openCanvasDataUrl);
+    }
   }, [currentStep, currentQueueIndex]);
 
   // Reset entire session state when lessonId changes (e.g. proceeding to next lesson)
@@ -2287,6 +2301,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     prevLessonIdRef.current = lessonId;
 
     setCurrentStep(0);
+    setIsTheoryReview(false);
+    theoryReturnRef.current = null;
     setTheorySubStep(0);
     setCurrentQueueIndex(0);
     setSessionMistakesCount(0);
@@ -2635,7 +2651,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
             setTheorySubStep(prev => prev + 1);
           } else {
             playSuccessSound();
-            setCurrentStep(1);
+            leaveTheoryToTasks();
           }
           return;
         }
@@ -3358,14 +3374,29 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     triggerHaptic('light');
   };
 
+  const leaveTheoryToTasks = () => {
+    setCurrentStep(1);
+    if (isTheoryReview) {
+      // Powrót z podglądu teorii: to samo zadanie, bez zerowania kolejki.
+      setIsTheoryReview(false);
+      return;
+    }
+    setCurrentQueueIndex(0);
+    setSelectedOption(null);
+    setIsEvaluated(false);
+    setIsCorrect(null);
+  };
+
+  const openTheoryFromTasks = () => {
+    theoryReturnRef.current = { selectedOption, numericInput, tfSelections, twoPart1, twoPart2, openAnswerText, openCanvasDataUrl };
+    setIsTheoryReview(true);
+    setCurrentStep(0);
+  };
+
   // Next step or finish – Mastery Learning (dynamiczny wymóg poprawnych odpowiedzi)
   const handleNextStep = () => {
     if (isTheoryStep) {
-      setCurrentStep(1);
-      setCurrentQueueIndex(0);
-      setSelectedOption(null);
-      setIsEvaluated(false);
-      setIsCorrect(null);
+      leaveTheoryToTasks();
       return;
     }
 
@@ -3827,6 +3858,24 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 </span>
               </button>
             ))}
+
+            {/* Teoria w trakcie zadań: powrót do tego samego zadania bez utraty wpisanej odpowiedzi */}
+            {!isTheoryStep && !isEvaluated && theoryPill && (
+              <button
+                id="session-theory-review-button"
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  openTheoryFromTasks();
+                }}
+                className="flex items-center justify-center gap-1.5 min-h-11 px-3 rounded-lg text-xs font-semibold shrink-0 cursor-pointer text-slate-200 bg-slate-800/80 border border-white/15 hover:bg-slate-700/80 focus-visible:outline-2 focus-visible:outline-primary"
+                title="Wróć do teorii (zadanie i odpowiedź zostaną zachowane)"
+                aria-label="Wróć do teorii"
+              >
+                <Compass className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">Teoria</span>
+              </button>
+            )}
 
             {/* Hearts Indicator Pill with Shockwave Arrival Effect */}
             <div className="relative shrink-0">
@@ -6765,7 +6814,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   }
                   triggerHaptic('medium');
                   playSuccessSound();
-                  setCurrentStep(1);
+                  leaveTheoryToTasks();
                 }}
                 className={`flex-1 h-[50px] px-4 rounded-xl font-bold active:scale-[0.98] transition flex items-center justify-center gap-2 text-sm tracking-wide shadow-sm ${
                   isEnglishSession && !isEnglishTrapPassed
@@ -6776,7 +6825,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 <span>
                   {isEnglishSession && !isEnglishTrapPassed
                     ? 'Rozwiąż mini-trening, aby odblokować zadania'
-                    : 'Przejdź do zadań'}
+                    : (isTheoryReview ? 'Wróć do zadania' : 'Przejdź do zadań')}
                 </span>
                 {isEnglishSession && !isEnglishTrapPassed ? (
                   <Lock className="w-4 h-4 text-slate-400" />

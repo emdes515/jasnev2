@@ -23,7 +23,6 @@ import { SubjectKey } from '../types';
 import { normalizeSubjectFirestoreId } from '../services/ckeCatalogRepository';
 import { EnglishDictionaryModal } from './english/EnglishDictionaryModal';
 import { MaturalnyDuetGame } from './english/MaturalnyDuetGame';
-import { MathTheoryModal } from './math/MathTheoryModal';
 
 
 // Ikony zapasowe działów matematyki – w kolejności działów 1–15
@@ -268,33 +267,6 @@ export function LearnView({
   const [bossExamData, setBossExamData] = useState<any>(null);
   const [isBossExamLoading, setIsBossExamLoading] = useState<boolean>(false);
   const [showEnglishDictionary, setShowEnglishDictionary] = useState<boolean>(false);
-  const [previewTheoryModalData, setPreviewTheoryModalData] = useState<{
-    isOpen: boolean;
-    lessonTitle: string;
-    lessonBadge: string;
-    theoryPill: any;
-    topicTitle: string;
-    onStartSession: () => void;
-  } | null>(null);
-
-  const handleOpenTheoryModal = async (group: LessonGroup, nextLessonPayload?: any) => {
-    triggerHaptic('light');
-    const topicId = currentTopic?.id || 'dzial-1';
-    const lessonDoc = await curriculumRepository.getLesson(topicId, group.id, subjectFirestoreId);
-    const rawTheoryPill = lessonDoc?.theory_pill || (group as any).theory_pill;
-    const enrichedPill = enrichTheoryPillWithVisual(rawTheoryPill, group.id);
-    setPreviewTheoryModalData({
-      isOpen: true,
-      lessonTitle: cleanLessonTitle(group.name),
-      lessonBadge: group.badge,
-      theoryPill: enrichedPill,
-      topicTitle: cleanTopicTitle(currentTopic?.name || currentTopic?.title),
-      onStartSession: () => handleStartLessonSession(group, nextLessonPayload)
-    });
-  };
-
-
-
   const getLessonMistakes = (lessonGroupId: string) => {
     if (lessonMistakes && lessonMistakes[lessonGroupId] !== undefined) {
       return lessonMistakes[lessonGroupId];
@@ -727,7 +699,7 @@ export function LearnView({
     setExpandedLessonId(prev => prev === group.id ? null : group.id);
   };
 
-  const handleStartLessonSession = async (group: LessonGroup, nextLessonPayload?: any, explicitTopicId?: string) => {
+  const handleStartLessonSession = async (group: LessonGroup, nextLessonPayload?: any, explicitTopicId?: string, tasksOnly = false) => {
     triggerHaptic('medium');
     const topicId = explicitTopicId || currentTopic?.id || 'dzial-1';
     // Flat-Bundle: 1 single document read for full theory_pill + tasks (0 reads if cached)
@@ -748,6 +720,8 @@ export function LearnView({
     const sessionPayload = {
       isSession: true,
       originTab: 'learn',
+      // „Same zadania” pomija pigułkę; teoria nadal jest dostępna z poziomu sesji.
+      ...(tasksOnly ? { currentStep: 1 } : {}),
       isPolish: selectedSubjectKey === 'pol',
       isEnglish: selectedSubjectKey === 'eng',
       subjectId: subjectFirestoreId,
@@ -1885,11 +1859,12 @@ export function LearnView({
                               <>
                                 <button
                                   type="button"
-                                  onClick={() => handleOpenTheoryModal(group, nextLessonPayload)}
-                                  className="w-full sm:w-auto py-2.5 px-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-[#FFB800]/40 text-slate-200 hover:text-[#FFB800] font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-[0.98] cursor-pointer shrink-0"
+                                  id={`tasks-only-btn-${group.id}`}
+                                  onClick={() => handleStartLessonSession(group, nextLessonPayload, undefined, true)}
+                                  className="w-full sm:w-auto min-h-11 py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-[#FFB800]/40 text-slate-200 hover:text-[#FFB800] font-semibold text-sm flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer"
                                 >
-                                  <Compass size={14} className="text-[#FFB800]" />
-                                  <span>Pigułka (~3-4 min)</span>
+                                  <ListChecks size={15} className="text-[#FFB800]" />
+                                  <span>Same zadania</span>
                                 </button>
 
                                 {isCompleted ? (
@@ -1899,7 +1874,7 @@ export function LearnView({
                                     className="flex-1 py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-emerald-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer"
                                   >
                                     <RefreshCw size={14} className="stroke-[2.5] text-emerald-400" />
-                                    <span>Powtórz lekcję</span>
+                                    <span>Pełna lekcja</span>
                                   </button>
                                 ) : (
                                   <button
@@ -1908,7 +1883,7 @@ export function LearnView({
                                     className={`flex-1 min-h-11 py-3 px-5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition cursor-pointer ${isCurrentActiveLesson ? 'bg-primary hover:bg-primary-hover text-[#080B11]' : 'bg-surface-card hover:bg-surface-card-hover border border-surface-border text-text-primary'}`}
                                   >
                                     <Play size={15} fill="currentColor" strokeWidth={0} />
-                                    <span>Rozpocznij lekcję</span>
+                                    <span>Pełna lekcja</span>
                                     <ArrowRight size={15} strokeWidth={3} />
                                   </button>
                                 )}
@@ -2053,21 +2028,6 @@ export function LearnView({
         <EnglishDictionaryModal
           isOpen={showEnglishDictionary}
           onClose={() => setShowEnglishDictionary(false)}
-        />
-      )}
-
-      {/* =========================================================================
-          ROZBUDOWANY MODAL TEORII MATEMATYKI W PIGUŁCE (~3-4 MIN)
-         ========================================================================= */}
-      {previewTheoryModalData?.isOpen && (
-        <MathTheoryModal
-          isOpen={previewTheoryModalData.isOpen}
-          onClose={() => setPreviewTheoryModalData(null)}
-          onStartSession={previewTheoryModalData.onStartSession}
-          lessonTitle={previewTheoryModalData.lessonTitle}
-          lessonBadge={previewTheoryModalData.lessonBadge}
-          theoryPill={previewTheoryModalData.theoryPill}
-          topicTitle={previewTheoryModalData.topicTitle}
         />
       )}
 
