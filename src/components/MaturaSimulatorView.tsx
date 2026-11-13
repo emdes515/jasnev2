@@ -61,6 +61,7 @@ import { OpenTaskWorkspace, convertDataUrlToAiOptimized } from './OpenTaskWorksp
 import { WritingWorkspace } from './writing/WritingWorkspace';
 import { PolishExamSimulator } from './polish/PolishExamSimulator';
 import { dedupeTasksByContent } from '../lib/dedupeTasks';
+import { recordExamResult } from '../lib/examResults';
 import { useTaskBank } from '../hooks/useTaskBank';
 import { setMaturaPracticePool } from '../services/maturaExamGenerator';
 import { MathDiagram } from './MathDiagram';
@@ -344,6 +345,7 @@ export function MaturaSimulatorView({
   });
   const ALL_ENGLISH_TASKS = useTaskBank(englishBankId);
   const ALL_POLISH_TASKS = useTaskBank('jezyk-polski');
+  const examKey: SubjectKey = subjectKey ?? (examSubject === 'polski' ? 'pol' : examSubject === 'angielski' ? 'eng' : 'math');
 
   // Reaktywna synchronizacja przedmiotu z paska górnego
   useEffect(() => {
@@ -364,7 +366,7 @@ export function MaturaSimulatorView({
     const earnedCoins = pct < 30 ? 30 : Math.round(30 + (pct / 100) * 120);
     onEarnReward?.(earnedXp, earnedCoins, true);
     if (onUpdateUserState) {
-      onUpdateUserState(prev => ({
+      onUpdateUserState(prev => recordExamResult({
         ...prev,
         xp: (prev.xp || 0) + earnedXp,
         coins: (prev.coins || 0) + earnedCoins,
@@ -375,7 +377,7 @@ export function MaturaSimulatorView({
           completedCount: (prev.polishStats?.completedCount || 0) + 1,
           lastLessonId: prev.polishStats?.lastLessonId
         }
-      }));
+      }, 'pol', score, maxScore));
     }
   };
 
@@ -1068,12 +1070,12 @@ export function MaturaSimulatorView({
         const scorePct = maxExamPoints > 0 ? Math.round((totalScore / maxExamPoints) * 100) : 0;
         const best = Math.max(prev.maturaBestScore || 0, scorePct);
 
-        return {
+        return recordExamResult({
           ...prev,
           completedCkeTasks: ckeMap,
           maturaAttempts: (prev.maturaAttempts || 0) + 1,
           maturaBestScore: best
-        };
+        }, examKey, totalScore, maxExamPoints);
       });
     }
 

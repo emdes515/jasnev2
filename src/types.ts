@@ -47,6 +47,8 @@ export interface UserState {
   lastProCoinDropDate?: string; // YYYY-MM-DD ostatniego odbioru Złotego Zrzutu PRO (+30 monet za 1. lekcję)
   maturaAttempts?: number; // Finished matura exam attempts
   maturaBestScore?: number; // Best score percentage in matura
+  /** Wyniki pełnych arkuszy per klucz przedmiotu i poziomu (math, math-roz, pol, eng, eng-roz). Źródło prognozy. */
+  examResults?: Record<string, { attempts: number; bestScore: number }>;
   level: number;
   campusRust: number; // 0-100%
   lastActive: number;

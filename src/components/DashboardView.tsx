@@ -35,6 +35,7 @@ import { curriculumRepository } from '../services/curriculumRepository';
 import { PredictorWidget } from './PredictorWidget';
 import { PredictorDetailsModal } from './PredictorDetailsModal';
 import { calculateMaturaPrediction } from '../lib/maturaPredictor';
+import { getExamResult } from '../lib/examResults';
 import { getCkeAvailableSubjects, normalizeSubjectFirestoreId, useCkeCatalogs } from '../services/ckeCatalogRepository';
 import { DailyChallengesWidget } from './DailyChallengesWidget';
 
@@ -247,23 +248,30 @@ export function DashboardView({
 
   const currentSubjectId = normalizeSubjectFirestoreId(selectedSubjectKey);
 
+  const allCompletedLessonIds = useMemo(() => [
+    ...(userState?.completed_lessons || []),
+    ...(userState?.completedLessonsPolish || []),
+    ...(userState?.completedLessonsEnglish || []),
+  ], [userState?.completed_lessons, userState?.completedLessonsPolish, userState?.completedLessonsEnglish]);
+  const subjectExam = getExamResult(userState, selectedSubjectKey ?? 'math');
+
   // Dynamiczny predyktor wyniku maturalnego CKE (obliczany w czasie rzeczywistym)
   const maturaPrediction = useMemo(() => {
     return calculateMaturaPrediction({
       subjectId: currentSubjectId,
       completedTasks,
       lessonMistakes,
-      userLessonsCompleted: userState?.completed_lessons,
-      maturaAttempts: userState?.maturaAttempts,
-      maturaBestScore: userState?.maturaBestScore
+      userLessonsCompleted: allCompletedLessonIds,
+      maturaAttempts: subjectExam.attempts,
+      maturaBestScore: subjectExam.bestScore
     });
   }, [
     currentSubjectId,
     completedTasks,
     lessonMistakes,
-    userState?.completed_lessons,
-    userState?.maturaAttempts,
-    userState?.maturaBestScore
+    allCompletedLessonIds,
+    subjectExam.attempts,
+    subjectExam.bestScore
   ]);
 
   const nextUp = useMemo(() => {
@@ -752,9 +760,9 @@ export function DashboardView({
         onSelectSubject={handleSelectSubject}
         completedTasks={completedTasks}
         lessonMistakes={lessonMistakes}
-        userLessonsCompleted={userState?.completed_lessons}
-        maturaAttempts={userState?.maturaAttempts}
-        maturaBestScore={userState?.maturaBestScore}
+        userLessonsCompleted={allCompletedLessonIds}
+        maturaAttempts={subjectExam.attempts}
+        maturaBestScore={subjectExam.bestScore}
         onNavigate={onNavigate}
         onOpenParentSponsor={onOpenParentSponsor}
         onOpenProPopup={onOpenProPopup}

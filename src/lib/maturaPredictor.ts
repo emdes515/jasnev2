@@ -2,6 +2,7 @@ import { uniqueLessonMistakes } from './lessonMistakes';
 import { PredictorResult, TopicMasteryBreakdown } from '../types';
 import { getSubjectCkeConfig } from '../services/ckeCatalogRepository';
 import { filterActualTaskIds } from '../utils';
+import { expectedLessonsForTopic, topicIdFromBankId } from './predictorTopics';
 
 export interface CalculateMaturaPredictionParams {
   subjectId?: string;
@@ -18,6 +19,9 @@ export interface CalculateMaturaPredictionParams {
  */
 export function extractTopicIdFromEntityId(id: string, subjectId: string): string | null {
   if (!id) return null;
+
+  const bankTopic = topicIdFromBankId(id);
+  if (bankTopic) return bankTopic;
 
   // 1. Angielski Rozszerzony
   if (subjectId === 'eng-roz' || subjectId === 'jezyk-angielski-rozszerzony' || id.includes('eng-roz')) {
@@ -71,19 +75,6 @@ export function extractTopicIdFromEntityId(id: string, subjectId: string): strin
   }
 
   return null;
-}
-
-/**
- * Szacuje liczbę lekcji w danym dziale w zależności od przedmiotu
- */
-function getExpectedLessonsForTopic(topicId: string): number {
-  if (topicId.startsWith('pol-')) return 6;
-  if (topicId.startsWith('eng-roz-')) return 2;
-  if (topicId.startsWith('eng-')) return 3;
-  if (topicId.startsWith('mat-roz-')) return 2;
-  if (topicId === 'dzial-1') return 15;
-  if (topicId === 'dzial-3' || topicId === 'dzial-6' || topicId === 'dzial-9') return 14;
-  return 11;
 }
 
 /**
@@ -176,7 +167,7 @@ export function calculateMaturaPrediction(params: CalculateMaturaPredictionParam
     const completedTasksCount = tasksByTopic[tId]?.size || 0;
     const completedLessonsCount = lessonsByTopic[tId]?.size || 0;
     const mistakesCount = mistakesByTopic[tId] || 0;
-    const expectedLessons = getExpectedLessonsForTopic(tId);
+    const expectedLessons = expectedLessonsForTopic(tId);
 
     let masteryNormalized = BASE_GUESSING_PROBABILITY;
 
@@ -186,8 +177,8 @@ export function calculateMaturaPrediction(params: CalculateMaturaPredictionParam
       touchedTopicsCount++;
     } else {
       // Obliczenie wskaźnika pokrycia materiału (lessons vs tasks)
-      const lessonProgressRatio = completedLessonsCount / expectedLessons;
-      const taskProgressRatio = completedTasksCount / (expectedLessons * 3);
+      const lessonProgressRatio = expectedLessons > 0 ? completedLessonsCount / expectedLessons : 0;
+      const taskProgressRatio = expectedLessons > 0 ? completedTasksCount / (expectedLessons * 3) : 0;
       const coverageRatio = Math.min(1.0, Math.max(lessonProgressRatio, taskProgressRatio));
 
       if (coverageRatio > 0) {
