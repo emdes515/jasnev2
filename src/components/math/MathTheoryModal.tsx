@@ -56,8 +56,8 @@ export function MathTheoryModal({
   if (!isOpen || !theoryPill) return null;
 
   const tabs = [
-    { id: 0, title: 'Sedno & Intuicja', icon: Compass, time: '~45 s' },
-    { id: 1, title: 'Wzory & Tłumaczenie', icon: Calculator, time: '~45 s' },
+    { id: 0, title: 'W pigułce', icon: Compass, time: '~45 s' },
+    { id: 1, title: 'Wzory', icon: Calculator, time: '~45 s' },
     { id: 2, title: 'Algorytm CKE', icon: Zap, time: '~45 s' },
     { id: 3, title: 'Przykłady (1-2 pkt)', icon: CheckCircle2, time: '~60 s' },
     { id: 4, title: 'Pułapka CKE', icon: ShieldAlert, time: '~45 s' }
@@ -85,7 +85,7 @@ export function MathTheoryModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-3xl max-h-[92vh] sm:max-h-[88vh] bg-[#0E1522] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100"
+        className="w-full max-w-3xl max-h-[92dvh] sm:max-h-[88dvh] bg-[#0E1522] border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-100"
       >
         {/* Header */}
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-white/10 bg-[#121B2C]/90 flex items-center justify-between shrink-0">
@@ -150,9 +150,9 @@ export function MathTheoryModal({
         </div>
 
         {/* Content Body (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-sm leading-relaxed overscroll-contain">
+        <div className="flex-1 focus-scroll overflow-y-auto p-4 sm:p-6 space-y-4 text-sm leading-relaxed overscroll-contain">
           <AnimatePresence mode="wait">
-            {/* Tab 0: Sedno & Intuicja */}
+            {/* Tab 0: W pigułce */}
             {activeTab === 0 && (
               <motion.div
                 key="tab-0"
@@ -166,7 +166,7 @@ export function MathTheoryModal({
                 <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#141E30] to-[#0F1726] border border-white/10 shadow-sm space-y-3">
                   <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#FFB800]">
                     <Target size={14} />
-                    <span>Sedno Konceptu (Core Concept)</span>
+                    <span>Najważniejsza zasada</span>
                   </div>
                   <div className="text-slate-200 text-sm sm:text-base leading-relaxed">
                     <MathRenderer content={theoryPill.concept_essence || theoryPill.intuition || ''} />
@@ -178,7 +178,7 @@ export function MathTheoryModal({
                   <div className="p-4 sm:p-5 rounded-2xl bg-[#1A1811] border border-[#FFB800]/25 shadow-sm space-y-2">
                     <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-amber-300">
                       <BookOpen size={14} />
-                      <span>Z polskiego na nasze (Intuicja bez żargonu)</span>
+                      <span>Prościej mówiąc</span>
                     </div>
                     <div className="text-amber-100/90 text-sm leading-relaxed font-medium">
                       <MathRenderer content={theoryPill.plain_polish} />
@@ -213,7 +213,7 @@ export function MathTheoryModal({
               </motion.div>
             )}
 
-            {/* Tab 1: Wzory & Tłumaczenie */}
+            {/* Tab 1: Wzory */}
             {activeTab === 1 && (
               <motion.div
                 key="tab-1"
@@ -304,7 +304,7 @@ export function MathTheoryModal({
                           </p>
                           {step.tip && (
                             <div className="pt-1 text-[11px] text-[#FFB800] font-medium flex items-center gap-1.5">
-                              <span>💡 Wskazówka:</span>
+                              <span> Wskazówka:</span>
                               <MathRenderer content={step.tip} />
                             </div>
                           )}
@@ -519,7 +519,7 @@ export function MathTheoryModal({
                 className="py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 active:scale-[0.98] transition cursor-pointer bg-[#FFB800] hover:bg-[#FFC72C] text-[#080B11] shadow-md shadow-amber-500/20"
               >
                 <Play size={14} fill="#080B11" strokeWidth={0} />
-                <span>ROZPOCZNIJ ZADANIA Z TEJ LEKCJI</span>
+                <span>PRZEJDŹ DO LEKCJI</span>
                 <ChevronRight size={15} strokeWidth={3} />
               </button>
             ) : (

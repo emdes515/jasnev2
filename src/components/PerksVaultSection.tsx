@@ -1,434 +1,132 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { Shield, ShieldCheck, Zap, Crown, Coins, ShoppingBag, Check, AlertCircle, ArrowRight } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { ARENA_ENABLED } from '../config/features';
-import { motion } from 'motion/react';
-import { 
-  Shield, 
-  ShieldCheck, 
-  Zap, 
-  Crown, 
-  Coins, 
-  ShoppingBag, 
-  Check, 
-  AlertCircle,
-  Flame,
-  ArrowRight
-} from 'lucide-react';
 import { UserState } from '../types';
 import { SHOP_ITEMS, ShopItem } from '../data/achievements';
 import { triggerHaptic } from '../utils';
-import confetti from 'canvas-confetti';
+import { RewardButton, RewardStatus, formatQuantity } from './rewards/RewardsUI';
 
 interface PerksVaultSectionProps {
   userState: UserState;
-  onBuyItem: (item: ShopItem, currency: 'tokens' | 'coins') => boolean;
+  onBuyItem: (item: ShopItem, currency: 'tokens' | 'coins') => boolean | Promise<boolean>;
   onUseStreakFreeze?: () => void;
   onOpenBlikModal?: () => void;
+  onOpenAchievements?: () => void;
 }
 
-export function PerksVaultSection({
-  userState,
-  onBuyItem,
-  onUseStreakFreeze,
-  onOpenBlikModal
-}: PerksVaultSectionProps) {
-  const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
-  const [purchaseError, setPurchaseError] = useState<string | null>(null);
-
-  const perks = userState.perks || {
-    xpBoostPercent: 0,
-    coinBoostPercent: 0,
-    streakFreezes: 0,
-    arenaShields: 0,
-    arenaTokenBonusPercent: 0,
-    temporaryXpBoostCharges: 0
-  };
-
-  const masteryTokens = userState.masteryTokens || 0;
-  const coins = userState.coins || 0;
-
-  const handlePurchase = (item: ShopItem, currency: 'tokens' | 'coins') => {
-    setPurchaseError(null);
-
-    if (item.effectType === 'streakFreeze' && (perks.streakFreezes || 0) >= 2) {
-      triggerHaptic('warning');
-      setPurchaseError('Osiągnięto maksymalny limit Tarczy Serii (2 sztuki w ekwipunku).');
-      setTimeout(() => setPurchaseError(null), 3500);
-      return;
-    }
-
-    if (item.effectType === 'arenaShield' && (perks.arenaShields || 0) >= 3) {
-      triggerHaptic('warning');
-      setPurchaseError('Osiągnięto maksymalny limit Tarcz Areny (3 sztuki w ekwipunku).');
-      setTimeout(() => setPurchaseError(null), 3500);
-      return;
-    }
-
-    const success = onBuyItem(item, currency);
-    if (success) {
-      triggerHaptic('success');
-      confetti({
-        particleCount: 50,
-        spread: 50,
-        origin: { y: 0.8 }
-      });
-      setPurchaseSuccess(`Zdobyto: ${item.name}!`);
-      setTimeout(() => setPurchaseSuccess(null), 3000);
-    } else {
-      triggerHaptic('error');
-      setPurchaseError(`Niewystarczająca ilość ${currency === 'tokens' ? 'Żetonów Areny' : 'Monet'}!`);
-      setTimeout(() => setPurchaseError(null), 3500);
-    }
-  };
-
+export function PerksVaultSection({ userState, onBuyItem, onUseStreakFreeze, onOpenBlikModal, onOpenAchievements }: PerksVaultSectionProps) {
+  const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null);
+  const [pending, setPending] = useState(false);
+  const purchasing = useRef(false);
+  const marketRef = useRef<HTMLElement>(null);
+  const perks = userState.perks;
+  const tokens = userState.masteryTokens || 0, coins = userState.coins || 0;
+  const freezes = perks?.streakFreezes || 0, boosts = perks?.temporaryXpBoostCharges || 0, shields = perks?.arenaShields || 0;
   const scrollToMarket = () => {
     triggerHaptic('light');
-    const marketEl = document.getElementById('perks-market-section');
-    if (marketEl) {
-      marketEl.scrollIntoView({ behavior: 'smooth' });
+    marketRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    marketRef.current?.focus({ preventScroll: true });
+  };
+  const purchase = async (item: ShopItem, currency: 'tokens' | 'coins') => {
+    if (purchasing.current) return;
+    setMessage(null);
+    if (item.effectType === 'coinBooster') return;
+    const limitReached = item.effectType === 'streakFreeze' && freezes >= 2 || item.effectType === 'arenaShield' && shields >= 3;
+    if (limitReached) { setMessage({ text: 'Masz już maksymalną liczbę tych bonusów.', error: true }); return; }
+    purchasing.current = true;
+    setPending(true);
+    try {
+      if (await onBuyItem(item, currency)) {
+        triggerHaptic('success');
+        confetti({ particleCount: 50, spread: 50, origin: { y: 0.8 } });
+        setMessage({ text: `Kupiono: ${item.name}.`, error: false });
+      } else {
+        triggerHaptic('error');
+        setMessage({ text: 'Nie udało się kupić bonusu. Sprawdź saldo i spróbuj ponownie.', error: true });
+      }
+    } catch {
+      setMessage({ text: 'Nie udało się kupić bonusu. Spróbuj ponownie.', error: true });
+    } finally {
+      purchasing.current = false;
+      setPending(false);
     }
   };
+  const bonuses = [
+    { Icon: Shield, name: 'Ochrona serii', count: freezes, description: 'Zachowuje passę po dniu bez nauki. Możesz mieć maksymalnie 2 sztuki.' },
+    { Icon: Zap, name: 'Podwójne XP', count: boosts, description: 'Podwaja XP z następnej ukończonej lekcji. Jeden bonus wystarcza na jedną sesję.' },
+    ...(ARENA_ENABLED ? [{ Icon: ShieldCheck, name: 'Ochrona rankingu Areny', count: shields, description: 'Chroni przed utratą punktów ELO po przegranym pojedynku.' }] : [])
+  ];
+  const permanent = [
+    perks?.xpBoostPercent ? `XP: +${perks.xpBoostPercent}%` : '',
+    perks?.coinBoostPercent ? `Monety: +${perks.coinBoostPercent}%` : '',
+    ARENA_ENABLED && perks?.arenaTokenBonusPercent ? `Żetony Areny: +${perks.arenaTokenBonusPercent}%` : ''
+  ].filter(Boolean);
 
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Wallet / Arena Currency Card */}
-      <div className="bg-[#141A23] border border-white/5 shadow-md rounded-[24px] p-5 relative overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 shadow-inner">
-              <Crown size={20} />
-            </div>
-            <div>
-              <h3 className="font-display font-black text-white text-base">Portfel Mistrzostwa</h3>
-              <p className="text-[11px] text-[#8B8D98]">Zasoby turniejowe i naukowe</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="bg-white/5 rounded-2xl p-3.5 flex flex-col border border-white/5">
-            <span className="text-[10px] uppercase font-black text-[#8B8D98] mb-1 flex items-center gap-1.5">
-              <Crown size={12} className="text-amber-400" /> {ARENA_ENABLED ? 'Żetony Areny' : 'Żetony Mistrzostwa'}
-            </span>
-            <span className="text-2xl font-display font-black text-amber-400 leading-tight">
-              {masteryTokens}
-            </span>
-            <span className="text-[10px] text-amber-200/60 mt-1">{ARENA_ENABLED ? 'Z walk 1v1 i odznak' : 'Z odznak'}</span>
-          </div>
-
-          <div className="bg-white/5 rounded-2xl p-3.5 flex flex-col border border-white/5">
-            <span className="text-[10px] uppercase font-black text-[#8B8D98] mb-1 flex items-center gap-1.5">
-              <Coins size={12} className="text-yellow-400" /> Monety Kampusu
-            </span>
-            <span className="text-2xl font-display font-black text-white leading-tight">
-              {coins.toLocaleString('pl-PL')}
-            </span>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-[10px] text-[#8B8D98]">Z zadań i matury</span>
-              {onOpenBlikModal && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    onOpenBlikModal();
-                  }}
-                  className="text-[10px] font-black text-amber-400 hover:text-amber-300 flex items-center gap-1 cursor-pointer bg-amber-500/10 hover:bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30 transition-all"
-                >
-                  <Coins size={10} /> + Doładuj BLIK
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+  return <div className="space-y-6">
+    <section className="reward-panel" aria-labelledby="vault-balance-title">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="vault-balance-title" className="reward-heading">Twoje środki</h2>
+        {onOpenBlikModal && <RewardButton onClick={onOpenBlikModal}>Doładuj monety przez BLIK</RewardButton>}
       </div>
-
-      {/* SYSTEM SLOTÓW EKWIPUNKU (RPG ARTIFACT SLOTS) */}
-      <div>
-        <div className="flex items-center justify-between mb-3 px-0.5">
-          <h3 className="text-sm font-display font-black text-white flex items-center gap-2">
-            <Zap size={16} className="text-[#FFB800]" /> Sloty Ekwipunku & Wzmocnienia
-          </h3>
-          <span className="text-[10px] uppercase tracking-wider font-bold text-[#8B8D98]">{ARENA_ENABLED ? 3 : 2} Gniazda RPG</span>
-        </div>
-
-        <div className="flex flex-col gap-3.5">
-          {/* SLOT 1: TARCZA PASSY */}
-          <div className="relative group bg-[#141A23] border border-blue-500/20 rounded-[22px] p-4 sm:p-5 overflow-hidden shadow-[0_4px_20px_rgba(59,130,246,0.08)] transition-all duration-150 active:scale-[0.98]">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[35px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-            
-            <div className="flex items-start gap-4 relative z-10">
-              {/* Świecący slot artefaktu */}
-              <div className="relative shrink-0">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-700/30 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                  <Shield size={26} className="drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
-                </div>
-                <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-[#141A23]">
-                  S1
-                </div>
-              </div>
-
-              {/* Opis i status slotu */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
-                  <h4 className="font-display font-black text-white text-base">Tarcza Passy</h4>
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30 shadow-sm">
-                    Aktywna: {perks.streakFreezes || 0} szt.
-                  </span>
-                </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed mb-3">
-                  Chroni Twój płomień serii przed zerwaniem i natychmiast neutralizuje rdzę po opuszczonym dniu nauki.
-                </p>
-
-                {/* Szybka interakcja */}
-                <div className="flex items-center gap-2">
-                  {userState.campusRust > 0 && (perks.streakFreezes || 0) > 0 && onUseStreakFreeze ? (
-                    <button
-                      onClick={() => {
-                        triggerHaptic('success');
-                        onUseStreakFreeze();
-                      }}
-                      className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all duration-150 active:scale-[0.96]"
-                    >
-                      Użyj i usuń rdzę ({userState.campusRust})
-                    </button>
-                  ) : (perks.streakFreezes || 0) === 0 ? (
-                    <button
-                      onClick={scrollToMarket}
-                      className="text-[11px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
-                    >
-                      Kup w Rynku poniżej <ArrowRight size={12} />
-                    </button>
-                  ) : (
-                    <span className="text-[11px] font-bold text-blue-300/70 flex items-center gap-1">
-                      <Check size={13} className="text-blue-400" /> Gotowa do automatycznej ochrony
-                    </span>
-                  )}
-                </div>
-              </div>
+      <dl className="grid grid-cols-2 gap-4 border-t border-surface-border mt-4 pt-4">
+        <div><dt className="flex items-center gap-2 text-sm text-text-secondary"><Coins size={16} className="text-primary" />Monety</dt><dd className="text-2xl font-semibold text-text-primary tabular-nums mt-2">{coins.toLocaleString('pl-PL')}</dd><p className="text-xs text-text-secondary mt-1">Z zadań i nagród</p></div>
+        <div><dt className="flex items-center gap-2 text-sm text-text-secondary"><Crown size={16} className="text-primary" />Żetony</dt><dd className="text-2xl font-semibold text-text-primary tabular-nums mt-2">{tokens.toLocaleString('pl-PL')}</dd><p className="text-xs text-text-secondary mt-1">Z odznak</p></div>
+      </dl>
+    </section>
+    <section aria-labelledby="vault-inventory-title">
+      <h2 id="vault-inventory-title" className="reward-heading mb-3">Twoje bonusy</h2>
+      <div className="reward-panel divide-y divide-surface-border !py-0">
+        {bonuses.map(({ Icon, name, count, description }) => <div key={name} className="py-5">
+          <div className="flex items-start gap-3">
+            <span className="reward-icon"><Icon size={20} aria-hidden="true" /></span>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap justify-between gap-2"><h3 className="reward-heading">{name}</h3><RewardStatus tone={count ? 'complete' : 'neutral'}>W zapasie: {count}</RewardStatus></div>
+              <p className="text-sm leading-relaxed text-text-secondary mt-2">{description}</p>
+              {name === 'Ochrona serii' && count > 0 && userState.campusRust > 0 && onUseStreakFreeze
+                ? <RewardButton onClick={onUseStreakFreeze} className="mt-3">Użyj ochrony i odśwież materiał</RewardButton>
+                : count === 0 ? <RewardButton onClick={scrollToMarket} className="mt-3">Przejdź do sklepu<ArrowRight size={15} /></RewardButton>
+                : <p className="text-xs text-text-secondary mt-3">{name === 'Podwójne XP' ? 'Włączy się automatycznie przy kolejnej sesji.' : 'Ochrona działa automatycznie.'}</p>}
             </div>
           </div>
-
-          {ARENA_ENABLED && (
-          <>
-          {/* SLOT 2: TARCZA ELO ARENY */}
-          <div className="relative group bg-[#141A23] border border-emerald-500/20 rounded-[22px] p-4 sm:p-5 overflow-hidden shadow-[0_4px_20px_rgba(16,185,129,0.08)] transition-all duration-150 active:scale-[0.98]">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-[35px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-
-            <div className="flex items-start gap-4 relative z-10">
-              {/* Świecący slot artefaktu */}
-              <div className="relative shrink-0">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-700/30 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                  <ShieldCheck size={26} className="drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                </div>
-                <div className="absolute -bottom-1 -right-1 bg-emerald-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-[#141A23]">
-                  S2
-                </div>
-              </div>
-
-              {/* Opis i status slotu */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
-                  <h4 className="font-display font-black text-white text-base">Egida Areny 1v1</h4>
-                  <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border shadow-sm ${
-                    (perks.arenaShields || 0) > 0 
-                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' 
-                      : 'bg-white/5 text-[#8B8D98] border-white/5'
-                  }`}>
-                    {(perks.arenaShields || 0) > 0 ? `Aktywna: ${perks.arenaShields} pojedynków` : 'Brak w ekwipunku'}
-                  </span>
-                </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed mb-3">
-                  Runiczna osłona turniejowa. Zapobiega utracie punktów rankingu ELO w razie przegranej w pojedynku na żywo.
-                </p>
-
-                <div className="flex items-center gap-2">
-                  {(perks.arenaShields || 0) > 0 ? (
-                    <span className="text-[11px] font-bold text-emerald-300/80 flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                      Chroni ranking w następnej walce
-                    </span>
-                  ) : (
-                    <button
-                      onClick={scrollToMarket}
-                      className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors"
-                    >
-                      Zdobądź Egidę w Rynku <ArrowRight size={12} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          </>
-          )}
-
-          {/* SLOT 3: DOŁADOWANIE XP (PULSUJĄCE ZŁOTYM ŚWIATŁEM) */}
-          <div className="relative group bg-[#141A23] border border-amber-500/25 rounded-[22px] p-4 sm:p-5 overflow-hidden shadow-[0_4px_25px_rgba(245,158,11,0.12)] transition-all duration-150 active:scale-[0.98]">
-            {/* Złota poświata */}
-            <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/15 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 pointer-events-none animate-pulse"></div>
-
-            <div className="flex items-start gap-4 relative z-10">
-              {/* Pulsujący artefakt z dynamicznym blaskiem */}
-              <div className="relative shrink-0">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/25 to-yellow-600/30 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.4)] animate-pulse">
-                  <Zap size={26} className="drop-shadow-[0_0_10px_rgba(251,191,36,0.9)]" />
-                </div>
-                <div className="absolute -bottom-1 -right-1 bg-amber-500 text-amber-950 text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-[#141A23]">
-                  S3
-                </div>
-              </div>
-
-              {/* Opis i status slotu */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between flex-wrap gap-1 mb-1">
-                  <h4 className="font-display font-black text-white text-base flex items-center gap-1.5">
-                    <span>Doładowanie 2x XP</span>
-                  </h4>
-                  <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border shadow-sm ${
-                    (perks.temporaryXpBoostCharges || 0) > 0 
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse' 
-                      : 'bg-white/5 text-[#8B8D98] border-white/5'
-                  }`}>
-                    {(perks.temporaryXpBoostCharges || 0) > 0 
-                      ? `2x XP przez ${perks.temporaryXpBoostCharges} zadania` 
-                      : 'Gotowe do zasilenia'}
-                  </span>
-                </div>
-                <p className="text-xs text-[#9CA3AF] leading-relaxed mb-3">
-                  Potężny eliksir mądrości. Podwaja wszystkie zdobywane punkty XP z lekcji, modułów i próbnych matur.
-                </p>
-
-                <div className="flex items-center gap-2">
-                  {(perks.temporaryXpBoostCharges || 0) > 0 ? (
-                    <span className="text-[11px] font-black text-amber-300 flex items-center gap-1.5">
-                      <Zap size={13} className="text-amber-400 animate-pulse" />
-                      Mnożnik aktywny w bieżących zadaniach!
-                    </span>
-                  ) : (
-                    <button
-                      onClick={scrollToMarket}
-                      className="text-[11px] font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
-                    >
-                      Kup Doładowanie w Rynku <ArrowRight size={12} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pasek pasywnych relikwii z odznak */}
-        <div className="mt-3.5 bg-white/[0.03] border border-white/5 rounded-2xl p-3 flex items-center justify-between gap-2 text-[11px] text-[#9CA3AF]">
-          <span className="font-bold flex items-center gap-1.5 text-white">
-            <Zap size={13} className="text-purple-400" /> Pasywne premie z odznak:
-          </span>
-          <div className="flex items-center gap-2.5 font-mono font-bold text-[10px]">
-            <span className="text-purple-300">+{perks.xpBoostPercent || 0}% XP</span>
-            <span>•</span>
-            <span className="text-yellow-300">+{perks.coinBoostPercent || 0}% Monet</span>
-            <span>•</span>
-            <span className="text-amber-300">+{perks.arenaTokenBonusPercent || 0}% Żetonów</span>
-          </div>
-        </div>
+        </div>)}
       </div>
-
-      {/* Notification Toast */}
-      {purchaseSuccess && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg"
-        >
-          <Check size={16} className="text-emerald-400" />
-          <span>{purchaseSuccess}</span>
-        </motion.div>
-      )}
-
-      {purchaseError && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-red-500/20 border border-red-500/40 text-red-200 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg"
-        >
-          <AlertCircle size={16} className="text-red-400" />
-          <span>{purchaseError}</span>
-        </motion.div>
-      )}
-
-      {/* Perks Market / Shop */}
-      <div id="perks-market-section">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-display font-black text-white flex items-center gap-2">
-            <ShoppingBag size={16} className="text-amber-400" /> Rynek Perków i Tarcz
-          </h3>
-          <span className="text-[11px] text-[#8B8D98]">Wymień żetony lub monety</span>
-        </div>
-
-        <div className="space-y-3">
-          {SHOP_ITEMS.filter(item => ARENA_ENABLED || item.effectType !== 'arenaShield').map(item => {
-            const canAffordTokens = masteryTokens >= item.tokenPrice;
-            const canAffordCoins = coins >= item.coinPrice;
-
-            return (
-              <div
-                key={item.id}
-                className="bg-surface-card border border-surface-border rounded-2xl p-5 flex flex-col gap-4 shadow-lg hover:border-surface-border transition-colors"
-              >
-                {/* Header Karty */}
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-surface-elevated border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_15px_rgba(255,184,0,0.2)]">
-                    {item.icon === 'Shield' && <Shield size={24} />}
-                    {item.icon === 'ShieldCheck' && <ShieldCheck size={24} />}
-                    {item.icon === 'Zap' && <Zap size={24} />}
-                  </div>
-                  <div>
-                    <h4 className="font-black text-white text-base">{item.name}</h4>
-                    <span className="text-[10px] uppercase font-bold text-[#A855F7] bg-[#A855F7]/10 px-2 py-0.5 rounded-full mt-1 inline-block">Wzmocnienie</span>
-                  </div>
+    </section>
+    <section className="reward-panel" aria-labelledby="vault-premiums-title">
+      <h2 id="vault-premiums-title" className="reward-heading">Stałe premie z odznak</h2>
+      <p className="text-sm leading-relaxed text-text-secondary mt-2">{permanent.length ? permanent.join(' · ') : 'Nie masz jeszcze stałych premii.'}</p>
+      {onOpenAchievements && <RewardButton onClick={onOpenAchievements} className="mt-4">Zobacz odznaki<ArrowRight size={15} /></RewardButton>}
+    </section>
+    <section id="perks-market-section" ref={marketRef} tabIndex={-1} className="scroll-mt-36 outline-none" aria-labelledby="vault-shop-title">
+      <div className="flex items-center gap-2 mb-2"><ShoppingBag size={18} className="text-primary" /><h2 id="vault-shop-title" className="reward-heading">Sklep z bonusami</h2></div>
+      <p className="text-sm text-text-secondary mb-4">Każdy bonus możesz kupić za monety albo żetony.</p>
+      {message && <div role={message.error ? 'alert' : 'status'} className={`flex items-start gap-2 mb-4 p-4 rounded-xl text-sm ${message.error ? 'bg-rose-500/10 text-rose-300' : 'bg-emerald-500/10 text-emerald-300'}`}>
+        {message.error ? <AlertCircle size={18} className="shrink-0" /> : <Check size={18} className="shrink-0" />}{message.text}
+      </div>}
+      <div className="space-y-4">
+        {SHOP_ITEMS.filter(item => ARENA_ENABLED || item.effectType !== 'arenaShield').map(item => {
+          const unavailable = item.effectType === 'coinBooster';
+          const atLimit = item.effectType === 'streakFreeze' && freezes >= 2 || item.effectType === 'arenaShield' && shields >= 3;
+          const canTokens = tokens >= item.tokenPrice, canCoins = coins >= item.coinPrice;
+          const Icon = item.icon === 'Shield' ? Shield : item.icon === 'ShieldCheck' ? ShieldCheck : item.icon === 'Zap' ? Zap : Crown;
+          const reasonId = `shop-reason-${item.id}`;
+          return <article key={item.id} className="reward-panel" aria-labelledby={`shop-title-${item.id}`}>
+            <div className="flex items-start gap-3"><span className="reward-icon"><Icon size={20} /></span><div className="flex-1 min-w-0">
+              <h3 id={`shop-title-${item.id}`} className="reward-heading">{item.name}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed mt-1">{item.description}</p>
+            </div></div>
+            {unavailable ? <div className="mt-4"><RewardStatus>W przygotowaniu</RewardStatus><p id={reasonId} className="text-sm text-text-secondary mt-2">Zakup będzie dostępny po uruchomieniu tej funkcji.</p></div>
+              : <>
+                <p className="text-xs text-text-secondary mt-5 mb-2">{atLimit ? 'Osiągnięto limit w zapasie.' : 'Kup za:'}</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <RewardButton onClick={() => purchase(item, 'tokens')} disabled={pending || atLimit || !canTokens} aria-label={`Kup ${item.name} za ${formatQuantity(item.tokenPrice, ['żeton', 'żetony', 'żetonów'])}`} aria-describedby={reasonId}><Crown size={16} className="shrink-0" />{formatQuantity(item.tokenPrice, ['żeton', 'żetony', 'żetonów'])}</RewardButton>
+                  <RewardButton onClick={() => purchase(item, 'coins')} disabled={pending || atLimit || !canCoins} aria-label={`Kup ${item.name} za ${formatQuantity(item.coinPrice, ['monetę', 'monety', 'monet'])}`} aria-describedby={reasonId}><Coins size={16} className="shrink-0" />{formatQuantity(item.coinPrice, ['moneta', 'monety', 'monet'])}</RewardButton>
                 </div>
-
-                {/* Body Karty */}
-                <div>
-                  <p className="text-sm text-[#9CA3AF] leading-relaxed">{item.description}</p>
-                </div>
-
-                {/* Footer / Action Row */}
-                <div className="flex flex-row items-center gap-2 mt-1">
-                  {/* Buy with Mastery Tokens */}
-                  <button
-                    onClick={() => handlePurchase(item, 'tokens')}
-                    disabled={!canAffordTokens}
-                    title={!canAffordTokens ? "Za mało żetonów" : ""}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 border transition-all duration-150 ${
-                      canAffordTokens
-                        ? 'bg-[#D97706]/10 hover:bg-[#D97706]/20 text-[#F59E0B] border-[#D97706]/30 active:scale-[0.96]'
-                        : 'bg-white/5 text-[#6B7280] border-white/5 opacity-40 cursor-not-allowed'
-                    }`}
-                  >
-                    <Crown size={14} />
-                    <span>{item.tokenPrice} Żetonów</span>
-                  </button>
-
-                  {/* Buy with Coins */}
-                  <button
-                    onClick={() => handlePurchase(item, 'coins')}
-                    disabled={!canAffordCoins}
-                    title={!canAffordCoins ? "Za mało monet" : ""}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 border transition-all duration-150 ${
-                      canAffordCoins
-                        ? 'bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 text-[#00D2FF] border-[#3B82F6]/30 active:scale-[0.96]'
-                        : 'bg-white/5 text-[#6B7280] border-white/5 opacity-40 cursor-not-allowed'
-                    }`}
-                  >
-                    <Coins size={14} />
-                    <span>{item.coinPrice.toLocaleString('pl-PL')} Monet</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                <p id={reasonId} className="text-xs text-text-secondary leading-relaxed mt-3">{atLimit ? 'Zużyj posiadany bonus, aby kupić kolejny.' : !canTokens && !canCoins ? `Brakuje ${formatQuantity(item.tokenPrice - tokens, ['żetonu', 'żetonów', 'żetonów'])} albo ${formatQuantity(item.coinPrice - coins, ['monety', 'monet', 'monet'])}.` : 'Wybierz jedną walutę. Saldo zmieni się po zakupie.'}</p>
+              </>}
+          </article>;
+        })}
       </div>
-    </div>
-  );
+    </section>
+  </div>;
 }

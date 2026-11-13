@@ -52,7 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
     md: 'max-w-md sm:max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
-    full: 'max-w-6xl w-full h-[90vh]'
+    full: 'max-w-6xl w-full h-[90dvh]'
   };
 
   return (
@@ -81,7 +81,7 @@ export const Modal: React.FC<ModalProps> = ({
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
             className={cn(
-              'relative w-full bg-surface-elevated border border-surface-border rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_24px_rgba(255,184,0,0.08)] overflow-hidden flex flex-col max-h-[90vh] z-10',
+              'focus-dialog relative w-full bg-surface-elevated border border-surface-border rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_24px_rgba(255,184,0,0.08)] overflow-hidden flex flex-col max-h-[90vh] z-10',
               sizeClasses[size],
               className
             )}
@@ -91,7 +91,7 @@ export const Modal: React.FC<ModalProps> = ({
               <div className="flex items-center justify-between p-4 sm:p-6 pb-3 border-b border-surface-border shrink-0">
                 <div className="pr-4 min-w-0">
                   {title && (
-                    <h2 id="modal-title" className="font-display font-bold text-lg sm:text-xl text-text-primary truncate">
+                    <h2 id="modal-title" className="font-display font-bold text-lg sm:text-xl text-text-primary break-words">
                       {title}
                     </h2>
                   )}
@@ -116,13 +116,13 @@ export const Modal: React.FC<ModalProps> = ({
             )}
 
             {/* Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto flex-1 overscroll-contain">
+            <div className="focus-scroll p-4 sm:p-6 overflow-y-auto flex-1 overscroll-contain">
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
-              <div className="p-4 sm:p-6 pt-3 border-t border-surface-border bg-surface-card/50 shrink-0 flex items-center justify-end gap-2.5">
+              <div className="focus-footer p-4 sm:p-6 pt-3 border-t border-surface-border bg-surface-card/50 shrink-0 flex items-center justify-end gap-2.5">
                 {footer}
               </div>
             )}

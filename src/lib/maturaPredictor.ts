@@ -1,3 +1,4 @@
+import { uniqueLessonMistakes } from './lessonMistakes';
 import { PredictorResult, TopicMasteryBreakdown } from '../types';
 import { getSubjectCkeConfig } from '../services/ckeCatalogRepository';
 import { filterActualTaskIds } from '../utils';
@@ -138,7 +139,7 @@ export function calculateMaturaPrediction(params: CalculateMaturaPredictionParam
   });
 
   // Przypisanie błędów z bazy błędów
-  Object.entries(lessonMistakes).forEach(([lessonKey, count]) => {
+  Object.entries(uniqueLessonMistakes(lessonMistakes)).forEach(([lessonKey, count]) => {
     const tId = extractTopicIdFromEntityId(lessonKey, config.subjectId);
     if (tId && mistakesByTopic[tId] !== undefined) {
       mistakesByTopic[tId] += count;

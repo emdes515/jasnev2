@@ -65,7 +65,7 @@ export interface MathSection {
 
 /**
  * 15 działów matematyki (poziom podstawowy, wymagania CKE od 2025 r.).
- * Numeracja i opisy są zgodne z src/data/math/generated/math_blueprints.json (generator scripts/math_pp),
+ * Numeracja i opisy są zgodne z src/data/offline/math/generated/math_blueprints.json (generator scripts/math_pp),
  * a numery stron odnoszą się do „Wybranych wzorów matematycznych” CKE (wydanie 2023).
  */
 export const MATH_SECTIONS: MathSection[] = [

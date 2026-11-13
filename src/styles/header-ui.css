@@ -1,0 +1,49 @@
+.subject-picker, .subject-picker [data-subject] {
+  --subject-accent: var(--primary);
+}
+.subject-picker[data-subject^="pol"], .subject-picker [data-subject^="pol"] { --subject-accent: #fb7185; }
+.subject-picker[data-subject^="eng"], .subject-picker [data-subject^="eng"] { --subject-accent: #34d399; }
+.subject-trigger {
+  border-color: color-mix(in srgb, var(--subject-accent) 45%, var(--surface-border));
+  background: color-mix(in srgb, var(--subject-accent) 7%, var(--surface-card));
+  transition: background-color 150ms, border-color 150ms;
+}
+.subject-trigger:hover, .subject-picker[open] > .subject-trigger {
+  border-color: var(--subject-accent);
+  background: color-mix(in srgb, var(--subject-accent) 12%, var(--surface-card));
+}
+.subject-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--subject-accent);
+  background: color-mix(in srgb, var(--subject-accent) 12%, transparent);
+}
+.subject-selected { background: color-mix(in srgb, var(--subject-accent) 12%, transparent); }
+.subject-check { color: var(--subject-accent); }
+.header-resources {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  background: var(--surface-card);
+}
+.header-resource {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+.header-resource:hover { background: var(--surface-card-hover); }
+.header-resource:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }

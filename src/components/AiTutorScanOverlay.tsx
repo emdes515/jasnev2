@@ -131,7 +131,7 @@ export const AiTutorScanOverlay: React.FC<AiTutorScanOverlayProps> = ({
                 isCompleted ? 'bg-emerald-400' : 'bg-[#FFB800] animate-pulse'
               }`}
             />
-            <span>{isCompleted ? 'Weryfikacja zakończona' : 'Tutor AI • CKE Formuła 2025'}</span>
+            <span>{isCompleted ? 'Weryfikacja zakończona' : 'Sprawdzanie rozwiązania'}</span>
           </div>
 
           {/* Stable Height Title & Subtitle Container (prevents layout jumping) */}

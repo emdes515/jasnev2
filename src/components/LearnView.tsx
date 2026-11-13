@@ -1,3 +1,5 @@
+import { SubjectPicker } from './SubjectPicker';
+import { subjectOption } from '../lib/subjects';
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { 
@@ -19,9 +21,6 @@ import { curriculumRepository } from '../services/curriculumRepository';
 import { BossExamRunner } from './BossExamRunner';
 import { SubjectKey } from '../types';
 import { normalizeSubjectFirestoreId } from '../services/ckeCatalogRepository';
-import { MATH_CURRICULUM_TOPICS } from '../data/mathCurriculumData';
-import { POLISH_CURRICULUM_TOPICS } from '../data/polishCurriculumData';
-import { ENGLISH_CURRICULUM_TOPICS } from '../data/englishCurriculumData';
 import { EnglishDictionaryModal } from './english/EnglishDictionaryModal';
 import { MaturalnyDuetGame } from './english/MaturalnyDuetGame';
 import { MathTheoryModal } from './math/MathTheoryModal';
@@ -386,6 +385,11 @@ export function LearnView({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'instant' }));
+    return () => cancelAnimationFrame(frame);
+  }, [viewState, selectedSubjectKey, selectedTopicIndex]);
+
   const openSubjectSheet = (open: boolean) => {
     setIsSubjectSheetOpen(open);
     onSheetToggle?.(open);
@@ -425,14 +429,14 @@ export function LearnView({
     }));
   }, [viewState, selectedSubjectKey, selectedTopicIndex]);
 
-  const [mathTopicsList, setMathTopicsList] = useState<any[]>(() => MATH_CURRICULUM_TOPICS);
-  const [polishTopicsList, setPolishTopicsList] = useState<any[]>(() => POLISH_CURRICULUM_TOPICS);
+  const [mathTopicsList, setMathTopicsList] = useState<any[]>([]);
+  const [polishTopicsList, setPolishTopicsList] = useState<any[]>([]);
   const [polishPillarsList, setPolishPillarsList] = useState<any[]>([]);
-  const [engTopicsList, setEngTopicsList] = useState<any[]>(() => ENGLISH_CURRICULUM_TOPICS);
+  const [engTopicsList, setEngTopicsList] = useState<any[]>([]);
   const [engPillarsList, setEngPillarsList] = useState<any[]>([]);
   const [mathRozTopicsList, setMathRozTopicsList] = useState<any[]>([]);
   const [engRozTopicsList, setEngRozTopicsList] = useState<any[]>([]);
-  const [isLoadingTopics, setIsLoadingTopics] = useState<boolean>(false);
+  const [isLoadingTopics, setIsLoadingTopics] = useState<boolean>(true);
   const [topicsLoadError, setTopicsLoadError] = useState<string | null>(null);
   const [selectedPillarId, setSelectedPillarId] = useState<string>(() => {
     try {
@@ -905,30 +909,8 @@ export function LearnView({
             >
               {/* Sub-header wyboru przedmiotu i postępu działów */}
               <header className="px-3 sm:px-6 py-2.5 sticky top-0 bg-surface-bg/90 backdrop-blur-xl z-20 border-b border-surface-border shadow-sm shrink-0">
-                <div className="max-w-3xl mx-auto w-full flex items-center justify-between gap-2.5">
-                  <button
-                    id="learn-subject-switcher-trigger"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      openSubjectSheet(true);
-                    }}
-                    className="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 rounded-xl bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-primary/40 transition-all cursor-pointer group active:scale-[0.98] shadow-sm min-w-0"
-                    title="Kliknij, aby zmienić przedmiot"
-                  >
-                    <h1 className="font-display font-black text-text-primary text-sm sm:text-base tracking-tight leading-none group-hover:text-primary transition-colors shrink-0 whitespace-nowrap">
-                      {currentSubject.name}
-                    </h1>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/25 shrink-0">
-                      {currentSubject.key === 'math' 
-                        ? 'Formuła 2023' 
-                        : currentSubject.key === 'eng' 
-                          ? 'Podstawa • B1/B2' 
-                          : currentSubject.key === 'eng-roz' 
-                            ? 'Rozszerzenie • B2/C1'
-                            : (currentSubject.level || 'Formuła 2023')}
-                    </span>
-                    <ChevronDown size={13} className="text-text-muted group-hover:text-primary transition-colors shrink-0" />
-                  </button>
+                <div className="max-w-3xl mx-auto w-full flex flex-wrap items-start justify-between gap-2.5">
+                  <h1 className="text-base font-semibold text-text-primary">{subjectOption(selectedSubjectKey).name}<span className="ml-2 text-sm font-normal text-text-secondary">{subjectOption(selectedSubjectKey).level}</span></h1>
 
                   <div className="flex items-center gap-2 shrink-0">
                     {selectedSubjectKey === 'eng' && (
@@ -939,10 +921,10 @@ export function LearnView({
                           setShowEnglishDictionary(true);
                         }}
                         className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-surface-card hover:bg-surface-card-hover border border-[#FFB800]/30 hover:border-[#FFB800]/60 text-[#FFDCA1] text-[11px] sm:text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 shrink-0"
-                        title="Otwórz oficjalny Słownik Maturalny CKE"
+                        title="Otwórz słownik do matury"
                       >
                         <BookOpen size={13} className="text-[#FFB800]" />
-                        <span>Słownik CKE</span>
+                        <span>Słownik do matury</span>
                       </button>
                     )}
 
@@ -1000,7 +982,7 @@ export function LearnView({
                           setSelectedPillarId('all');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedPillarId === 'all'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1029,7 +1011,7 @@ export function LearnView({
                           setSelectedPillarId('pillar-1-jezyk-w-uzyciu');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedPillarId === 'pillar-1-jezyk-w-uzyciu'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1061,7 +1043,7 @@ export function LearnView({
                           setSelectedPillarId('pillar-2-lektury');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedPillarId === 'pillar-2-lektury'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1093,7 +1075,7 @@ export function LearnView({
                           setSelectedPillarId('pillar-3-wypracowanie');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 sm:px-2 rounded-lg text-[11px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedPillarId === 'pillar-3-wypracowanie'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1142,7 +1124,7 @@ export function LearnView({
               {selectedSubjectKey === 'eng' && (
                 <div className="px-3 sm:px-6 py-2 sticky top-[49px] bg-surface-bg/95 backdrop-blur-xl z-19 border-b border-surface-border shadow-sm">
                   <div className="max-w-3xl mx-auto w-full">
-                    <div className="grid grid-cols-5 p-1 rounded-xl bg-[#101726] border border-white/10 relative gap-1">
+                    <div className="flex flex-wrap p-1 rounded-xl bg-[#101726] border border-white/10 relative gap-1">
                       {/* Tab 0: Wszystkie działy */}
                       <button
                         onClick={() => {
@@ -1150,7 +1132,7 @@ export function LearnView({
                           setSelectedEnglishPillarId('all');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedEnglishPillarId === 'all'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1179,7 +1161,7 @@ export function LearnView({
                           setSelectedEnglishPillarId('pillar-use-of-english');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedEnglishPillarId === 'pillar-use-of-english'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1194,8 +1176,8 @@ export function LearnView({
                         )}
                         <Zap size={13} className={selectedEnglishPillarId === 'pillar-use-of-english' ? 'text-amber-400 shrink-0 relative z-10' : 'text-slate-500 shrink-0 relative z-10'} />
                         <span className="truncate relative z-10">
-                          <span className="hidden sm:inline">Środki językowe</span>
-                          <span className="sm:hidden">Środki</span>
+                          <span className="hidden sm:inline">Gramatyka</span>
+                          <span className="sm:hidden">Gramatyka</span>
                         </span>
                         <span className={`hidden md:inline-flex px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 relative z-10 ${
                           selectedEnglishPillarId === 'pillar-use-of-english' ? 'bg-amber-500/20 text-amber-300' : 'bg-white/5 text-slate-500'
@@ -1211,7 +1193,7 @@ export function LearnView({
                           setSelectedEnglishPillarId('pillar-listening');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedEnglishPillarId === 'pillar-listening'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1240,7 +1222,7 @@ export function LearnView({
                           setSelectedEnglishPillarId('pillar-reading');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedEnglishPillarId === 'pillar-reading'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1269,7 +1251,7 @@ export function LearnView({
                           setSelectedEnglishPillarId('pillar-writing');
                           setVisibleTopicsCount(TOPICS_BATCH_SIZE);
                         }}
-                        className={`relative z-10 flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:px-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors cursor-pointer ${
+                        className={`relative z-10 flex min-h-11 items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                           selectedEnglishPillarId === 'pillar-writing'
                             ? 'text-white'
                             : 'text-slate-400 hover:text-slate-200'
@@ -1293,8 +1275,8 @@ export function LearnView({
                     </div>
 
                     {/* Sub-description ribbon for active pillar */}
-                    <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400 px-1">
-                      <span className="truncate">
+                    <div className="mt-2 flex flex-col sm:flex-row gap-1 sm:gap-3 sm:items-center justify-between text-xs leading-relaxed text-slate-400 px-1">
+                      <span className="min-w-0">
                         {selectedEnglishPillarId === 'pillar-use-of-english'
                           ? '• Zadania 8–11: Gramatyka, transformacje zdań, luki i słowotwórstwo (13 pkt)'
                           : selectedEnglishPillarId === 'pillar-listening'
@@ -1303,9 +1285,9 @@ export function LearnView({
                               ? '• Zadania 4–7: Dobieranie nagłówków, luki spójnościowe i teksty wieloźródłowe (20 pkt)'
                               : selectedEnglishPillarId === 'pillar-writing'
                                 ? '• Zadanie 12: Wypowiedź pisemna – e-mail lub wpis na blogu 80–130 słów (12 pkt)'
-                                : '• 4 Filary Egzaminacyjne CKE: Use of English, Listening, Reading, Writing (60 pkt)'}
+                                : 'Gramatyka, słuchanie, czytanie i pisanie'}
                       </span>
-                      <span className="text-[10px] text-amber-400 font-semibold shrink-0 ml-2">
+                      <span className="text-xs text-text-secondary font-medium shrink-0">
                         {selectedEnglishPillarId === 'pillar-use-of-english' 
                           ? 'Działy 1–5 • 13 pkt CKE' 
                           : selectedEnglishPillarId === 'pillar-listening'
@@ -1530,8 +1512,8 @@ export function LearnView({
                     <div className="w-14 h-14 bg-gradient-to-br from-[#F59E0B] to-[#D97706] rounded-2xl flex items-center justify-center shadow-sm border border-[#FFFBEB]/30 mb-2">
                       <Trophy size={28} className="text-white drop-shadow-md" />
                     </div>
-                    <p className="text-xs font-black uppercase text-amber-400 tracking-wider">Matura zdana na 100%</p>
-                    <p className="text-[11px] text-[#6B7280] mt-0.5">Ukończ wszystkie działy, aby zdobyć trofeum</p>
+                    <p className="text-sm font-bold text-amber-300">{totalTopicsCount > 0 && completedTopicsCount === totalTopicsCount ? 'Cały program ukończony' : 'Twój cel: ukończyć program'}</p>
+                    <p className="text-xs text-slate-400 mt-1">{totalTopicsCount > 0 && completedTopicsCount === totalTopicsCount ? 'Wróć do trudniejszych zadań lub sprawdź się w arkuszu maturalnym.' : 'Przechodź kolejne lekcje i wracaj do zadań, które sprawiają trudność.'}</p>
                   </div>
                 )}
               </div>
@@ -1559,8 +1541,8 @@ export function LearnView({
               {/* Header działu */}
               <header className="px-4 py-2.5 sm:py-3 sticky top-0 bg-surface-bg/95 backdrop-blur-md z-20 border-b border-surface-border shadow-sm shrink-0">
                 <div className="max-w-3xl mx-auto w-full flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-3 w-full">
-                    <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-3 w-full">
+                    <div className="flex flex-1 items-start gap-2.5 min-w-0">
                       <button 
                         id="lessons-back-button"
                         onClick={handleBack}
@@ -1569,7 +1551,7 @@ export function LearnView({
                       >
                         <ChevronLeft size={20} />
                       </button>
-                      <div className="min-w-0 flex items-center gap-2">
+                      <div className="min-w-0 flex-1 flex flex-col items-start gap-1.5">
                         <span className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-xs font-mono font-black uppercase tracking-wider shrink-0 shadow-sm ${
                           selectedSubjectKey === 'pol'
                             ? 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
@@ -1577,13 +1559,13 @@ export function LearnView({
                         }`}>
                           DZIAŁ {currentTopic.topic_number || currentTopic.numericId || (currentSubject.topics.findIndex((t: any) => t.id === currentTopic.id) + 1)}
                         </span>
-                        <h2 className="font-display font-black text-text-primary text-base sm:text-lg leading-tight truncate">
+                        <h2 className="font-display font-black text-text-primary text-base sm:text-lg leading-snug break-words">
                           <MathRenderer content={cleanTopicTitle(currentTopic.name || currentTopic.title)} />
                         </h2>
                       </div>
                     </div>
 
-                    <div className="shrink-0 flex items-center gap-2">
+                    <div className="shrink-0 flex items-center justify-end gap-2">
                       {selectedSubjectKey === 'eng' && (
                         <button
                           type="button"
@@ -1592,7 +1574,7 @@ export function LearnView({
                             setShowEnglishDictionary(true);
                           }}
                           className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-card hover:bg-surface-card-hover border border-[#FFB800]/30 hover:border-[#FFB800]/60 text-[#FFDCA1] text-[11px] font-bold transition-all shadow-xs cursor-pointer active:scale-95"
-                          title="Otwórz oficjalny Słownik Maturalny CKE"
+                          title="Otwórz słownik do matury"
                         >
                           <BookOpen size={12} className="text-[#FFB800]" />
                           <span>Słownik</span>
@@ -1612,25 +1594,7 @@ export function LearnView({
                     </div>
                   </div>
 
-                  <div className="flex items-center pl-0 sm:pl-11">
-                    <button
-                      id="lessons-subject-switcher-badge"
-                      onClick={() => {
-                        triggerHaptic('light');
-                        openSubjectSheet(true);
-                      }}
-                      className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-surface-card border border-surface-border text-[10px] sm:text-[11px] font-medium text-text-muted transition-colors cursor-pointer group ${
-                        selectedSubjectKey === 'pol' ? 'hover:border-rose-500/40' : 'hover:border-primary/40'
-                      }`}
-                      title="Zmień przedmiot"
-                    >
-                      <span className="text-text-muted font-normal">Dział {(selectedTopicIndex ?? 0) + 1}</span>
-                      <span className="text-white/20">•</span>
-                      <span className={`font-medium transition-colors ${selectedSubjectKey === 'pol' ? 'text-text-primary group-hover:text-rose-400' : 'text-text-primary group-hover:text-primary'}`}>{currentSubject.name}</span>
-                      <span className="text-white/20">•</span>
-                      <span className={`font-medium ${selectedSubjectKey === 'pol' ? 'text-rose-400' : 'text-primary'}`}>{currentSubject.key === 'math' ? 'Nowa Formuła 2023' : (currentSubject.level || 'Nowa Formuła 2023')}</span>
-                    </button>
-                  </div>
+
                 </div>
               </header>
               
@@ -1670,12 +1634,13 @@ export function LearnView({
 
                 {/* Rozgrzewka Pewniaka: Maturalny Duet (Język Angielski) */}
                 {selectedSubjectKey === 'eng' && currentTopic && lessonsForCurrentTopic.length > 0 && (
-                  <div className="mb-2">
+                  <details className="mb-2 rounded-xl border border-surface-border p-4">
+                    <summary className="cursor-pointer text-sm font-medium text-text-secondary">Opcjonalna rozgrzewka: połącz w pary</summary>
                     <MaturalnyDuetGame
                       lessonId={lessonsForCurrentTopic[0]?.id || currentTopic.id}
                       topicId={currentTopic.id}
                     />
-                  </div>
+                  </details>
                 )}
 
                 {lessonsForCurrentTopic.length === 0 ? (
@@ -1768,7 +1733,7 @@ export function LearnView({
                       } : null;
 
                       const cleanLessonNumber = (() => {
-                        if (/sprawdzian/i.test(group.id) || /sprawdzian/i.test(group.badge || '')) return '★';
+                        if (/sprawdzian/i.test(group.id) || /sprawdzian/i.test(group.badge || '')) return '';
                         const badgeMatch = (group.badge || '').match(/(\d+(?:\.\d+)?)/);
                         if (badgeMatch) return badgeMatch[1];
                         const stripped = group.id.replace(/^(?:pol|eng|mat-roz|math-roz|eng-roz)?[-_]?lesson[-_]?/i, '');
@@ -1783,7 +1748,7 @@ export function LearnView({
                             isCompleted
                               ? 'border-emerald-500/30 bg-[#0E1524] shadow-[0_4px_20px_rgba(16,185,129,0.06)]'
                               : isCurrentActiveLesson
-                                ? 'border-2 border-[#FFB800] bg-gradient-to-b from-[#151D2C] to-[#0E1420] shadow-sm ring-1 ring-[#FFB800]/40'
+                                ? 'border-primary/50 bg-surface-card'
                                 : !isUnlocked
                                   ? 'border-white/5 bg-[#0A0E17]/60 opacity-60'
                                   : 'border-white/10 bg-[#101726]'
@@ -1877,7 +1842,7 @@ export function LearnView({
                                           <span>•</span>
                                           <span className="text-white font-medium">Wymóg: {reqTasks} {taskNoun}</span>
                                           <span>•</span>
-                                          <span className="text-slate-400">Pewniaki maturalne</span>
+                                          <span className="text-slate-400">Program maturalny</span>
                                         </>
                                       );
                                     }
@@ -1934,16 +1899,16 @@ export function LearnView({
                                     className="flex-1 py-2.5 px-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/40 text-slate-200 hover:text-emerald-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-[0.99] cursor-pointer"
                                   >
                                     <RefreshCw size={14} className="stroke-[2.5] text-emerald-400" />
-                                    <span>POWTÓRZ LEKCJĘ</span>
+                                    <span>Powtórz lekcję</span>
                                   </button>
                                 ) : (
                                   <button
                                     id={`start-lesson-btn-${group.id}`}
                                     onClick={() => handleStartLessonSession(group, nextLessonPayload)}
-                                    className="flex-1 py-3 px-5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition cursor-pointer bg-[#FFB800] hover:bg-[#FFC72C] text-[#080B11] shadow-sm"
+                                    className={`flex-1 min-h-11 py-3 px-5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition cursor-pointer ${isCurrentActiveLesson ? 'bg-primary hover:bg-primary-hover text-[#080B11]' : 'bg-surface-card hover:bg-surface-card-hover border border-surface-border text-text-primary'}`}
                                   >
-                                    <Play size={15} fill="#080B11" strokeWidth={0} />
-                                    <span>ROZPOCZNIJ LEKCJĘ</span>
+                                    <Play size={15} fill="currentColor" strokeWidth={0} />
+                                    <span>Rozpocznij lekcję</span>
                                     <ArrowRight size={15} strokeWidth={3} />
                                   </button>
                                 )}
@@ -1954,11 +1919,11 @@ export function LearnView({
                       );
                     })}
 
-                    {/* WALKA Z BOSSEM DZIAŁU / SPRAWDZIAN CKE */}
+                    {/* Sprawdzian działu / SPRAWDZIAN CKE */}
                     {currentTopic && (
                       <div 
                         id={`boss-fight-card-${currentTopic.id}`}
-                        className="rounded-2xl border-2 transition-all p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden mt-3 border-[#FFB800]/60 bg-gradient-to-b from-[#1C1811] via-[#14151C] to-[#0E121A] shadow-[0_8px_32px_rgba(255,184,0,0.12)]"
+                        className="rounded-2xl border border-surface-border p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden mt-3 bg-surface-card"
                       >
                         {/* Ambient glow accent */}
                         <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-[#FFB800]/10" />
@@ -1972,11 +1937,11 @@ export function LearnView({
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 mb-1 flex-wrap">
                                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border shadow-sm text-[#FFB800] bg-[#FFB800]/20 border-[#FFB800]/40">
-                                  WALKA Z BOSSEM DZIAŁU
+                                  Sprawdzian działu
                                 </span>
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
                                   <Clock size={10} />
-                                  <span>15 min • 5 zadań CKE</span>
+                                  <span>15 min • 5 zadań</span>
                                 </span>
                               </div>
 
@@ -1984,7 +1949,7 @@ export function LearnView({
                                 Sprawdzian: {cleanTopicTitle(currentTopic.name || currentTopic.title)}
                               </h3>
                               <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                                Ostateczne starcie z materiałem tego działu. Zmierz się z zestawem maturalnym CKE, zdobądź min. 70% i zgarnij odznakę Mistrza!
+                                Rozwiąż zadania z tego działu. Wynik co najmniej 70% odblokuje odznakę.
                               </p>
 
                               {/* Nagrody za pokonanie bossa */}
@@ -1994,7 +1959,7 @@ export function LearnView({
                                   <span>+200 XP</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-lg">
-                                  <span>🪙 +100 Monet</span>
+                                  <span> +100 Monet</span>
                                 </span>
                                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-300 bg-purple-500/10 border border-purple-500/25 px-2 py-0.5 rounded-lg">
                                   <Award size={11} />
@@ -2020,7 +1985,7 @@ export function LearnView({
                             ) : (
                               <>
                                 <Flame size={18} className="animate-bounce" />
-                                <span>WALCZ Z BOSSEM (SPRAWDZIAN)</span>
+                                <span>Rozpocznij sprawdzian</span>
                                 <ArrowRight size={18} strokeWidth={3} />
                               </>
                             )}
@@ -2041,400 +2006,13 @@ export function LearnView({
           PRZEŁĄCZNIK PRZEDMIOTÓW: WYSWUWANY OD DOŁU ARKUSZ (BOTTOM SHEET)
           Uruchamiany po kliknięciu < w widoku działów lub kliknięciu w tytuł "Matematyka".
          ========================================================================= */}
-      {isMounted && typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {isSubjectSheetOpen && (
-            <div 
-              key="subject-sheet-portal-wrapper"
-              id="subject-sheet-wrapper"
-              className="fixed inset-0 z-[120] flex items-end md:items-center justify-center pointer-events-auto p-0 md:p-4"
-            >
-              {/* Full Screen Backdrop Overlay - completely dims the entire screen including top header */}
-              <motion.div
-                key="subject-sheet-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => openSubjectSheet(false)}
-                className="fixed inset-0 bg-black/80 backdrop-blur-md cursor-pointer z-[120]"
-              />
-
-              {/* Bottom Sheet on Mobile / Centered Modal Dialog on Desktop */}
-              <motion.div
-                key="subject-sheet-modal-content"
-                initial={isDesktop ? { opacity: 0, scale: 0.96, y: 0 } : { y: '100%' }}
-                animate={isDesktop ? { opacity: 1, scale: 1, y: 0 } : { y: 0 }}
-                exit={isDesktop ? { opacity: 0, scale: 0.96, y: 0 } : { y: '100%' }}
-                transition={isDesktop ? { duration: 0.2, ease: [0.16, 1, 0.3, 1] } : { type: 'spring', damping: 26, stiffness: 280 }}
-                className="relative z-[125] w-full max-w-lg md:max-w-[800px] mx-auto bg-[#0E131C] border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl p-5 sm:p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.9)] flex flex-col gap-4 max-h-[85vh] md:max-h-[90vh] overflow-y-auto"
-                style={{ paddingBottom: isDesktop ? '1.5rem' : 'max(24px, env(safe-area-inset-bottom, 24px))' }}
-              >
-                {/* Grab handle (tylko na mobile) */}
-                <div 
-                  className="md:hidden w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-1 cursor-pointer" 
-                  onClick={() => openSubjectSheet(false)} 
-                />
-
-                {/* 1. Nagłówek (Header): "Wybierz przedmiot nauki", brak podtytułu, więcej światła */}
-                <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/5">
-                  <h3 className="font-display font-black text-white text-lg sm:text-xl tracking-tight">
-                    Wybierz przedmiot nauki
-                  </h3>
-                  <button
-                    id="subject-sheet-close-btn"
-                    onClick={() => openSubjectSheet(false)}
-                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors cursor-pointer"
-                    aria-label="Zamknij"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-
-                {/* Lista dostępnych przedmiotów: pionowa lista na mobile, CSS Grid 2-kolumnowy na desktopie */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pb-2">
-                  
-                  {/* 1. Matematyka */}
-                  <div
-                    id="subject-card-math"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setSelectedSubjectKey('math');
-                      setSelectedTopicIndex(0);
-                      setViewState('topics');
-                      openSubjectSheet(false);
-                    }}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                      selectedSubjectKey === 'math'
-                        ? 'border-[#FFB800] bg-gradient-to-br from-[#151D2C] via-[#111724] to-[#0E1420] ring-1 ring-[#FFB800]/40 shadow-sm'
-                        : 'border-white/10 bg-[#101726] hover:border-white/20 hover:bg-[#141C2C]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 shadow-sm">
-                        <Calculator size={24} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="font-display font-black text-white text-base">
-                            Matematyka
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FFB800]/10 text-[#FFB800] border border-[#FFB800]/20">
-                            <span className="w-1 h-1 rounded-full bg-[#FFB800]" />
-                            Nowa Formuła 2023
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#8B8D98] truncate">
-                          15 działów • 75 lekcji • 1500 zadań
-                        </p>
-                        <div className="mt-2.5 flex items-center gap-2.5">
-                          <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                mathProgressPercent > 0 ? 'bg-[#FFB800]' : 'bg-transparent'
-                              }`}
-                              style={{ width: `${mathProgressPercent}%` }}
-                            />
-                          </div>
-                          <span className={`text-[11px] font-bold shrink-0 ${
-                            mathProgressPercent > 0 ? 'text-[#FFB800]' : 'text-slate-500'
-                          }`}>
-                            {mathProgressPercent}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {selectedSubjectKey === 'math' && (
-                      <motion.div 
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
-                        className="w-6 h-6 rounded-full bg-[#FFB800] text-[#080B11] font-bold flex items-center justify-center shrink-0 shadow-sm"
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* 2. Język Polski */}
-                  <div
-                    id="subject-card-pol"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setSelectedSubjectKey('pol');
-                      setSelectedTopicIndex(0);
-                      setViewState('topics');
-                      openSubjectSheet(false);
-                    }}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                      selectedSubjectKey === 'pol'
-                        ? 'border-rose-500 bg-gradient-to-br from-[#2D161F] to-[#1C1217] ring-1 ring-rose-500/30 shadow-sm'
-                        : 'border-white/10 bg-[#141A23] hover:border-white/20 hover:bg-[#18202C]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-rose-400 flex items-center justify-center shrink-0">
-                        <BookOpen size={24} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="font-display font-black text-white text-base">
-                            Język Polski
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                            <span className="w-1 h-1 rounded-full bg-rose-400" />
-                            Nowa Formuła 2023
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#8B8D98] truncate">
-                          15 działów • 75 lekcji • 2 części CKE
-                        </p>
-                        <div className="mt-2.5 flex items-center gap-2.5">
-                          <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                polProgressPercent > 0 ? 'bg-rose-400' : 'bg-transparent'
-                              }`}
-                              style={{ width: `${polProgressPercent}%` }}
-                            />
-                          </div>
-                          <span className={`text-[11px] font-bold shrink-0 ${
-                            polProgressPercent > 0 ? 'text-rose-400' : 'text-slate-500'
-                          }`}>
-                            {polProgressPercent}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {selectedSubjectKey === 'pol' && (
-                      <motion.div 
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
-                        className="w-6 h-6 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-sm"
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* 3. Język Angielski */}
-                  <div
-                    id="subject-card-eng"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setSelectedSubjectKey('eng');
-                      setSelectedTopicIndex(0);
-                      setViewState('topics');
-                      openSubjectSheet(false);
-                    }}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                      selectedSubjectKey === 'eng'
-                        ? 'border-[#FFB800] bg-gradient-to-br from-[#1C1811] to-[#0E1420] ring-1 ring-[#FFB800]/30 shadow-sm'
-                        : 'border-white/10 bg-[#141A23] hover:border-white/20 hover:bg-[#18202C]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-[#FFB800]/15 border border-[#FFB800]/30 text-[#FFDCA1] flex items-center justify-center shrink-0 shadow-sm">
-                        <Globe size={24} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="font-display font-black text-white text-base">
-                            Język Angielski
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FFB800]/10 text-[#FFDCA1] border border-[#FFB800]/20">
-                            <span className="w-1 h-1 rounded-full bg-[#FFB800]" />
-                            Podstawa • B1/B2
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#8B8D98] truncate">
-                          15 działów • 49 lekcji • 1500 zadań
-                        </p>
-                        <div className="mt-2.5 flex items-center gap-2.5">
-                          <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                engProgressPercent > 0 ? 'bg-[#FFB800]' : 'bg-transparent'
-                              }`}
-                              style={{ width: `${engProgressPercent}%` }}
-                            />
-                          </div>
-                          <span className={`text-[11px] font-bold shrink-0 ${
-                            engProgressPercent > 0 ? 'text-[#FFB800]' : 'text-slate-500'
-                          }`}>
-                            {engProgressPercent}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {selectedSubjectKey === 'eng' && (
-                      <motion.div 
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
-                        className="w-6 h-6 rounded-full bg-[#FFB800] text-[#080B11] font-bold flex items-center justify-center shrink-0 shadow-sm"
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* 4. Matematyka Rozszerzona */}
-                  <div
-                    id="subject-card-math-roz"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setSelectedSubjectKey('math-roz');
-                      setSelectedTopicIndex(0);
-                      setViewState('topics');
-                      openSubjectSheet(false);
-                    }}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                      selectedSubjectKey === 'math-roz'
-                        ? 'border-sky-400 bg-gradient-to-br from-[#0E2034] to-[#0A1524] ring-1 ring-sky-400/30 shadow-sm'
-                        : 'border-white/10 bg-[#141A23] hover:border-white/20 hover:bg-[#18202C]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-400 flex items-center justify-center shrink-0 shadow-sm">
-                        <Calculator size={24} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="font-display font-black text-white text-base">
-                            Matematyka Rozszerzona
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                            <span className="w-1 h-1 rounded-full bg-sky-400" />
-                            Rozszerzenie • 2023
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#8B8D98] truncate">
-                          15 działów • 75 lekcji • 1500 zadań
-                        </p>
-                        <div className="mt-2.5 flex items-center gap-2.5">
-                          <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                mathRozProgressPercent > 0 ? 'bg-sky-400' : 'bg-transparent'
-                              }`}
-                              style={{ width: `${mathRozProgressPercent}%` }}
-                            />
-                          </div>
-                          <span className={`text-[11px] font-bold shrink-0 ${
-                            mathRozProgressPercent > 0 ? 'text-sky-400' : 'text-slate-500'
-                          }`}>
-                            {mathRozProgressPercent}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {selectedSubjectKey === 'math-roz' && (
-                      <motion.div 
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
-                        className="w-6 h-6 rounded-full bg-sky-400 text-[#080B11] font-bold flex items-center justify-center shrink-0 shadow-sm"
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* 5. Język Angielski Rozszerzony */}
-                  <div
-                    id="subject-card-eng-roz"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setSelectedSubjectKey('eng-roz');
-                      setSelectedTopicIndex(0);
-                      setViewState('topics');
-                      openSubjectSheet(false);
-                    }}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                      selectedSubjectKey === 'eng-roz'
-                        ? 'border-purple-400 bg-gradient-to-br from-[#241233] to-[#160B20] ring-1 ring-purple-400/30 shadow-sm'
-                        : 'border-white/10 bg-[#141A23] hover:border-white/20 hover:bg-[#18202C]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 shadow-sm">
-                        <Globe size={24} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="font-display font-black text-white text-base">
-                            Język Angielski Rozszerzony
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                            <span className="w-1 h-1 rounded-full bg-purple-400" />
-                            Rozszerzenie • B2+/C1
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#8B8D98] truncate">
-                          10 działów • 18 lekcji • 72 zadania
-                        </p>
-                        <div className="mt-2.5 flex items-center gap-2.5">
-                          <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden border border-surface-border">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                engRozProgressPercent > 0 ? 'bg-purple-400' : 'bg-transparent'
-                              }`}
-                              style={{ width: `${engRozProgressPercent}%` }}
-                            />
-                          </div>
-                          <span className={`text-[11px] font-bold shrink-0 ${
-                            engRozProgressPercent > 0 ? 'text-purple-400' : 'text-slate-500'
-                          }`}>
-                            {engRozProgressPercent}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    {selectedSubjectKey === 'eng-roz' && (
-                      <motion.div 
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 450, damping: 22 }}
-                        className="w-6 h-6 rounded-full bg-purple-400 text-white font-bold flex items-center justify-center shrink-0 shadow-sm"
-                      >
-                        <Check size={14} strokeWidth={3} />
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* 6. Przedmioty w przygotowaniu */}
-                  <div className="p-4 rounded-2xl border border-white/5 bg-[#10141C]/50 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-slate-500 flex items-center justify-center shrink-0">
-                        <BookOpen size={24} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-display font-bold text-white/70 text-base">
-                            Kolejne przedmioty
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
-                            <Lock size={10} className="text-slate-400" />
-                            <span>Wkrótce</span>
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#6B7280] truncate">
-                          Biologia • Chemia • Fizyka
-                        </p>
-                      </div>
-                    </div>
-                    <Lock size={16} className="text-slate-600 shrink-0" />
-                  </div>
-
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      {isSubjectSheetOpen && <div className="fixed inset-0 z-[120] bg-surface-bg/95 p-6 flex flex-col items-center justify-center gap-5">
+        <h2 className="text-lg font-semibold text-text-primary">Wybierz przedmiot i poziom</h2>
+        <SubjectPicker value={selectedSubjectKey} onChange={key => {
+          setSelectedSubjectKey(key); setSelectedTopicIndex(0); setViewState('topics'); openSubjectSheet(false);
+        }} />
+        <button type="button" onClick={() => openSubjectSheet(false)} className="px-4 py-3 text-sm text-text-secondary">Zamknij</button>
+      </div>}
 
       {/* =========================================================================
           BOSS EXAM RUNNER: DYNAMICZNY SPRAWDZIAN DZIAŁU / LEKTURY

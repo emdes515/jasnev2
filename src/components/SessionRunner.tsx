@@ -1,18 +1,19 @@
+import { taskProvenance } from '../lib/taskProvenance';
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  X, 
-  BookOpen, 
-  CheckCircle2, 
-  AlertTriangle, 
-  ArrowRight, 
+import {
+  X,
+  BookOpen,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
   ArrowLeft,
-  Trophy, 
-  Flame, 
-  Coins, 
+  Trophy,
+  Flame,
+  Coins,
   Zap,
-  RefreshCw, 
-  RotateCcw, 
-  Check, 
+  RefreshCw,
+  RotateCcw,
+  Check,
   Info,
   Clock,
   FileText,
@@ -435,6 +436,7 @@ export function sanitizeExaminerTip(text: string): string {
     .replace(/^(?:żelazna\s+zasada[a-ząćęłńóśźż\s]*|złota\s+(?:zasada|reguła)[a-ząćęłńóśźż\s]*|kluczowa\s+zasada[a-ząćęłńóśźż\s]*|klucz\s+do[a-ząćęłńóśźż\s]*|algorytm[a-ząćęłńóśźż\s]*|schemat[a-ząćęłńóśźż\s]*|checklista[a-ząćęłńóśźż\s]*|błyskawiczny\s+(?:odczyt|sposób)|błyskawiczne\s+wyznaczanie\s+boków|trik\s+(?:z|na)[a-ząćęłńóśźż\s]*|strategia\s+wyboru\s+narzędzia|trójki\s+pitagorejskie\s+na\s+pamięć|najpopularniejsza\s+cecha\s+na\s+maturze|warunek\s+styczności\s+na\s+maturze|częste\s+przekroje\s+na\s+maturze|praktyczny\s+sposób\s+na\s+równanie\s+prostej|przejście\s+z\s+postaci\s+ogólnej\s+do\s+kierunkowej|skracanie\s+silni|metoda\s+sklejenia|zadania\s+z\s+dodawaniem\s+kul|zestawienie\s+miar\s+w\s+1\s+minutę|przewodnik\s+wyboru\s+metody|kwadrat\s+optymalny|zliczanie\s+odcinków\s+siatki|odejmij\s+bramę\s+na\s+samym\s+początku|pole\s+trójkąta\s+z\s+sumą\s+boków|kluczowy\s+skrót\s+matematyczny|bilans\s+obwodu\s+okna\s+normańskiego|uważaj\s+na\s+(?:treść\s+zadania|potęgi\s+we\s+wzorach|nawias\s+przy\s+odejmowaniu\s+kosztów))\s*[:\-–!]\s*/i, '')
     // Strip uppercase heading prefixes (e.g. "ŻELAZNY SCHEMAT 5 KROKÓW CKE NA 4 PUNKTY:", "OBOWIĄZKOWY KROK 1:", "NIE WYMNAŻAJ NAWIASÓW!")
     .replace(/^[A-ZĄĆĘŁŃÓŚŹŻ0-9\s–—\-]{4,}[:!]\s*/, '')
+    .replace(/\(\s*żelazny\s+pewniak[^)\n]*\)\.?/gi, '')
     .replace(/[Żż]elazny\s+pewniak[^\n:!.]*(?::|!|\.|\b)\s*/gi, '')
     .replace(/\b100%\s+pewniak!?/gi, 'Częsty motyw w arkuszach CKE.')
     .replace(/NIGDY\s+nie\s+daje/g, 'nie daje')
@@ -503,7 +505,7 @@ function renderConceptEssenceCard(rawText: string | any, isPolishSession: boolea
   }
 
   const sentences: string[] = [];
-  
+
   if (rawParagraphs.length > 1) {
     sentences.push(...rawParagraphs);
   } else if (rawParagraphs.length === 1) {
@@ -1285,9 +1287,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
   const isTrueFalseTask = currentTask?.type === 'TRUE_FALSE';
   const isTwoPartTask = currentTask?.type === 'TWO_PART' || Boolean(currentTask?.part_1 && currentTask?.part_2);
   const isOpenTask = (
-    currentTask?.type === 'OPEN_PROOF' || 
+    currentTask?.type === 'OPEN_PROOF' ||
     currentTask?.type === 'OPEN_CALCULATION' ||
-    currentTask?.type === 'OPEN_TASK' || 
+    currentTask?.type === 'OPEN_TASK' ||
     currentTask?.type === 'OPEN_GENERAL' ||
     currentTask?.type === 'OPEN' ||
     currentTask?.type === 'OPEN_SHORT' ||
@@ -1872,10 +1874,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       }
       const topicId = String((sessionData as any)?.topicId || (sessionData as any)?.topic_id || '');
       const lessonIdStr = String(lessonId || '');
-      
+
       const topicNumMatch = topicId.match(/(?:dzial|topic)[-_]?(\d+)/i) || lessonIdStr.match(/(?:pol[-_]?)?lesson[-_]?(\d+)/i);
       const num = topicNumMatch ? parseInt(topicNumMatch[1], 10) : null;
-      
+
       if (topicId.includes('pillar-1') || topicId.includes('jezyk') || (num !== null && num >= 1 && num <= 4)) {
         return 'Język w użyciu';
       }
@@ -1994,7 +1996,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       });
 
       for (const item of matchingCke) {
-        const alreadyHas = list.some(l => 
+        const alreadyHas = list.some(l =>
           (l.title && l.title.toLowerCase() === item.title.toLowerCase()) ||
           (l.latex && item.formula && l.latex.replace(/\s+/g, '') === item.formula.replace(/\s+/g, ''))
         );
@@ -2072,93 +2074,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     });
   }, [departmentFormulas, formulaSearchQuery, formulaViewMode, isPolishSession, selectedFormulaCkeTopic]);
 
-  // Rozpoznawanie autentycznego źródła zadania i stylu plakietki (CKE vs Autorskie vs Informator)
   const taskSourceBadge = useMemo(() => {
-    // Sprawdzamy pole źródłowe z priorytetem dla badge / source_badge
-    const raw = (currentTask?.badge || currentTask?.source_badge || currentTask?.source || currentTask?.cke_source || '').trim();
-    
-    if (!raw) {
-      return {
-        label: 'Trening JASNE • w stylu CKE',
-        type: 'autorskie' as const,
-        badgeClass: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300',
-        dotClass: 'bg-emerald-400'
-      };
-    }
-
-    const zadMatch = raw.match(/zad(?:anie)?\.?\s*(\d+(?:\.\d+)?)/i);
-    const monthMatch = raw.match(/(maj|czerwiec|sierpi?e[nń]|grudzi?e[nń]|wrzesi?e[nń]|marzec)/i);
-    const yearMatch = raw.match(/20\d\d/);
-    const isInformatorOrPokazowy = /informator|arkusz\s*pokazowy/i.test(raw);
-    const hasMaturaKeywords = /matura|cke/i.test(raw);
-
-    // 1. Oficjalne arkusze CKE z określoną sesją i rokiem
-    if (monthMatch && yearMatch) {
-      const mRaw = monthMatch[1].toLowerCase();
-      const monthMap: Record<string, string> = {
-        maj: 'maj', czerwiec: 'czerwiec', sierpien: 'sierpień', 'sierpień': 'sierpień',
-        grudzien: 'grudzień', 'grudzień': 'grudzień', wrzesien: 'wrzesień', 'wrzesień': 'wrzesień', marzec: 'marzec'
-      };
-      const mClean = monthMap[mRaw] || mRaw;
-      const isProbna = /próbna|probna/i.test(raw);
-      const prefix = isProbna ? 'Matura próbna' : 'Matura';
-      let label = `${prefix} ${mClean} ${yearMatch[0]}`;
-      if (zadMatch) {
-        label += ` • Zad. ${zadMatch[1]}`;
-      }
-      return {
-        label,
-        type: 'cke_matura' as const,
-        badgeClass: 'bg-sky-500/15 border-sky-400/30 text-sky-300',
-        dotClass: 'bg-sky-400'
-      };
-    }
-
-    // 2. Informator CKE / Arkusz pokazowy
-    if (isInformatorOrPokazowy) {
-      let label = /pokazowy/i.test(raw) ? 'Arkusz pokazowy CKE' : 'Informator CKE';
-      if (zadMatch) {
-        label += ` • Zad. ${zadMatch[1]}`;
-      }
-      return {
-        label,
-        type: 'cke_matura' as const,
-        badgeClass: 'bg-sky-500/15 border-sky-400/30 text-sky-300',
-        dotClass: 'bg-sky-400'
-      };
-    }
-
-    // 3. Matura CKE z rokiem lub numerem zadania
-    if (yearMatch && (hasMaturaKeywords || /202[3-6]/.test(raw))) {
-      let label = `Matura ${yearMatch[0]}`;
-      if (zadMatch) {
-        label += ` • Zad. ${zadMatch[1]}`;
-      }
-      return {
-        label,
-        type: 'cke_matura' as const,
-        badgeClass: 'bg-sky-500/15 border-sky-400/30 text-sky-300',
-        dotClass: 'bg-sky-400'
-      };
-    }
-
-    if (zadMatch && hasMaturaKeywords) {
-      const cleanRaw = raw.replace(/\bCKE\s+CKE\b/gi, 'CKE').replace(/\bCKE\s*•\s*CKE\b/gi, 'CKE').trim();
-      return {
-        label: cleanRaw.startsWith('CKE') || cleanRaw.startsWith('Matura') ? cleanRaw : `Matura • Zad. ${zadMatch[1]}`,
-        type: 'cke_matura' as const,
-        badgeClass: 'bg-sky-500/15 border-sky-400/30 text-sky-300',
-        dotClass: 'bg-sky-400'
-      };
-    }
-
-    // 4. Zadania treningowe, rozgrzewkowe lub autorskie
-    return {
-      label: 'Trening JASNE • w stylu CKE',
-      type: 'autorskie' as const,
-      badgeClass: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300',
-      dotClass: 'bg-emerald-400'
-    };
+    const source = taskProvenance(currentTask);
+    return { ...source, type: source.official ? 'cke_matura' : 'autorskie',
+      badgeClass: source.official ? 'text-sky-200' : 'text-slate-400' };
   }, [currentTask]);
 
   const taskSourceLabel = taskSourceBadge.label;
@@ -2577,7 +2496,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
         const nextNum = lessonNum + 1;
         const nextIdCandidateDash = `lesson-${topicNum}-${nextNum}`;
         const nextIdCandidateDot = `${topicNum}.${nextNum}`;
-        
+
         const poolResult = drawSessionTasks(nextIdCandidateDash);
         const tasksToUse = (poolResult.sessionTasks && poolResult.sessionTasks.length > 0)
           ? poolResult.sessionTasks
@@ -2818,9 +2737,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
       const userClean = numericInput.trim();
       const targetClean = String(
-        currentTask?.correctAnswer || 
-        currentTask?.correct_answer || 
-        currentTask?.numeric_correct_answer || 
+        currentTask?.correctAnswer ||
+        currentTask?.correct_answer ||
+        currentTask?.numeric_correct_answer ||
         currentTask?.correct_val ||
         ''
       ).trim();
@@ -3128,22 +3047,22 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
           score: fallbackScore,
           maxPoints: targetPts,
           isPassed: fallbackScore >= Math.ceil(targetPts * 0.5),
-          gradeTitle: fallbackScore === targetPts 
+          gradeTitle: fallbackScore === targetPts
             ? `${targetPts} / ${targetPts} PKT – Kompletna odpowiedź i argumentacja`
             : (fallbackScore > 0 ? `${fallbackScore} / ${targetPts} PKT – Częściowa odpowiedź` : `0 / ${targetPts} PKT – Próba odpowiedzi`),
-          summary: fallbackScore === targetPts 
+          summary: fallbackScore === targetPts
             ? (currentTask?.ai_tutor_rubric?.criterion_2_points || 'Perfekcyjne rozwiązanie! Odpowiedź w pełni zgodna ze schematem maturalnym.')
             : (currentTask?.ai_tutor_rubric?.criterion_1_point || 'Częściowo poprawna odpowiedź. Wskaż dodatkowy element z tekstu.'),
           mentorComment: fallbackScore === targetPts
             ? 'Intencja polecenia trafnie odczytana, uzasadnienie precyzyjne.'
             : 'Twoja odpowiedź idzie w dobrym kierunku, ale pamiętaj o precyzyjniejszym odwołaniu do tekstu.',
-          strengths: fallbackScore > 0 
-            ? ['Poprawnie zidentyfikowano kluczowe cechy wypowiedzi', 'Trafna argumentacja w kontekście polecenia'] 
+          strengths: fallbackScore > 0
+            ? ['Poprawnie zidentyfikowano kluczowe cechy wypowiedzi', 'Trafna argumentacja w kontekście polecenia']
             : [],
-          errors: fallbackScore < targetPts 
-            ? ['Upewnij się, że odwołujesz się do konkretnych sformułowań z załączonego tekstu lub lektury'] 
+          errors: fallbackScore < targetPts
+            ? ['Upewnij się, że odwołujesz się do konkretnych sformułowań z załączonego tekstu lub lektury']
             : [],
-          ckeFeedback: fallbackScore === targetPts 
+          ckeFeedback: fallbackScore === targetPts
             ? 'Egzaminator przyznaje pełne punkty za trafną interpretację i wyczerpujące uzasadnienie.'
             : 'Egzaminator maturalny docenia próbę odpowiedzi. Do pełnej punktacji uzupełnij wypowiedź o wskazany w poleceniu element.',
           suggestion: 'Zapoznaj się z wzorcowym modelem rozwiązania poniżej.',
@@ -3151,63 +3070,63 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
         };
       } else {
         // Universal math fallback logic: Fraction arithmetic & algebra
-        const hasFractionFinal = 
-          text.includes('2/5') || 
-          text.includes('0.4') || 
-          text.includes('0{,}4') || 
-          text.includes('12/30') || 
+        const hasFractionFinal =
+          text.includes('2/5') ||
+          text.includes('0.4') ||
+          text.includes('0{,}4') ||
+          text.includes('12/30') ||
           text.includes('\\frac{2}{5}') ||
           text.includes('0,4');
 
-        const hasFractionStep = 
-          text.includes('1/6') || 
-          text.includes('4/6') || 
-          text.includes('3/6') || 
-          text.includes('\\frac{1}{6}') || 
-          text.includes('\\frac{4}{6}') || 
-          text.includes('12/5') || 
-          text.includes('wspólny') || 
+        const hasFractionStep =
+          text.includes('1/6') ||
+          text.includes('4/6') ||
+          text.includes('3/6') ||
+          text.includes('\\frac{1}{6}') ||
+          text.includes('\\frac{4}{6}') ||
+          text.includes('12/5') ||
+          text.includes('wspólny') ||
           text.includes('mianownik');
 
-        const hasAlgebraProgress = 
-          text.includes('3n^2') || 
-          text.includes('3n²') || 
-          text.includes('4n(n+1)') || 
-          text.includes('4k(k+1)') || 
-          text.includes('4k(') || 
-          text.includes('4n(') || 
-          text.includes('5(n-1)') || 
-          text.includes('5n(') || 
-          text.includes('2^96') || 
-          text.includes('2^{96}') || 
-          text.includes('2^20') || 
-          text.includes('2^{20}') || 
+        const hasAlgebraProgress =
+          text.includes('3n^2') ||
+          text.includes('3n²') ||
+          text.includes('4n(n+1)') ||
+          text.includes('4k(k+1)') ||
+          text.includes('4k(') ||
+          text.includes('4n(') ||
+          text.includes('5(n-1)') ||
+          text.includes('5n(') ||
+          text.includes('2^96') ||
+          text.includes('2^{96}') ||
+          text.includes('2^20') ||
+          text.includes('2^{20}') ||
           text.includes('2k') ||
-          text.includes('wyłącz') || 
+          text.includes('wyłącz') ||
           text.includes('wspólny') ||
-          text.includes('rozł') || 
-          text.includes('kwadrat') || 
+          text.includes('rozł') ||
+          text.includes('kwadrat') ||
           text.includes('iloczyn') ||
           text.includes('reszt');
 
-        const hasConclusion = 
-          text.includes('podziel') || 
-          text.includes('całkowit') || 
-          text.includes('wniosek') || 
-          text.includes('udowodnion') || 
-          text.includes('cnd') || 
-          text.includes('c.n.d') || 
-          text.includes('reszta 2') || 
-          text.includes('8k') || 
-          text.includes('30k') || 
-          text.includes('21k') || 
-          text.includes('k \\in') || 
-          text.includes('c \\in') || 
+        const hasConclusion =
+          text.includes('podziel') ||
+          text.includes('całkowit') ||
+          text.includes('wniosek') ||
+          text.includes('udowodnion') ||
+          text.includes('cnd') ||
+          text.includes('c.n.d') ||
+          text.includes('reszta 2') ||
+          text.includes('8k') ||
+          text.includes('30k') ||
+          text.includes('21k') ||
+          text.includes('k \\in') ||
+          text.includes('c \\in') ||
           text.includes('n \\in');
 
         const keyText = String(currentTask?.officialKey || currentTask?.scoring_key || currentTask?.explanation || '').toLowerCase();
         const matchesOfficial = Boolean(keyText && text && (
-          keyText.includes(text) || 
+          keyText.includes(text) ||
           (text.length >= 1 && keyText.split(/[\s,;=]+/).some(token => token && token === text))
         ));
 
@@ -3276,17 +3195,17 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
             score: fallbackScore,
             maxPoints: targetPts,
             isPassed: fallbackScore >= 1,
-            gradeTitle: fallbackScore === targetPts 
+            gradeTitle: fallbackScore === targetPts
               ? `${targetPts} / ${targetPts} PKT – Kompletne i bezbłędne rozwiązanie`
               : (fallbackScore === 1 ? `1 / ${targetPts} PKT – Zasadniczy postęp` : `0 / ${targetPts} PKT – Próba rozwiązania`),
             transcription: dynamicTranscription,
-            summary: fallbackScore === targetPts 
+            summary: fallbackScore === targetPts
               ? (currentTask?.ai_tutor_rubric?.criterion_2_points || 'Perfekcyjne rozwiązanie! Obliczenia i wynik są w pełni poprawne.')
               : (currentTask?.ai_tutor_rubric?.criterion_1_point || 'Zasadniczy postęp w rozwiązaniu zadania. Poprawny pierwszy etap obliczeń.'),
             mentorComment: dynamicMentorComment,
             strengths: dynamicStrengths,
             errors: dynamicErrors,
-            ckeFeedback: fallbackScore === targetPts 
+            ckeFeedback: fallbackScore === targetPts
               ? 'Zgodnie z oficjalnym modelem oceniania CKE przyznano pełną punktację za bezbłędny wynik końcowy.'
               : 'Zgodnie z kryteriami CKE za zasadniczy postęp w toku rozumowania przysługuje 1 punkt.',
             suggestion: dynamicSuggestion,
@@ -3337,11 +3256,11 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       isPassed: points > 0,
       gradeTitle: `${points} / ${maxPts} PKT – samoocena według etapów CKE`,
       summary: points === maxPts
-        ? 'Pełne rozwiązanie według zasad oceniania CKE.'
+        ? 'W samoocenie zaznaczono wszystkie etapy rozwiązania.'
         : reached.length > 0 ? `Osiągnięty etap: ${reached[reached.length - 1].label}.` : 'Nie masz jeszcze żadnego etapu – zacznij od pierwszego kroku ze wzorcowego rozwiązania.',
       mentorComment: next
         ? `Do progu ${next.points} pkt brakuje: ${next.criterion}`
-        : 'Masz komplet punktów. Porównaj jeszcze zapis ze wzorcowym rozwiązaniem – egzaminator sprawdza też uzasadnienia.',
+        : 'Przyznano komplet punktów w samoocenie. Porównaj zapis ze wzorcowym rozwiązaniem i sprawdź uzasadnienia.',
       strengths: reached.map((s: any) => s.criterion),
       errors: next ? [next.criterion] : [],
       ckeFeedback: 'Samoocena według etapów z zasad oceniania CKE.',
@@ -3501,7 +3420,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
     const cleanLessonId = lessonId.replace('lesson-', '');
     const dotLessonId = cleanLessonId.replace('-', '.');
-    
+
     // Tylko i wyłącznie zadania poprawnie rozwiązane przez ucznia w tej sesji
     const validSolvedTaskIds = Array.from(new Set(correctlySolvedTaskIds.filter(isActualTaskId)));
 
@@ -3524,12 +3443,12 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
     });
 
     onCompleteSession(
-      completedIds, 
-      stars, 
-      finalEarnedXp, 
-      finalEarnedCoins, 
-      goToNextLesson ? resolvedNextLesson : null, 
-      activeSeconds, 
+      completedIds,
+      stars,
+      finalEarnedXp,
+      finalEarnedCoins,
+      goToNextLesson ? resolvedNextLesson : null,
+      activeSeconds,
       sessionMistakesCount
     );
   };
@@ -3548,24 +3467,24 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       ? `${lessonNumberMatch[1]}.${lessonNumberMatch[2]}`
       : lessonId.replace('lesson-', '').replace('-', '.');
 
-    const accuracyPct = sessionMistakesCount === 0 
-      ? 100 
+    const accuracyPct = sessionMistakesCount === 0
+      ? 100
       : Math.round((targetCorrectAnswers / (targetCorrectAnswers + sessionMistakesCount)) * 100);
 
-    const mistakesCountLabel = sessionMistakesCount === 1 
-      ? '1 błąd poprawiony w trakcie nauki'
-      : sessionMistakesCount < 5 
-        ? `${sessionMistakesCount} błędy poprawione w trakcie nauki` 
-        : `${sessionMistakesCount} błędów poprawionych w trakcie nauki`;
+    const mistakesCountLabel = sessionMistakesCount === 1
+      ? '1 błędna odpowiedź'
+      : sessionMistakesCount < 5
+        ? `${sessionMistakesCount} błędne odpowiedzi`
+        : `${sessionMistakesCount} błędnych odpowiedzi`;
 
     return (
-      <div 
+      <div
         id="session-celebration-screen"
-        className="fixed inset-0 z-50 bg-[#070A0F]/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 text-white select-none overflow-y-auto"
+        className="focus-result fixed inset-0 z-50 bg-[#070A0F]/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 text-white select-none overflow-y-auto"
       >
         <div className="w-full max-w-md mx-auto bg-[#0B0F19] rounded-3xl border border-white/10 flex flex-col items-center justify-center p-4 sm:p-6 text-white select-none relative shadow-2xl my-auto">
           <div className="w-full flex flex-col items-center justify-center text-center">
-            
+
             {/* 1. Profesjonalny puchar Lucide Trophy w złotym okręgu sukcesu */}
             <motion.div
               initial={{ scale: 0.85, opacity: 0 }}
@@ -3583,7 +3502,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               </div>
             </motion.div>
 
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
@@ -3599,14 +3518,14 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               transition={{ duration: 0.15, ease: 'easeOut' }}
               className="text-slate-300 text-sm sm:text-base max-w-sm mb-5 leading-relaxed font-medium"
             >
-              {sessionMistakesCount === 0 
+              {sessionMistakesCount === 0
                 ? 'Perfekcyjna runda! Wszystkie zadania za pierwszym podejściem.'
-                : 'Lekcja zaliczona. Materiał opanowany.'
+                : 'Cel lekcji osiągnięty. Wróć do trudniejszych zadań, gdy potrzebujesz powtórki.'
               }
             </motion.p>
 
             {/* 2. Równy rozmiar 4 kafelków: XP, Monety, Seria, Czas Sesji - CSS Grid 2 kolumny */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
@@ -3650,15 +3569,15 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
             </motion.div>
 
             {/* 3. Karta podsumowania błędów (Bilans Skuteczności) */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
               className="flex items-center justify-center mb-6"
             >
               <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold ${
-                sessionMistakesCount === 0 
-                  ? 'bg-slate-900/90 border-emerald-500/30 text-emerald-300 shadow-sm' 
+                sessionMistakesCount === 0
+                  ? 'bg-slate-900/90 border-emerald-500/30 text-emerald-300 shadow-sm'
                   : 'bg-slate-900/90 border-amber-500/30 text-amber-300 shadow-sm'
               }`}>
                 {sessionMistakesCount === 0 ? (
@@ -3667,7 +3586,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   <RefreshCw className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 )}
                 <span>
-                  {sessionMistakesCount === 0 
+                  {sessionMistakesCount === 0
                     ? 'Skuteczność: 100% • 0 błędów'
                     : `Skuteczność: ${accuracyPct}% • ${mistakesCountLabel}`
                   }
@@ -3716,24 +3635,24 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
   // Tier color mapping
   const tier = currentTask?.tier || 'A';
-  const tierBadgeColor = 
-    tier === 'C' 
-      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' 
-      : tier === 'B' 
-        ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' 
+  const tierBadgeColor =
+    tier === 'C'
+      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+      : tier === 'B'
+        ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
         : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
 
   return (
-    <div 
+    <div
       id="session-runner-modal"
-      className="fixed inset-0 z-50 bg-[#070A0F] flex flex-col w-full h-full overflow-hidden p-0 m-0 select-none"
+      className="focus-screen fixed inset-0 z-50 bg-[#070A0F] flex flex-col w-full h-full overflow-hidden p-0 m-0 select-none"
     >
-      <div 
+      <div
         id="session-runner-container"
         className="w-full h-full flex flex-col justify-between overflow-hidden relative text-white bg-[#070A0F] rounded-none border-0 shadow-none transition-all duration-200"
       >
       {/* ================= DEDICATED FOCUS SESSION BAR ================= */}
-      <header 
+      <header
         id="session-header"
         className="w-full shrink-0 bg-[#0B0F19] border-b border-white/10 z-20 sticky top-0"
       >
@@ -3743,7 +3662,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
             <button
               id="session-exit-button"
               onClick={() => setShowExitModal(true)}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition active:scale-95 shrink-0 flex items-center justify-center cursor-pointer border border-white/5"
+              className="w-11 h-11 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition active:scale-95 shrink-0 flex items-center justify-center cursor-pointer border border-white/5"
               title="Przerwij sesję"
               aria-label="Przerwij sesję"
             >
@@ -3770,7 +3689,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 >
                   {departmentBadgeLabel}
                 </button>
-                <span 
+                <span
                   title={moduleBadgeName ? `${lessonPillLabel ? lessonPillLabel.replace('LEKCJA', 'Lekcja') + ': ' : ''}${lessonTitleClean || moduleBadgeName}` : (lessonTitleClean || lessonTitle)}
                   className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-semibold truncate flex-1 min-w-0 max-w-full sm:max-w-md shadow-sm ${
                     isPolishSession
@@ -3956,7 +3875,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 ) : (
                   <Heart className={`w-3.5 h-3.5 text-rose-500 ${Number(displayedHeartsCount) > 0 || heartsData.isPro || isTheoryStep ? 'fill-rose-500' : ''} shrink-0`} />
                 )}
-                <motion.span 
+                <motion.span
                   key={String(displayedHeartsCount)}
                   initial={{ scale: 1.45 }}
                   animate={{ scale: 1 }}
@@ -3971,9 +3890,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               <AnimatePresence>
                 {showHeartsPopover && (
                   <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setShowHeartsPopover(false)} 
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowHeartsPopover(false)}
                     />
                     <motion.div
                       initial={{ opacity: 0, y: 8, scale: 0.95 }}
@@ -4000,8 +3919,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                               key={idx}
                               size={20}
                               className={`transition-all duration-300 ${
-                                hasHeart 
-                                  ? 'text-rose-500 fill-rose-500' 
+                                hasHeart
+                                  ? 'text-rose-500 fill-rose-500'
                                   : 'text-slate-700 stroke-slate-700'
                               }`}
                             />
@@ -4078,7 +3997,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   <span className="text-slate-400 font-semibold">{targetCorrectAnswers}</span>
                 </span>
 
-                <div 
+                <div
                   id="session-coins-pill"
                   className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/60 border border-slate-700/80 text-slate-200 text-xs font-semibold shadow-sm select-none"
                   title={`Stan portfela: ${currentCoins} monet`}
@@ -4102,8 +4021,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
           const targetY = heartFlyAnim.targetY;
 
           return (
-            <div 
-              key={heartFlyAnim.key} 
+            <div
+              key={heartFlyAnim.key}
               className="fixed inset-0 pointer-events-none z-50 overflow-hidden select-none"
               aria-hidden="true"
             >
@@ -4309,12 +4228,12 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       </AnimatePresence>
 
       {/* ================= MAIN TASK AREA ================= */}
-      <main 
+      <main
         id="session-task-area"
         ref={taskAreaRef}
         className={`w-full mx-auto flex-1 min-h-0 overflow-y-auto overscroll-y-contain touch-pan-y flex flex-col justify-start transition-all max-w-3xl lg:max-w-4xl px-4 ${
-          isTheoryStep 
-            ? 'pb-36 sm:pb-36' 
+          isTheoryStep
+            ? 'pb-36 sm:pb-36'
             : isEvaluated ? 'pb-28 sm:pb-32' : 'pb-24 sm:pb-28'
         }`}
         style={{
@@ -4335,7 +4254,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   ]
                 : isEnglishSession
                   ? [
-                      { id: 0, title: 'Pewniaki', icon: Key },
+                      { id: 0, title: 'Zasady', icon: Key },
                       { id: 1, title: 'Przykłady', icon: CheckCircle2 },
                       { id: 2, title: 'Typowy błąd', icon: ShieldAlert }
                     ]
@@ -4367,10 +4286,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                     aria-label={`Przejdź do zakładki: ${step.title}`}
                   >
                     <StepIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-colors ${
-                      isActive 
-                        ? 'text-amber-400' 
-                        : isDone 
-                          ? 'text-emerald-400/80' 
+                      isActive
+                        ? 'text-amber-400'
+                        : isDone
+                          ? 'text-emerald-400/80'
                           : 'text-slate-500'
                     }`} />
                     <span className="truncate">{step.title}</span>
@@ -4828,12 +4747,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#FFB800]/15 text-[#FFDCA1] border border-[#FFB800]/30 flex items-center gap-1.5 shadow-sm">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800]" />
-                              Język angielski CKE
+                              Język angielski
                             </span>
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
-                              <Flame size={12} className="text-amber-400" />
-                              {pewniakData.ckeFrequency}
-                            </span>
+
                             <span className="text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-300 border border-white/10">
                               Poziom B1+ (Formuła 2023)
                             </span>
@@ -4844,7 +4760,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                               {theoryPill?.title || lessonTitle}
                             </h2>
                             <p className="text-xs sm:text-sm font-medium text-[#FFDCA1]/90">
-                              Pewniaki maturalne, schematy form gramatycznych i kluczowe reguły CKE
+                              Zasady, przykłady i typowe błędy
                             </p>
                           </div>
                         </section>
@@ -4859,11 +4775,11 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                               <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-amber-400" />
                                 <span className="text-xs font-black uppercase text-slate-300 tracking-wider">
-                                   KONTRAST CKE • STANDARD VS TYPOWY BŁĄD
+                                   Poprawnie i z błędem
                                 </span>
                               </div>
                               <span className="text-[10px] font-bold text-amber-300/80 uppercase">
-                                Różnica między 100% a 0 pkt
+                                Porównaj zdania
                               </span>
                             </div>
 
@@ -4927,7 +4843,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                         <div className="flex flex-col items-start gap-1">
                           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#FFB800]">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800]" />
-                            <span>ESENCJA POJĘCIA CKE</span>
+                            <span>Najważniejsza zasada</span>
                           </div>
                         </div>
                         {renderConceptEssenceCard(theoryPill?.concept_essence || theoryPill?.intuition, isPolishSession, theoryPill?.diagram, (theoryPill as any)?.numberLine)}
@@ -4949,7 +4865,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                         <section className="rounded-2xl p-4 sm:p-5 flex flex-col gap-3 border bg-[#121B2C] border-white/10 shadow-sm">
                           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#FFB800]">
                             <Zap className="w-4 h-4 text-[#FFB800]" />
-                            <span>Algorytm postępowania CKE (Krok po kroku)</span>
+                            <span>Jak rozwiązać zadanie</span>
                           </div>
                           <div className="space-y-2.5">
                             {theoryPill.algorithm_steps.map((st: any, sIdx: number) => (
@@ -4964,7 +4880,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                   </p>
                                   {st.tip && (
                                     <div className="text-[11px] text-[#FFB800] font-medium pt-0.5">
-                                      <span>💡 Wskazówka: </span>
+                                      <span> Wskazówka: </span>
                                       <MathRenderer content={st.tip} />
                                     </div>
                                   )}
@@ -5003,7 +4919,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 >
                   {isPolishSession ? (() => {
                     const polishTheory = theoryPill?.polishTheory || getPolishLessonDocument((sessionData as any)?.topicId, lessonId)?.theory_pill?.polishTheory;
-                    const rawBento = 
+                    const rawBento =
                       (theoryPill?.bentoConcepts && theoryPill.bentoConcepts.length > 0 ? theoryPill.bentoConcepts : null) ||
                       (polishTheory?.bentoConcepts && polishTheory.bentoConcepts.length > 0 ? polishTheory.bentoConcepts : null) ||
                       getPolishBentoConceptsForLesson(lessonId);
@@ -5118,7 +5034,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                           <ChevronDown className={`w-3.5 h-3.5 text-rose-400/80 transition-transform duration-200 ${isTrapOpen ? 'rotate-180' : ''}`} />
                                         </div>
                                       </button>
-                                      
+
                                       <AnimatePresence initial={false}>
                                         {isTrapOpen && (
                                           <motion.div
@@ -5194,7 +5110,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                 }
                               }
 
-                              const hasDistinctTip = item.matura_tip && 
+                              const hasDistinctTip = item.matura_tip &&
                                 !unifiedExplanation.toLowerCase().includes(item.matura_tip.toLowerCase().slice(0, 25));
 
                               return (
@@ -5236,7 +5152,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
                                   {/* Kaseton wzoru KaTeX */}
                                   {item.latex && (
-                                    <div 
+                                    <div
                                       className="w-full px-3 py-1.5 sm:py-2.5 bg-black/40 border border-white/5 rounded-xl overflow-x-auto text-center text-white scrollbar-thin shadow-inner max-w-full"
                                       style={{ WebkitMaskImage: 'linear-gradient(to right, black 88%, transparent 100%)', maskImage: 'linear-gradient(to right, black 88%, transparent 100%)' }}
                                     >
@@ -5390,7 +5306,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
                     let normExamples = rawExamplesList
                       .map((rawEx: any) => normalizeWorkedExample(
-                        rawEx || 
+                        rawEx ||
                         ((theoryPill as any)?.quote ? {
                           quote: (theoryPill as any).quote,
                           title: (theoryPill as any).quote_title,
@@ -5471,17 +5387,17 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                     if (normExamples.length === 0) {
                       return (
                         <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 text-slate-400 text-sm text-center">
-                          {isPolishSession 
-                            ? 'Przeanalizuj pojęcia w Leksykonie i przejdź do zadań praktycznych z czytania ze zrozumieniem i analizy językowej.' 
-                            : isEnglishSession 
-                              ? 'Brak przykładu dla tej pigułki wiedzy.' 
+                          {isPolishSession
+                            ? 'Przeanalizuj pojęcia w Leksykonie i przejdź do zadań praktycznych z czytania ze zrozumieniem i analizy językowej.'
+                            : isEnglishSession
+                              ? 'Brak przykładu dla tej pigułki wiedzy.'
                               : 'Brak przykładu dla tej pigułki wiedzy.'}
                         </div>
                       );
                     }
 
                     const polishSectionLabel = (() => {
-                      const match = String(lessonId).match(/^pol-(?:lesson-|dzial-|topic-)?(\d+)/) || 
+                      const match = String(lessonId).match(/^pol-(?:lesson-|dzial-|topic-)?(\d+)/) ||
                                     String((sessionData as any)?.topicId || '').match(/^pol-(?:dzial-|topic-)?(\d+)/);
                       const num = match ? parseInt(match[1], 10) : undefined;
                       if (num && num <= 4) {
@@ -5532,8 +5448,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                             : null;
 
                           return (
-                            <div 
-                              key={exIdx} 
+                            <div
+                              key={exIdx}
                               className={`rounded-2xl p-4 sm:p-5 border flex flex-col gap-4 shadow-sm ${
                                 isEnglishSession
                                   ? 'bg-[#0E1726]/60 border-emerald-500/25'
@@ -5543,10 +5459,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                               <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-2.5">
                                 <div className="flex items-center gap-2.5">
                                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center border shadow-sm ${
-                                    isPolishSession 
-                                      ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' 
-                                      : isEnglishSession 
-                                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' 
+                                    isPolishSession
+                                      ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                                      : isEnglishSession
+                                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
                                         : 'bg-amber-500/15 text-[#FFB800] border-amber-500/30'
                                   }`}>
                                     <FileText className="w-4 h-4" />
@@ -5611,16 +5527,16 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                     {normExample.steps.map((st, sIdx) => {
                                       const cleanLabel = formatStepLabel(st.label);
                                       return (
-                                        <div 
-                                          key={sIdx} 
+                                        <div
+                                          key={sIdx}
                                           className="rounded-xl p-3.5 sm:p-4 bg-white/[0.02] border border-white/5 hover:border-white/10 flex flex-col gap-2 transition-all shadow-sm min-w-0 max-w-full"
                                         >
                                           <div className="flex items-center gap-2.5 flex-wrap">
                                             <span className={`px-2 py-0.5 rounded-md font-mono text-xs font-bold shrink-0 border ${
-                                              isPolishSession 
-                                                ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' 
-                                                : isEnglishSession 
-                                                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' 
+                                              isPolishSession
+                                                ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                                                : isEnglishSession
+                                                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                                                   : 'bg-amber-500/15 text-[#FFB800] border-amber-500/30'
                                             }`}>
                                               Krok {st.num}
@@ -5703,7 +5619,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                           <ShieldAlert className="w-4 h-4" />
                         </div>
                         <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
-                          PUŁAPKA EGZAMINACYJNA CKE
+                          Typowy błąd
                         </h3>
                       </div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300 bg-rose-500/10 border border-rose-500/25 px-2.5 py-0.5 rounded-full shrink-0">
@@ -5738,7 +5654,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                                     <span>Poprawne podejście</span>
                                   </div>
                                   <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-full">
-                                    Klucz CKE
+                                    Poprawnie
                                   </span>
                                 </div>
                                 <div className="text-sm sm:text-base text-emerald-100/95 leading-relaxed font-normal">
@@ -5823,8 +5739,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   Zadanie {currentQueueIndex + 1} z {tasks?.length || targetCorrectAnswers || 5}
                 </span>
                 <span className="text-slate-600 hidden sm:inline">•</span>
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg border font-semibold text-[11px] sm:text-xs shadow-sm ${taskSourceBadge.badgeClass}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 shadow-sm ${taskSourceBadge.dotClass}`} />
+                <span className={`inline-flex items-center font-medium text-xs leading-relaxed ${taskSourceBadge.badgeClass}`}>
+
                   <span>{taskSourceBadge.label}</span>
                 </span>
               </div>
@@ -5850,10 +5766,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                         Oficjalne audio CKE
                       </span>
                     </div>
-                    <audio 
-                      controls 
-                      src={currentTask.audio_url || currentTask.audioUrl} 
-                      className="w-full h-10 rounded-lg accent-sky-500" 
+                    <audio
+                      controls
+                      src={currentTask.audio_url || currentTask.audioUrl}
+                      className="w-full h-10 rounded-lg accent-sky-500"
                       preload="metadata"
                     >
                       Twoja przeglądarka nie obsługuje odtwarzacza audio.
@@ -5925,8 +5841,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
                 {(currentTask?.image || currentTask?.imageUrl) && (
                   <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 flex flex-col items-center gap-2">
-                    <img 
-                      src={currentTask.image?.imageUrl || currentTask.imageUrl} 
+                    <img
+                      src={currentTask.image?.imageUrl || currentTask.imageUrl}
                       alt={currentTask.image?.imageAlt || currentTask.imageCaption || 'Materiał ikonograficzny'}
                       className="max-h-64 rounded-xl object-contain border border-white/10"
                     />
@@ -5984,6 +5900,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 <OpenTaskWorkspace
               task={currentTask}
               isEvaluated={isEvaluated}
+              selfAssessed={Boolean(tutorEvaluation?.selfAssessed)}
               isCorrect={isCorrect}
               value={openAnswerText}
               onChangeValue={(val) => setOpenAnswerText(val)}
@@ -5993,8 +5910,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               onAskAiTutor={handleToggleOrBuyHint}
               onRetry={handleRetryOpenTask}
               isAiLoading={isTutorScanning || isAiHintLoading}
-              inputPlaceholder={isPolishSession 
-                ? "Sformułuj swoją odpowiedź, uzasadnienie lub argument na podstawie załączonego tekstu/lektury..." 
+              inputPlaceholder={isPolishSession
+                ? "Sformułuj swoją odpowiedź, uzasadnienie lub argument na podstawie załączonego tekstu/lektury..."
                 : isEnglishSession
                   ? "Napisz swoją wypowiedź po angielsku (np. e-mail lub wpis na blogu, 80-130 słów)..."
                   : "Zapisz swoje rozwiązanie lub użyj klawiatury..."}
@@ -6051,10 +5968,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                     </div>
                     <div>
                       <h4 className="font-bold text-white text-base leading-tight">
-                        Ocena Egzaminatora CKE
+                        {tutorEvaluation.selfAssessed ? 'Samoocena według etapów CKE' : 'Ocena Egzaminatora CKE'}
                       </h4>
                       <span className="text-xs text-slate-400">
-                        {isPolishSession ? 'Nowa Formuła 2023/2026 • Język polski' : 'Nowa Formuła 2025 • Matematyka'}
+                        {isPolishSession ? 'Nowa Formuła 2023/2026 • Język polski' : 'Formuła 2023 • Matematyka'}
                       </span>
                     </div>
                   </div>
@@ -6079,8 +5996,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 </div>
 
                 {/* AI Vision OCR Transcription (only shown if real mathematical equations recognized, not placeholder) */}
-                {tutorEvaluation.transcription && 
-                 !tutorEvaluation.transcription.includes('[Rozwiązanie odręczne') && 
+                {tutorEvaluation.transcription &&
+                 !tutorEvaluation.transcription.includes('[Rozwiązanie odręczne') &&
                  tutorEvaluation.transcription.trim().length > 2 && (
                   <div className="p-3 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs space-y-1.5">
                     <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5 uppercase tracking-wide">
@@ -6180,8 +6097,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   </div>
 
                   {/* Rubric justification if distinct */}
-                  {tutorEvaluation.ckeFeedback && 
-                   tutorEvaluation.ckeFeedback !== tutorEvaluation.mentorComment && 
+                  {tutorEvaluation.ckeFeedback &&
+                   tutorEvaluation.ckeFeedback !== tutorEvaluation.mentorComment &&
                    !tutorEvaluation.mentorComment?.includes(tutorEvaluation.ckeFeedback) && (
                     <div className="pt-2.5 border-t border-white/5 space-y-1">
                       <div className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
@@ -6558,7 +6475,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
                   let btnClass = 'p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all text-xs sm:text-sm cursor-pointer ';
                   if (!isEvaluated) {
-                    btnClass += isSelected 
+                    btnClass += isSelected
                       ? 'bg-[#FFB800]/[0.08] border-[#FFB800] text-amber-100 shadow-[0_0_15px_rgba(255,184,0,0.15)]'
                       : 'bg-[#141D2E]/80 border-white/[0.06] hover:border-white/[0.14] hover:bg-[#141D2E] text-slate-200';
                   } else {
@@ -6620,7 +6537,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
                   let btnClass = 'p-3 rounded-xl border text-left flex items-center gap-2.5 transition-all text-xs sm:text-sm cursor-pointer ';
                   if (!isEvaluated) {
-                    btnClass += isSelected 
+                    btnClass += isSelected
                       ? 'bg-[#FFB800]/[0.08] border-[#FFB800] text-amber-100 shadow-[0_0_15px_rgba(255,184,0,0.15)]'
                       : 'bg-[#141D2E]/80 border-white/[0.06] hover:border-white/[0.14] hover:bg-[#141D2E] text-slate-200';
                   } else {
@@ -6678,7 +6595,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
           return (
             /* 4. STANDARD SINGLE CHOICE (A, B, C, D) - ANSWERS ALWAYS VISIBLE */
-            <motion.div 
+            <motion.div
               key={`session-options-${currentStep}-${currentTask?.id || ''}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -6734,7 +6651,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent pointer-events-none" />
 
                     <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                      <span 
+                      <span
                         className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 border transition-colors ${
                           isSelected && !isEvaluated
                             ? isPolishSession
@@ -6794,9 +6711,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
       {/* ================= STICKY BOTTOM CTA FOR THEORY STEP ================= */}
       {isTheoryStep && (
-        <footer 
+        <footer
           id="session-theory-sticky-cta"
-          className="w-full shrink-0 sticky bottom-0 z-30 bg-[#070A0F]/95 backdrop-blur-md border-t border-white/[0.06] px-4 py-3 relative"
+          className="focus-footer w-full shrink-0 sticky bottom-0 z-30 bg-[#070A0F]/95 backdrop-blur-md border-t border-white/[0.06] px-4 py-3 relative"
         >
           {/* Subtelny gradient maskujący na krawędzi górnej paska CTA */}
           <div className="absolute -top-6 left-0 right-0 h-6 pointer-events-none bg-gradient-to-t from-[#070A0F]/95 to-transparent" aria-hidden="true" />
@@ -6828,7 +6745,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 <span>
                   {isEnglishSession
                     ? (theorySubStep === 0 ? 'Dalej: Przykłady' : 'Dalej: Typowy błąd')
-                    : theorySubStep === 0 
+                    : theorySubStep === 0
                       ? (isPolishSession ? 'Dalej: Pojęcia' : 'Dalej: Wzory')
                       : theorySubStep === 1
                         ? (isPolishSession ? 'Dalej: Analiza' : 'Dalej: Przykład')
@@ -6874,14 +6791,14 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
       {/* ================= BOTTOM ACTION & FEEDBACK BAR (ELEGANT 90-110PX BAR) ================= */}
       {!isTheoryStep && (
-        <footer 
+        <footer
           id="session-footer-drawer"
-          className="w-full shrink-0 sticky bottom-0 z-30"
+          className="focus-footer w-full shrink-0 sticky bottom-0 z-30"
         >
         <AnimatePresence mode="wait">
           {!isEvaluated ? (
             /* Normal Action Bar */
-            <div 
+            <div
               id="session-check-bar"
               className="w-full bg-[#070A0F]/95 backdrop-blur-md border-t border-white/[0.06] px-4 py-3 sm:py-4"
             >
@@ -6977,10 +6894,10 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   <span>
                     {isPolishInteractiveTask
                       ? 'Wykonaj zadanie na powyższej karcie lekturowej'
-                      : isOpenTask 
-                        ? (isPolishSession ? 'Naciśnij Enter aby ocenić odpowiedź z Egzaminatorem AI' : 'Naciśnij Enter aby ocenić dowód z Egzaminatorem AI') 
-                        : isNumericTask 
-                          ? 'Wpisz wynik i naciśnij Enter aby sprawdzić' 
+                      : isOpenTask
+                        ? (isPolishSession ? 'Naciśnij Enter aby ocenić odpowiedź z Egzaminatorem AI' : 'Naciśnij Enter aby ocenić dowód z Egzaminatorem AI')
+                        : isNumericTask
+                          ? 'Wpisz wynik i naciśnij Enter aby sprawdzić'
                           : isTrueFalseTask
                             ? 'Oceń wszystkie zdania i naciśnij Enter'
                             : isTwoPartTask
@@ -7000,8 +6917,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               exit={{ y: 80, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               className={`w-full border-t-2 px-4 py-3 sm:py-3.5 min-h-[88px] flex items-center backdrop-blur-md shadow-2xl ${
-                isCorrect 
-                  ? 'bg-[#0B1A16]/95 border-emerald-500 shadow-[0_-8px_25px_rgba(16,185,129,0.2)]' 
+                isCorrect
+                  ? 'bg-[#0B1A16]/95 border-emerald-500 shadow-[0_-8px_25px_rgba(16,185,129,0.2)]'
                   : 'bg-[#1C0F14]/95 border-rose-500 shadow-[0_-8px_25px_rgba(244,63,94,0.2)]'
               }`}
             >
@@ -7009,8 +6926,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                 {/* Status Section (Left) - Bez ucinania tekstu */}
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 border ${
-                    isCorrect 
-                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
+                    isCorrect
+                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
                       : 'bg-rose-500/20 border-rose-500/50 text-rose-400'
                   }`}>
                     {isCorrect ? (
@@ -7094,7 +7011,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       {/* ================= EXPLANATION & MATURA TRAP MODAL (ON-DEMAND) ================= */}
       <AnimatePresence>
         {showExplanation && (
-          <div 
+          <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) setShowExplanation(false);
@@ -7195,7 +7112,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                         <Award size={15} />
-                        Kryteria punktowania CKE (Formuła 2025):
+                        Kryteria punktowania CKE (Formuła 2023):
                       </span>
                       <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                         {currentTask.points || 2} pkt max
@@ -7271,7 +7188,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       {/* ================= HINT BOTTOM SHEET / DRAWER ================= */}
       <AnimatePresence>
         {isHintSheetOpen && currentTask && (unlockedHints[currentTask.id] || isAiHintLoading) && (
-          <div 
+          <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) setIsHintSheetOpen(false);
@@ -7288,8 +7205,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
               <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60 shrink-0">
                 <div className="flex items-center gap-2.5">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                    isAiHintTask 
-                      ? 'bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800]' 
+                    isAiHintTask
+                      ? 'bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800]'
                       : 'bg-amber-500/10 border border-amber-500/30 text-amber-400'
                   }`}>
                     <Lightbulb size={18} />
@@ -7363,7 +7280,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       {/* ================= EXIT CONFIRMATION MODAL ================= */}
       <AnimatePresence>
         {showExitModal && (
-          <div 
+          <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) setShowExitModal(false);
@@ -7413,7 +7330,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
       {/* ================= FORMULA SHEET DRAWER ================= */}
       <AnimatePresence>
         {showFormulaSheet && (
-          <div 
+          <div
             id="session-formula-sheet-backdrop"
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-md p-0 sm:p-4"
             onClick={(e) => {
@@ -7497,8 +7414,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                       value={formulaSearchQuery}
                       onChange={e => setFormulaSearchQuery(e.target.value)}
                       placeholder={
-                        formulaViewMode === 'department' 
-                          ? `Szukaj we wzorach z: ${departmentNameOnly}...` 
+                        formulaViewMode === 'department'
+                          ? `Szukaj we wzorach z: ${departmentNameOnly}...`
                           : 'Szukaj we wszystkich wzorach CKE (np. delta, potęgi, sinus)...'
                       }
                       className="w-full bg-[#111724] border border-white/10 focus:border-[#FFB800]/50 rounded-xl pl-8 pr-8 py-1.5 text-xs text-white placeholder-slate-500 outline-none transition"
@@ -7584,9 +7501,9 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                       <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800]" />
                         {isPolishSession
-                          ? 'Pojęcia Kluczowe i Definicje' 
+                          ? 'Pojęcia Kluczowe i Definicje'
                           : (formulaViewMode === 'department'
-                              ? `Wzory i Tożsamości: ${departmentNameOnly}` 
+                              ? `Wzory i Tożsamości: ${departmentNameOnly}`
                               : (selectedFormulaCkeTopic !== 'all'
                                   ? `Wzory CKE: ${availableCkeTopics.find(t => t.id === selectedFormulaCkeTopic)?.name || 'Wybrany dział'}`
                                   : 'Tablice i Wzory CKE'
@@ -7602,8 +7519,8 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                     </div>
 
                     {drawerFormulas.map((f, i) => (
-                      <div 
-                        key={f.id || i} 
+                      <div
+                        key={f.id || i}
                         className="formula-sheet-card bg-[#111726]/80 hover:bg-[#141C2E] border border-white/5 hover:border-[#FFB800]/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 flex flex-col gap-3 shadow-sm"
                       >
                         <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -7628,7 +7545,7 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                         </div>
 
                         {f.latex && (
-                          <div 
+                          <div
                             className="bg-[#080C14] border border-white/5 rounded-xl px-3 py-1.5 sm:py-2.5 text-center overflow-x-auto custom-scrollbar touch-pan-x max-w-full"
                             style={{ WebkitMaskImage: 'linear-gradient(to right, black 88%, transparent 100%)', maskImage: 'linear-gradient(to right, black 88%, transparent 100%)' }}
                           >

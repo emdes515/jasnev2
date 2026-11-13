@@ -1,0 +1,43 @@
+/* Shared layout for focused lessons, exams and dialogs. See docs/FOCUS_SCREENS.md. */
+.focus-screen {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.focus-scroll {
+  min-height: 0;
+  min-width: 0;
+  overscroll-behavior: contain;
+  overflow-y: auto;
+}
+#session-task-area {
+  min-width: 0;
+  overflow-x: hidden;
+}
+#session-theory-pill-content {
+  min-width: 0;
+  max-width: 100%;
+}
+.focus-footer {
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.focus-dialog {
+  min-height: 0;
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+.focus-dialog-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.focus-result {
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+@media (max-height: 520px) {
+  .focus-dialog { max-height: calc(100dvh - 1rem); }
+}

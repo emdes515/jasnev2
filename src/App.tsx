@@ -298,7 +298,7 @@ export default function App() {
 
   const handleSelectSubject = (key: SubjectKey) => {
     setSelectedSubjectKey(key);
-    const subId: SubjectId = key === 'pol' ? 'polski' : key === 'eng' ? 'angielski' : 'matematyka';
+    const subId: SubjectId = key === 'pol' ? 'polski' : (key === 'eng' || key === 'eng-roz') ? 'angielski' : 'matematyka';
     setCurrentSubject(subId);
     try {
       // Zdarzenie emitujemy tylko przy realnej zmianie – inaczej nasłuch w DashboardView
@@ -1248,24 +1248,27 @@ export default function App() {
     });
   };
 
-  const handleBuyShopItem = (item: ShopItem, currency: 'tokens' | 'coins'): boolean => {
-    let success = false;
+  const handleBuyShopItem = (item: ShopItem, currency: 'tokens' | 'coins'): Promise<boolean> => {
+    // The avatar/coin booster has no implemented effect and must not consume currency.
+    if (item.effectType === 'coinBooster') return Promise.resolve(false);
+    return new Promise(resolve => {
     setUserState(prev => {
       // Egzekwowanie limitów ekwipunku: Streak Freeze (max 2), Tarcze Areny (max 3)
       if (item.effectType === 'streakFreeze' && (prev.perks?.streakFreezes || 0) >= 2) {
+        resolve(false);
         return prev;
       }
       if (item.effectType === 'arenaShield' && (prev.perks?.arenaShields || 0) >= 3) {
+        resolve(false);
         return prev;
       }
 
       if (currency === 'tokens') {
-        if ((prev.masteryTokens || 0) < item.tokenPrice) return prev;
+        if ((prev.masteryTokens || 0) < item.tokenPrice) { resolve(false); return prev; }
       } else {
-        if (prev.coins < item.coinPrice) return prev;
+        if (prev.coins < item.coinPrice) { resolve(false); return prev; }
       }
 
-      success = true;
       const newTokens = currency === 'tokens' ? (prev.masteryTokens || 0) - item.tokenPrice : (prev.masteryTokens || 0);
       const newCoins = currency === 'coins' ? prev.coins - item.coinPrice : prev.coins;
 
@@ -1287,9 +1290,10 @@ export default function App() {
 
       triggerHaptic('heavy');
       saveUserData(newState);
+      resolve(true);
       return newState;
     });
-    return success;
+    });
   };
 
   const handleClaimDailyChallenge = (challengeId: DailyChallengeId, rewardCoins: number) => {
@@ -1411,7 +1415,7 @@ export default function App() {
 
       {/* 1. NAWIGACJA (DLA DESKTOPU I TABLETU: LEWY PANEL BOCZNY; DLA MOBILNYCH: DOLNY DOCK) */}
       {!activeTask && !(currentTab === 'simulator' && isSimulatorSessionActive) && (
-        <Navigation currentTab={currentTab} setTab={setCurrentTab} />
+        <Navigation currentTab={currentTab} setTab={setCurrentTab} userState={userState} />
       )}
 
       {/* 2. GŁÓWNY OBSZAR APLIKACJI (PRZESTRONNY DLA PC/DESKTOPU) */}
@@ -1456,7 +1460,7 @@ export default function App() {
         )}
 
         {/* Pływająca pigułka promocji -50% PRO (prawy dolny róg) */}
-        <PromoFloatingPill
+        <PromoFloatingPill variant="bottom-inline"
           secondsLeft={guestPromoSecondsLeft}
           discountPercent={promoConfig.discountPercent}
           onClick={() => {
@@ -1644,7 +1648,8 @@ export default function App() {
                   </AnimatePresence>
                 )}
                 {currentTab === 'simulator' && (
-                  <MaturaSimulatorView 
+                  <MaturaSimulatorView
+                    lessonMistakes={lessonMistakes}
                     initialView={simulatorInitialView}
                     onEarnReward={handleMaturaReward}
                     userState={userState}
@@ -1684,7 +1689,7 @@ export default function App() {
                     onBuyShopItem={handleBuyShopItem}
                     onUseStreakFreeze={handleUseStreakFreeze}
                     onOpenAuthModal={() => setShowAuthModal(true)}
-                    onOpenOnboarding={() => setShowGuestPrompt(true)}
+                    onUpdateUserState={setUserState}
                     onOpenDevHub={isDevAccessAllowed() ? () => setShowDevModal(true) : undefined}
                     onOpenBlikModal={() => setShowBlikCoinModal(true)}
                     initialTab={profileInitialTab}
@@ -1729,7 +1734,7 @@ export default function App() {
         studentName="Twój maturzysta"
       />
       <GuestPromoModal
-        isOpen={showGuestPromoModal}
+        isOpen={showGuestPromoModal && !activeTask}
         onClose={() => setShowGuestPromoModal(false)}
         onClaimPromo={(promo) => {
           setShowGuestPromoModal(false);
@@ -1794,6 +1799,8 @@ export default function App() {
       />
 
       <SubjectLobbyModal
+        selectedSubjectKey={selectedSubjectKey}
+        onSelectSubjectKey={handleSelectSubject}
         isOpen={showSubjectLobbyModal}
         onClose={() => setShowSubjectLobbyModal(false)}
         currentSubject={currentSubject}

@@ -4,6 +4,10 @@ import * as path from 'path';
 import { sanitizeExaminerTip, resolveCkeTopicForDepartment, isEmergencyFallback } from '../SessionRunner';
 
 describe('SessionRunner - sanitizeExaminerTip', () => {
+  it('removes a promotional aside without leaving an open parenthesis or deleting the next sentence', () => {
+    expect(sanitizeExaminerTip('CKE Formuła 2023 • Zadanie 1–2 w arkuszu • Waga: 1 pkt (Żelazny pewniak). Sprawdź wykładnik.'))
+      .toBe('CKE Formuła 2023 • Zadanie 1–2 w arkuszu • Waga: 1 pkt  Sprawdź wykładnik.');
+  });
   it('returns empty string for null, undefined, or empty string', () => {
     expect(sanitizeExaminerTip('')).toBe('');
     expect(sanitizeExaminerTip(null as any)).toBe('');

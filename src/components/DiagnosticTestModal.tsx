@@ -290,7 +290,7 @@ export const DiagnosticTestModal: React.FC<DiagnosticTestModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-lg bg-[#0C101C] border border-white/10 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden max-h-[90vh]"
+          className="relative w-full max-w-lg bg-[#0C101C] border border-white/10 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden max-h-[90dvh]"
         >
           {/* Header */}
           <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
@@ -317,7 +317,7 @@ export const DiagnosticTestModal: React.FC<DiagnosticTestModalProps> = ({
           </div>
 
           {/* Body */}
-          <div className="p-4 sm:p-6 overflow-y-auto space-y-4">
+          <div className="p-4 sm:p-6 focus-scroll overflow-y-auto space-y-4">
             {!isFinished ? (
               <>
                 {/* Progress bar */}

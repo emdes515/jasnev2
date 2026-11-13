@@ -1,0 +1,41 @@
+.reward-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+.reward-button-primary { background: var(--primary); color: #080b11; border-color: transparent; }
+.reward-button-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.reward-button-secondary { background: var(--surface-card); color: var(--text-primary); }
+.reward-button-secondary:hover:not(:disabled) { background: var(--surface-card-hover); border-color: var(--text-muted); }
+.reward-button:disabled { cursor: not-allowed; color: var(--text-secondary); background: var(--surface-card); }
+.reward-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.reward-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.reward-status-neutral { background: var(--surface-card-hover); color: var(--text-secondary); }
+.reward-status-ready { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+.reward-status-complete { background: rgba(16, 185, 129, .12); color: #34d399; }
+.reward-panel { background: var(--surface-card); border: 1px solid var(--surface-border); border-radius: 16px; padding: 20px; }
+.reward-heading { color: var(--text-primary); font-size: 16px; font-weight: 600; line-height: 24px; }
+.reward-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px; color: var(--primary); background: var(--surface-card-hover); }
+.reward-progress { height: 6px; background: var(--surface-card-hover); border-radius: 6px; overflow: hidden; }
+.reward-progress > span { display: block; height: 100%; background: var(--primary); border-radius: inherit; }
+@media (max-width: 420px) { .reward-panel { padding: 16px; } }

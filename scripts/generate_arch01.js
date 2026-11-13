@@ -772,7 +772,7 @@ const initialTasks = [
 
 const allArch01 = [...initialTasks, ...tasks];
 
-const outputPath = path.join(__dirname, '../src/data/math/generated/arch01_complete_57.json');
+const outputPath = path.join(__dirname, '../src/data/offline/math/generated/arch01_complete_57.json');
 fs.writeFileSync(outputPath, JSON.stringify(allArch01, null, 2), 'utf-8');
 
 console.log(`Pomyślnie wygenerowano i zapisano komplet 57 zadań ARCH-01 w: ${outputPath}`);

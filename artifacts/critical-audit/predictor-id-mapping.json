@@ -1,0 +1,46 @@
+[
+  {
+    "subject": "matematyka-podstawowa",
+    "total": 1500,
+    "idsWithoutTopicMapping": 1500,
+    "examples": [
+      "mat-pp-1-1-01",
+      "mat-pp-1-1-02",
+      "mat-pp-1-1-03",
+      "mat-pp-1-1-04"
+    ]
+  },
+  {
+    "subject": "jezyk-angielski",
+    "total": 1500,
+    "idsWithoutTopicMapping": 1500,
+    "examples": [
+      "eng_uoe_001",
+      "eng_uoe_002",
+      "eng_uoe_003",
+      "eng_uoe_004"
+    ]
+  },
+  {
+    "subject": "jezyk-polski",
+    "total": 910,
+    "idsWithoutTopicMapping": 910,
+    "examples": [
+      "POL_P1_T1_001",
+      "POL_P1_T1_002",
+      "POL_P1_T1_003",
+      "POL_P1_T1_004"
+    ]
+  },
+  {
+    "subject": "matematyka-rozszerzona",
+    "total": 1500,
+    "idsWithoutTopicMapping": 1500,
+    "examples": [
+      "mat-pr-1-1-01",
+      "mat-pr-1-1-02",
+      "mat-pr-1-1-03",
+      "mat-pr-1-1-04"
+    ]
+  }
+]

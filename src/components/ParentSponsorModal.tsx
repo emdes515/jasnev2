@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  X, 
-  Heart, 
-  Brain, 
-  Send, 
-  Copy, 
-  Check, 
-  ShieldCheck, 
-  Zap, 
-  Smartphone, 
+import {
+  X,
+  Heart,
+  Brain,
+  Send,
+  Copy,
+  Check,
+  ShieldCheck,
+  Zap,
+  Smartphone,
   MessageCircle,
   Coins,
   KeyRound,
@@ -42,15 +42,15 @@ export const ParentSponsorModal: React.FC<ParentSponsorModalProps> = ({
 
   const displayName = customName.trim() || 'Twoje dziecko';
   const sponsorUrl = 'https://jasne.edu.pl/sponsor/matura-pro';
-  
+
   const sponsorMessage = `Cześć! Uczę się do egzaminu maturalnego w aplikacji JASNE. (https://jasne.edu.pl).
 
 Żebym mógł uczyć się bez limitów (nielimitowane serca, sprawdzanie zadań otwartych przez AI egzaminatora wg oficjalnego klucza CKE), potrzebuję pełnego konta PRO.
 
 Czy moglibyście mi kupić dostęp? To jednorazowy wydatek 39 zł przez bezpieczny i szybki BLIK:
-👉 ${sponsorUrl}
+ ${sponsorUrl}
 
-Dzięki wielkie za pomoc w zdaniu matury! ❤️
+Dzięki wielkie za pomoc w zdaniu matury!
 — ${displayName}`;
 
   const handleCopy = async () => {
@@ -105,7 +105,7 @@ Dzięki wielkie za pomoc w zdaniu matury! ❤️
 
   return (
     <AnimatePresence>
-      <div 
+      <div
         id="parent-sponsor-backdrop"
         className="fixed inset-0 z-[130] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
         onClick={(e) => {
@@ -234,7 +234,7 @@ Dzięki wielkie za pomoc w zdaniu matury! ❤️
             <button
               onClick={handleCopy}
               className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                copied 
+                copied
                   ? 'bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]'
                   : 'bg-white/10 hover:bg-white/15 text-white border border-white/10'
               }`}

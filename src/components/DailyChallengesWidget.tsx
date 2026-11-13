@@ -121,18 +121,18 @@ export const DailyChallengesWidget: React.FC<DailyChallengesWidgetProps> = ({
       <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header Widgetu */}
-      <div className="flex items-center justify-between mb-3.5 relative z-10">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-3.5 relative z-10">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500/20 to-yellow-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
             <Trophy size={16} />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <h3 className="font-display font-black text-sm text-text-primary tracking-tight">
-                Wyzwania Dnia
+                Wyzwania na dziś
               </h3>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400">
-                +35 monet
+                Nagrody: 35 monet
               </span>
             </div>
             <p className="text-[11px] text-text-muted">
@@ -142,7 +142,7 @@ export const DailyChallengesWidget: React.FC<DailyChallengesWidgetProps> = ({
         </div>
 
         {timeLeftStr && (
-          <div className="flex items-center gap-1 text-[11px] text-text-muted font-mono bg-white/[0.03] border border-white/5 px-2 py-1 rounded-lg">
+          <div className="flex items-center gap-1 text-[11px] text-text-secondary font-sans bg-white/[0.03] border border-white/5 px-2 py-1 rounded-lg">
             <Clock size={11} className="text-amber-400/80" />
             <span>{timeLeftStr}</span>
           </div>

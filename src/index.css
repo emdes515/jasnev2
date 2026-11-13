@@ -1,6 +1,9 @@
 @import "tailwindcss";
 /* Adapter motywu jasnego: jasne odpowiedniki kolorów wpisanych na sztywno w komponentach (plik generowany) */
 @import "./theme-light-adapter.css";
+@import "./styles/focus-layout.css";
+@import "./styles/header-ui.css";
+@import "./styles/rewards.css";
 
 @theme {
   --font-sans: 'DM Sans', sans-serif;
@@ -188,10 +191,10 @@ body,
 }
 
 /* Wymogi identyfikacji JASNE. dla przycisków Solar Amber */
-button[class*="bg-[#FFB800]"],
-button[class*="bg-jasne"],
-a[class*="bg-[#FFB800]"],
-a[class*="bg-jasne"],
+button[class~="bg-[#FFB800]"],
+button[class~="bg-jasne"],
+a[class~="bg-[#FFB800]"],
+a[class~="bg-jasne"],
 .btn-jasne {
   color: #080B11 !important;
   font-weight: 700 !important;

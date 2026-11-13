@@ -559,7 +559,7 @@ export const AiTaskGeneratorModal: React.FC<AiTaskGeneratorModalProps> = ({
 
                     {generatedTask.cke_trap && (
                       <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-200">
-                        <span className="font-bold text-rose-300 block">⚠️ Pułapka egzaminacyjna:</span>
+                        <span className="font-bold text-rose-300 block"> Pułapka egzaminacyjna:</span>
                         <span>{generatedTask.cke_trap}</span>
                       </div>
                     )}

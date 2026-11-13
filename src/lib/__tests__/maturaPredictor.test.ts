@@ -122,3 +122,11 @@ describe('maturaPredictor', () => {
     });
   });
 });
+
+
+it('does not inflate prediction mistakes for legacy lesson aliases', () => {
+  const base = { subjectId: 'matematyka-podstawowa', completedTasks: ['task-1-1-1', 'task-1-1-2', 'task-1-1-3'] };
+  const single = calculateMaturaPrediction({ ...base, lessonMistakes: { '1.1': 1 } });
+  const aliases = calculateMaturaPrediction({ ...base, lessonMistakes: { '1.1': 1, 'math-lesson-1-1': 1, 'math.lesson-1-1': 1 } });
+  expect(aliases).toEqual(single);
+});

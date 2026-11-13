@@ -18,6 +18,23 @@ vi.mock('../../lib/firebase', () => ({
   auth: { currentUser: null },
   db: {}
 }));
+vi.mock('../../firebase', () => ({ app: {}, auth: { currentUser: null }, db: {} }));
+// Recovery tests supply session fixtures; do not leave real Firestore reads running after teardown.
+vi.mock('../../services/curriculumRepository', async importOriginal => {
+  const actual = await importOriginal<typeof import('../../services/curriculumRepository')>();
+  return { ...actual, curriculumRepository: {
+    ...actual.curriculumRepository,
+    getTopics: vi.fn().mockResolvedValue([]),
+    getSubjects: vi.fn().mockResolvedValue([]),
+    getSubject: vi.fn().mockResolvedValue(null),
+    getSubjectPillars: vi.fn().mockResolvedValue([]),
+    getLesson: vi.fn().mockResolvedValue(null),
+    ensureLessonLoaded: vi.fn().mockResolvedValue(null),
+    getCkeExamTasks: vi.fn().mockResolvedValue([]),
+    getPracticeTasks: vi.fn().mockResolvedValue([]),
+    getStudyCatalog: vi.fn().mockResolvedValue({ lessons: [], sections: [], epochs: [] })
+  } };
+});
 
 vi.mock('canvas-confetti', () => ({
   default: vi.fn()
@@ -333,7 +350,7 @@ describe('Session Recovery Component Integration', () => {
       // 2. Zapisana zakładka 'arena' – Arena jest wyłączona (ARENA_ENABLED), więc wracamy na Dashboard
       localStorage.setItem('jasne_active_tab_v1', 'arena');
       const { unmount: unmountArena } = render(<App />);
-      expect(screen.getAllByText(/Główny panel|Dashboard/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Główny panel|Dashboard|Pulpit/i).length).toBeGreaterThan(0);
       expect(screen.queryByText(/Szybkie starcia 1v1/i)).toBeNull();
       unmountArena();
 
@@ -346,7 +363,7 @@ describe('Session Recovery Component Integration', () => {
       // 4. Test fallback to 'dashboard' when no saved tab
       localStorage.removeItem('jasne_active_tab_v1');
       const { unmount: unmountDash } = render(<App />);
-      expect(screen.getAllByText(/Główny panel|Dashboard/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Główny panel|Dashboard|Pulpit/i).length).toBeGreaterThan(0);
       unmountDash();
     });
   });

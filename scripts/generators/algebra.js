@@ -10,7 +10,7 @@ export function generateAlgebra() {
   const allTasks = [];
 
   // ARCH-01: Potęgi i pierwiastki (57 zadań)
-  const arch01Path = path.join(__dirname, '../../src/data/math/generated/arch01_complete_57.json');
+  const arch01Path = path.join(__dirname, '../../src/data/offline/math/generated/arch01_complete_57.json');
   let arch01Tasks = JSON.parse(fs.readFileSync(arch01Path, 'utf8'));
 
   // Ensure all ARCH-01 tasks have clean math and step-by-step structure

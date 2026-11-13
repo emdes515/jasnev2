@@ -79,7 +79,7 @@ describe('OnboardingOverlay Component', () => {
     });
 
     // Should now be on Step 3 (Bento Ecosystem)
-    expect(screen.getByText('EKOSYSTEM MATURALNY JASNE')).toBeDefined();
+    expect(screen.getByText('NAUKA Z JASNE')).toBeDefined();
     expect(screen.getByText(/System Mini-matur CKE/i)).toBeDefined();
   });
 
@@ -110,7 +110,7 @@ describe('OnboardingOverlay Component', () => {
     expect(screen.getByText('Twój plan nauki z matematyki jest gotowy!')).toBeDefined();
 
     // Click guest continue
-    const guestBtn = screen.getByRole('button', { name: /Przejdź do Dashboardu jako gość/i });
+    const guestBtn = screen.getByRole('button', { name: /Zacznij naukę jako gość/i });
     fireEvent.click(guestBtn);
 
     expect(handleComplete).toHaveBeenCalledTimes(1);

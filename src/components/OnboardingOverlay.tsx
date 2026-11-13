@@ -107,7 +107,7 @@ export function OnboardingOverlay({
       title: '30%+ • Zdać na luzie',
       subtitle: 'Święty spokój, zero stresu • Pewniaki z zadań zamkniętych CKE',
       icon: ShieldCheck,
-      badgeText: 'PEWNE ZALICZENIE',
+      badgeText: 'CEL: ZDAĆ MATURĘ',
       badgeVariant: 'amber'
     },
     {
@@ -132,7 +132,7 @@ export function OnboardingOverlay({
     }
   ];
 
-  // Krok 1: Wybór celu z płynnym auto-advance
+  // Wybór celu jest zatwierdzany przyciskiem Dalej.
   const handleSelectGoal = (option: GoalOption) => {
     setSelectedGoalId(option.id);
     setTargetExam(option.exam);
@@ -140,9 +140,6 @@ export function OnboardingOverlay({
     triggerHaptic('light');
 
     if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
-    advanceTimerRef.current = setTimeout(() => {
-      setCurrentStep(2);
-    }, 260);
   };
 
   // Krok 2: Odpowiedź na zadanie z wykresem paraboli
@@ -387,7 +384,7 @@ export function OnboardingOverlay({
                 </button>
                 <span className="text-[11px] text-slate-500 text-center flex items-center justify-center gap-1">
                   <Lightbulb size={12} className="text-amber-400 shrink-0" />
-                  <span>Kliknięcie celu automatycznie przenosi Cię do kolejnego kroku</span>
+                  <span>Wybierz cel i kliknij Dalej. Możesz go później zmienić.</span>
                 </span>
               </div>
             </motion.div>
@@ -412,7 +409,7 @@ export function OnboardingOverlay({
                   </Badge>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">
-                  Rozwiąż 1 pewniaka z wykresu i poczuj satysfakcję
+                  Sprawdź, jak odczytać wynik z wykresu
                 </h2>
                 <p className="text-xs text-slate-400 mt-1">
                   Zadanie w stylu CKE (Formuła 2023). Zobacz, jak działa odczytywanie zbioru wartości:
@@ -539,7 +536,7 @@ export function OnboardingOverlay({
                   >
                     <Lightbulb size={16} className="text-amber-400 shrink-0 mt-0.5" />
                     <span>
-                      <strong>Pułapka CKE!</strong> Zbiór wartości odczytujemy z osi <strong>OY</strong> (od dołu do góry). Najniższa wartość to <InlineMath math="-4" />. Ponieważ punkt należy do wykresu, nawias musi być <strong>domknięty</strong> <InlineMath math="\\langle" />. Wybierz odpowiedź <strong>A</strong>!
+                      <strong>Pułapka CKE!</strong> Zbiór wartości odczytujemy z osi <strong>OY</strong> (od dołu do góry). Najniższa wartość to <InlineMath math="-4" />. Ponieważ punkt należy do wykresu, nawias musi być <strong>domknięty</strong> <InlineMath math={String.raw`\langle`} />. Wybierz odpowiedź <strong>A</strong>!
                     </span>
                   </motion.div>
                 )}
@@ -557,7 +554,7 @@ export function OnboardingOverlay({
                       </div>
                       <div>
                         <span className="text-xs font-bold text-white block">
-                          Świetnie! Zbiór wartości to <InlineMath math="\\langle -4, +\\infty)" />.
+                          Świetnie! Zbiór wartości to <InlineMath math={String.raw`\langle -4, +\infty)`} />.
                         </span>
                         <span className="text-[11px] text-emerald-300">
                           Pułapka CKE z domkniętym nawiasem rozpracowana.
@@ -594,7 +591,7 @@ export function OnboardingOverlay({
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
                   <Badge variant="jasne" icon={<Compass size={12} />}>
-                    EKOSYSTEM MATURALNY JASNE
+                    NAUKA Z JASNE
                   </Badge>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
@@ -652,7 +649,7 @@ export function OnboardingOverlay({
                   </div>
                 </div>
 
-                {/* Bento 3: AI Tutor & Seria Nawykowa */}
+                {/* Bento 3: Pomoc AI i seria nauki */}
                 <div className="bg-[#0E1522]/90 border border-emerald-500/30 rounded-2xl p-3.5 sm:p-4 shadow-[0_4px_15px_rgba(16,185,129,0.06)] relative overflow-hidden">
                   <div className="flex items-start gap-3.5">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
@@ -661,14 +658,14 @@ export function OnboardingOverlay({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
                         <h4 className="text-sm font-bold text-white">
-                          AI Tutor & Seria Nawykowa
+                          Pomoc AI i seria nauki
                         </h4>
                         <Badge variant="emerald">
                           ZERO STRESU
                         </Badge>
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
-                        5–10 minut dziennie wystarczy, by nie zapomnieć wiedzy do maja. AI Tutor natychmiast wyjaśnia błędy, a seria motywuje do systematyczności.
+                        Regularne, krótkie powtórki pomagają utrwalać wiedzę. Pomoc AI wyjaśnia błędy, a seria przypomina o nauce.
                       </p>
                     </div>
                   </div>
@@ -711,7 +708,7 @@ export function OnboardingOverlay({
                   </Badge>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
-                  Twój kokpit w pigułce
+                  Poznaj aplikację
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-400 mt-1">
                   Dotknij sekcji poniżej, aby podejrzeć najważniejsze strefy aplikacji:
@@ -907,7 +904,7 @@ export function OnboardingOverlay({
                   onClick={() => handleFinishOnboarding(false)}
                   className="text-xs text-slate-400 hover:text-slate-200 underline decoration-slate-600 underline-offset-4 transition py-1 cursor-pointer"
                 >
-                  Przejdź do Dashboardu jako gość
+                  Zacznij naukę jako gość
                 </button>
               </div>
             </motion.div>

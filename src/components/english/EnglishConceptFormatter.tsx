@@ -18,7 +18,7 @@ export function renderFormattedInline(text: string): React.ReactNode {
       return (
         <span
           key={i}
-          className="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-xs sm:text-sm font-bold mx-0.5 shadow-sm inline-block break-words break-all max-w-full align-middle"
+          className="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-sans text-sm font-medium mx-0.5 shadow-sm inline-block break-words max-w-full align-middle"
         >
           {code}
         </span>
@@ -234,7 +234,7 @@ export const EnglishConceptFormatter: React.FC<{ content: string }> = ({ content
       {intro && (
         <section className="p-3.5 sm:p-4 rounded-xl border-l-4 border-l-[#FFB800] border border-white/10 bg-black/40 text-slate-200 text-xs sm:text-sm leading-relaxed shadow-inner min-w-0 overflow-hidden">
           <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1">
-            Wprowadzenie & Sens Zagadnienia CKE:
+            Na czym to polega
           </span>
           <div className="text-slate-200 break-words">
             {renderFormattedInline(intro)}
@@ -248,10 +248,10 @@ export const EnglishConceptFormatter: React.FC<{ content: string }> = ({ content
           <div className="flex items-center justify-between gap-2 flex-wrap min-w-0">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 min-w-0">
               <BookmarkCheck size={16} className="text-emerald-400 shrink-0" />
-              <span className="truncate">Główne filary wiedzy CKE</span>
+              <span className="truncate">Najważniejsze zasady</span>
             </div>
-            <span className="text-[10px] font-medium text-emerald-300/90 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-mono shrink-0">
-              {bentoPoints.length} kluczowe pojęcia
+            <span className="text-[10px] font-medium text-emerald-300/90 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-sans shrink-0">
+              Pojęcia: {bentoPoints.length}
             </span>
           </div>
 
@@ -265,7 +265,7 @@ export const EnglishConceptFormatter: React.FC<{ content: string }> = ({ content
                   {/* Górny pasek: Licznik 01, 02 + Tytuł pojęcia + Pigułka formuły */}
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2 min-w-0">
                     <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <span className="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      <span className="w-6 h-6 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-sans text-xs font-bold flex items-center justify-center shrink-0">
                         {String(pIdx + 1).padStart(2, '0')}
                       </span>
                       <h4 className="text-xs sm:text-sm font-bold text-white tracking-tight break-words min-w-0">
@@ -273,8 +273,8 @@ export const EnglishConceptFormatter: React.FC<{ content: string }> = ({ content
                       </h4>
                     </div>
                     {point.formula && (
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-bold text-emerald-300 break-words whitespace-normal max-w-full text-left">
-                        {point.formula}
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-sm leading-relaxed font-sans font-medium text-emerald-200 break-words whitespace-normal max-w-full text-left">
+                        {renderFormattedInline(point.formula)}
                       </span>
                     )}
                   </div>

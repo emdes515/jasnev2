@@ -1,21 +1,22 @@
+import { taskProvenance } from '../lib/taskProvenance';
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  CheckCircle2, 
-  AlertTriangle, 
-  ArrowRight, 
-  Lightbulb, 
-  FileText, 
-  ChevronDown, 
+import {
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  Lightbulb,
+  FileText,
+  ChevronDown,
   ChevronUp,
-  Check, 
-  X, 
-  RefreshCw, 
-  Trophy, 
-  Flame, 
-  Clock, 
-  Target, 
-  Maximize2, 
-  Minimize2, 
+  Check,
+  X,
+  RefreshCw,
+  Trophy,
+  Flame,
+  Clock,
+  Target,
+  Maximize2,
+  Minimize2,
   BookOpen,
   Zap,
   RotateCcw,
@@ -239,10 +240,10 @@ function parseTheoryCards(officialKey: string, question: string): TheoryCardItem
   }];
 }
 
-export function TaskView({ 
-  taskData, 
-  userState, 
-  onCompleteTask, 
+export function TaskView({
+  taskData,
+  userState,
+  onCompleteTask,
   onCancelTask,
   onDeductCoins,
   onDeductHeart,
@@ -252,10 +253,10 @@ export function TaskView({
 }: TaskViewProps) {
   if (taskData?.isSession) {
     return (
-      <SessionRunner 
-        sessionData={taskData} 
-        userState={userState} 
-        onCompleteSession={onCompleteTask} 
+      <SessionRunner
+        sessionData={taskData}
+        userState={userState}
+        onCompleteSession={onCompleteTask}
         onCancelSession={onCancelTask}
         onDeductCoins={onDeductCoins}
         onDeductHeart={onDeductHeart}
@@ -282,8 +283,8 @@ export function TaskView({
   const [currentTheoryIndex, setCurrentTheoryIndex] = useState<number>(0);
 
   // Practice tasks queue
-  const initialPracticeQueue = practiceTasksList.length > 0 
-    ? practiceTasksList 
+  const initialPracticeQueue = practiceTasksList.length > 0
+    ? practiceTasksList
     : (startsWithTheory ? [] : [taskData]);
 
   const [practiceQueue, setPracticeQueue] = useState<any[]>(initialPracticeQueue);
@@ -336,7 +337,7 @@ export function TaskView({
   // Hints drawer state (Static CKE hints only for closed tasks)
   const [showHintModal, setShowHintModal] = useState<boolean>(false);
   const [unlockedHintLevel, setUnlockedHintLevel] = useState<number>(1);
-  
+
   // Socratic AI Tutor state (Active strictly for OPEN_PROOF tasks)
   const [showOpenProofTutorSheet, setShowOpenProofTutorSheet] = useState<boolean>(false);
   const [aiTutorResponse, setAiTutorResponse] = useState<string>('');
@@ -345,7 +346,7 @@ export function TaskView({
   // Celebration state
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
-  const activeTask: any = isInTheoryMode 
+  const activeTask: any = isInTheoryMode
     ? (theoryTask || taskData)
     : (practiceQueue[currentTaskIndex] || taskData || {});
 
@@ -588,14 +589,14 @@ export function TaskView({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
-    isCompleted, 
-    showRetryInterstitial, 
-    isScratchpadOpen, 
-    showHintModal, 
-    showOpenProofTutorSheet, 
-    isEvaluated, 
-    taskType, 
-    normalizedOptions, 
+    isCompleted,
+    showRetryInterstitial,
+    isScratchpadOpen,
+    showHintModal,
+    showOpenProofTutorSheet,
+    isEvaluated,
+    taskType,
+    normalizedOptions,
     isReadyToVerify,
     isInTheoryMode,
     currentTheoryIndex,
@@ -624,7 +625,7 @@ export function TaskView({
       const correctRaw = String(activeTask.correct_answer || activeTask.correctAnswer || activeTask.officialKey || '').trim();
       const expected1 = activeTask.part_1?.correct || activeTask.correct_combination?.[0] || (correctRaw.length >= 1 ? correctRaw[0] : '');
       const expected2 = activeTask.part_2?.correct || activeTask.correct_combination?.[1] || (correctRaw.length >= 2 ? correctRaw.slice(1).replace(/[^0-9A-Za-z]/g, '') : '');
-      
+
       const matches1 = twoPart1.toUpperCase() === String(expected1).toUpperCase();
       const matches2 = twoPart2.toUpperCase() === String(expected2).toUpperCase();
       evaluatedCorrect = matches1 && matches2;
@@ -806,10 +807,10 @@ export function TaskView({
       const validDoneIds = filterActualTaskIds(completedTaskIds);
 
       onCompleteTask(
-        validDoneIds, 
-        calculatedStars, 
-        totalEarnedXp, 
-        totalEarnedCoins, 
+        validDoneIds,
+        calculatedStars,
+        totalEarnedXp,
+        totalEarnedCoins,
         taskData?.nextLesson || null
       );
     };
@@ -819,7 +820,7 @@ export function TaskView({
         <div className="w-full h-full md:h-[90vh] md:max-h-[850px] md:max-w-[760px] bg-surface-elevated md:rounded-[32px] md:border md:border-surface-border md:shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(255,184,0,0.06)] flex flex-col justify-between items-stretch overflow-hidden relative">
         {/* Top bar header */}
         <header className="shrink-0 px-4 pt-4 pb-3 border-b border-surface-border bg-surface-elevated flex items-center justify-end z-20">
-          <button 
+          <button
             onClick={handleContinue}
             className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors active:scale-95"
             title="Zamknij"
@@ -933,7 +934,7 @@ export function TaskView({
         {/* 5. Sticky Action Footer: powrót do mapy lekcji */}
         <footer className="shrink-0 w-full p-4 bg-surface-elevated border-t border-surface-border z-20" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
           <div className="flex flex-col items-center w-full">
-            <button 
+            <button
               onClick={handleContinue}
               className="w-full h-[52px] bg-primary hover:bg-[#FFC72C] border border-primary-dark/40 text-[#070A0F] font-bold text-base px-6 rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(255,184,0,0.35)] cursor-pointer"
             >
@@ -961,7 +962,7 @@ export function TaskView({
           <span className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
             <RotateCcw size={14} /> Pętla Poprawkowa
           </span>
-          <button 
+          <button
             onClick={onCancelTask}
             className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors"
           >
@@ -1008,7 +1009,7 @@ export function TaskView({
         </div>
 
         <footer className="shrink-0 w-full p-4 bg-surface-elevated/95 backdrop-blur-md border-t border-surface-border" style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
-          <button 
+          <button
             onClick={handleStartRetryPhase}
             className="w-full bg-[#FFB800] hover:bg-[#FFC72C] border border-[#D97706]/40 text-[#080B11] font-bold text-base py-3.5 px-6 rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(255,184,0,0.35)] cursor-pointer"
           >
@@ -1034,7 +1035,7 @@ export function TaskView({
       <div className="fixed inset-0 z-50 bg-[#070A0F]/90 backdrop-blur-xl flex items-center justify-center p-0 md:p-6 lg:p-8 overflow-hidden">
         <div className="w-full h-full h-[100dvh] md:h-[90vh] md:max-h-[850px] md:max-w-[760px] bg-surface-bg md:rounded-[32px] md:border md:border-surface-border md:shadow-[0_20px_60px_rgba(0,0,0,0.8),0_0_40px_rgba(255,184,0,0.06)] flex flex-col justify-start items-stretch overflow-hidden relative">
           <header className="shrink-0 px-4 pt-3.5 pb-3 border-b border-surface-border bg-surface-elevated flex items-center justify-between z-20">
-          <button 
+          <button
             onClick={onCancelTask}
             className="flex items-center gap-1.5 text-[#9CA3AF] hover:text-white text-xs font-bold bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors active:scale-95"
           >
@@ -1052,7 +1053,7 @@ export function TaskView({
           </div>
         </header>
 
-        <main 
+        <main
           className="flex-1 min-h-0 overflow-y-auto px-4 py-3 flex flex-col justify-start items-stretch gap-3 custom-scrollbar"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
@@ -1285,8 +1286,8 @@ export function TaskView({
                           <span>Częsty błąd</span>
                         </div>
                         <div className="text-white font-medium text-xs sm:text-sm leading-relaxed break-words py-0.5 max-w-full">
-                          <MathRenderer 
-                            content={currentCard.trap_error.startsWith('$') ? currentCard.trap_error : `$${currentCard.trap_error}$`} 
+                          <MathRenderer
+                            content={currentCard.trap_error.startsWith('$') ? currentCard.trap_error : `$${currentCard.trap_error}$`}
                             className="flex flex-wrap items-center gap-x-1.5 gap-y-1 break-words max-w-full"
                           />
                         </div>
@@ -1300,8 +1301,8 @@ export function TaskView({
                           <span>Prawidłowy zapis</span>
                         </div>
                         <div className="text-white font-medium text-xs sm:text-sm leading-relaxed break-words py-0.5 max-w-full">
-                          <MathRenderer 
-                            content={currentCard.trap_correct.startsWith('$') ? currentCard.trap_correct : `$${currentCard.trap_correct}$`} 
+                          <MathRenderer
+                            content={currentCard.trap_correct.startsWith('$') ? currentCard.trap_correct : `$${currentCard.trap_correct}$`}
                             className="flex flex-wrap items-center gap-x-1.5 gap-y-1 break-words max-w-full"
                           />
                         </div>
@@ -1355,8 +1356,8 @@ export function TaskView({
             className="flex-1 bg-[#FFB800] hover:bg-[#FFC72C] border border-[#D97706]/40 text-[#080B11] font-bold py-3.5 px-6 rounded-xl text-sm transition-all flex items-center justify-center gap-2 group active:scale-[0.98] shadow-[0_0_20px_rgba(255,184,0,0.35)] cursor-pointer"
           >
             <span>
-              {!isLastCard 
-                ? 'Następna karta' 
+              {!isLastCard
+                ? 'Następna karta'
                 : 'Przejdź do zadań'}
             </span>
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -1370,8 +1371,8 @@ export function TaskView({
   // --------------------------------------------------------------------------
   // 4. UNIWERSALNA "RAMKA AKTYWNOŚCI" (CKE TASK CONTAINER)
   // --------------------------------------------------------------------------
-  const progressPercent = practiceQueue.length > 0 
-    ? ((currentTaskIndex + (isEvaluated && isCorrect ? 1 : 0)) / practiceQueue.length) * 100 
+  const progressPercent = practiceQueue.length > 0
+    ? ((currentTaskIndex + (isEvaluated && isCorrect ? 1 : 0)) / practiceQueue.length) * 100
     : 100;
 
   const pointsCount = activeTask.points || (activeTask.cke_source?.includes('2 pkt') || taskType === 'MULTI_CHOICE' || taskType === 'OPEN_PROOF' ? 2 : 1);
@@ -1391,7 +1392,7 @@ export function TaskView({
       <header className="shrink-0 px-4 pt-3 pb-2.5 border-b border-surface-border bg-surface-elevated flex flex-col gap-2 z-20">
         <div className="flex items-center justify-between">
           {/* Exit button */}
-          <button 
+          <button
             type="button"
             onClick={onCancelTask}
             className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-[#9CA3AF] hover:text-white transition-colors active:scale-95"
@@ -1448,7 +1449,7 @@ export function TaskView({
 
         {/* Progress Bar Track */}
         <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-          <motion.div 
+          <motion.div
             className={`h-full rounded-full transition-all duration-300 ${
               isRetryPhase ? 'bg-amber-400' : 'bg-[#FFB800]'
             }`}
@@ -1460,8 +1461,8 @@ export function TaskView({
       {/* -------------------------------------------------------------------- */}
       {/* SECTION 2: BODY (Zero-Scroll Flex Container for Task & Answers)      */}
       {/* -------------------------------------------------------------------- */}
-      <main 
-        ref={mainScrollRef} 
+      <main
+        ref={mainScrollRef}
         className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-28 flex flex-col justify-between items-stretch gap-2.5 custom-scrollbar"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
@@ -1470,7 +1471,7 @@ export function TaskView({
           {/* Authentic Source & Exam Metadata line above question */}
           <div className="flex items-center gap-2 text-[11px] sm:text-xs text-[#8B8D98] flex-wrap pb-1 border-b border-white/5">
             <span className="text-[#38BDF8] font-semibold tracking-wide">
-              {activeTask.badge || activeTask.source_badge || activeTask.source || activeTask.cke_source || 'Trening JASNE • Baza CKE'}
+              {taskProvenance(activeTask).label}
             </span>
             <span className="text-white/20">•</span>
             <span className="font-semibold text-white/90">
@@ -1557,7 +1558,7 @@ export function TaskView({
               const isSelected = selectedOptions.includes(opt.id);
               const isOptionCorrect = opt.is_correct;
 
-              let cardClasses = isShortOptions 
+              let cardClasses = isShortOptions
                 ? "h-[52px] sm:h-[56px] px-3 rounded-xl border text-left flex items-center gap-2.5 transition-all select-none overflow-hidden "
                 : "p-3 sm:p-3.5 rounded-xl border text-left flex items-center gap-3 transition-all select-none ";
               let badgeClasses = "w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center shrink-0 border ";
@@ -1706,7 +1707,7 @@ export function TaskView({
 
                   let btnClass = 'p-3.5 rounded-xl border text-left flex items-center gap-3 transition-all text-xs sm:text-sm cursor-pointer select-none ';
                   if (!isEvaluated) {
-                    btnClass += isSelected 
+                    btnClass += isSelected
                       ? 'bg-primary/15 border-primary text-white shadow-[0_0_12px_rgba(255,184,0,0.2)]'
                       : 'bg-surface-elevated border-surface-border hover:border-primary/40 text-text-primary';
                   } else {
@@ -1759,7 +1760,7 @@ export function TaskView({
 
                   let btnClass = 'p-3.5 rounded-xl border text-left flex items-center gap-3 transition-all text-xs sm:text-sm cursor-pointer select-none ';
                   if (!isEvaluated) {
-                    btnClass += isSelected 
+                    btnClass += isSelected
                       ? 'bg-primary/15 border-primary text-white shadow-[0_0_12px_rgba(255,184,0,0.2)]'
                       : 'bg-surface-elevated border-surface-border hover:border-primary/40 text-text-primary';
                   } else {
@@ -1949,8 +1950,8 @@ export function TaskView({
               <span className={`font-display font-black text-base ${
                 isCorrect ? 'text-emerald-300' : 'text-rose-300'
               }`}>
-                {isCorrect 
-                  ? (isRetryPhase ? 'Poprawione! Świetna robota' : 'Poprawna odpowiedź!') 
+                {isCorrect
+                  ? (isRetryPhase ? 'Poprawione! Świetna robota' : 'Poprawna odpowiedź!')
                   : 'Niepoprawna odpowiedź'}
               </span>
             </div>
@@ -2037,7 +2038,7 @@ export function TaskView({
                   <div className="text-xs text-white/90 leading-relaxed overflow-x-auto">
                     <MathRenderer content={solutionSteps[0]?.content || activeTask.explanation || 'Poprawna odpowiedź.'} />
                   </div>
-                
+
                   {/* Explanation Visuals */}
                   {((activeTask as any)?.explanationNumberLine || (activeTask as any)?.explanationDiagram || (activeTask as any)?.explanationPlot) && (
                     <div className="mt-3 flex justify-center w-full">
@@ -2095,8 +2096,8 @@ export function TaskView({
             }`}
           >
             <span>
-              {currentTaskIndex < practiceQueue.length - 1 
-                ? 'Następne zadanie' 
+              {currentTaskIndex < practiceQueue.length - 1
+                ? 'Następne zadanie'
                 : (!isRetryPhase && mistakesBuffer.length > 0)
                   ? 'Przejdź do powtórki'
                   : 'Ukończ lekcję'}

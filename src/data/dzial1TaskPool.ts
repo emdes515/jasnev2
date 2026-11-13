@@ -15,7 +15,7 @@ import { TaskOption, LessonTheoryPill } from '../types';
 import { curriculumRepository } from '../services/curriculumRepository';
 import { normalizeTask } from './mathTasks';
 import { enrichTaskWithVisual, enrichTheoryPillWithVisual } from './mathVisualRegistry';
-import { getMathLessonDocument, convertMathTaskToOpen } from './mathCurriculumData';
+import { convertMathTaskToOpen } from './mathCurriculumData';
 import type { LessonDocument } from '../schema_firestore';
 
 export type TaskDifficultyTier = 'A' | 'B' | 'C';
@@ -152,9 +152,6 @@ export function drawSessionTasks(
   const isMathRoz = String(lessonId || '').startsWith('math-pr-');
   const subjectId = isEng ? 'jezyk-angielski' : isPol ? 'jezyk-polski' : isMathRoz ? 'matematyka-rozszerzona' : 'matematyka-podstawowa';
   let lesson = curriculumRepository.getCachedLesson(lessonId, subjectId);
-  if (!lesson && !isEng && !isPol) {
-    lesson = getMathLessonDocument(undefined, lessonId);
-  }
   const formulaSheet =
     toFormulaSheet(providedFormulaSheet, lesson) || toFormulaSheet(
       (lesson as any)?.formulaSheet || (lesson as any)?.formula_sheet,

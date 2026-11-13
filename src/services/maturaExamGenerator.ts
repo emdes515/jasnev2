@@ -1,6 +1,6 @@
 import { MaturaTask } from '../types';
 import { MathTask } from '../types/mathTypes';
-import rawGeneratedTasks from '../data/math/generated/all_1500_tasks.json';
+import rawGeneratedTasks from '../data/offline/math/generated/all_1500_tasks.json';
 import { shuffleTaskOptions } from '../utils/taskShuffler';
 
 export interface MaturaExamSheet {
@@ -208,6 +208,19 @@ const TASKS_BY_LESSON: Record<string, MaturaTask[]> = {};
   }
   TASKS_BY_LESSON[key].push(ALL_1500_MATURA_TASKS[i]);
 });
+
+/** The UI configures the generator only after the repository has resolved Firestore/cache/offline. */
+export function setMaturaPracticePool(rawTasks: any[]): void {
+  const normalized = rawTasks.map(normalizeToMaturaTask);
+  ALL_1500_MATURA_TASKS.splice(0, ALL_1500_MATURA_TASKS.length, ...normalized);
+  for (const key of Object.keys(TASKS_BY_LESSON)) delete TASKS_BY_LESSON[key];
+  rawTasks.forEach((task, index) => {
+    const key = lessonKeyOf(task);
+    (TASKS_BY_LESSON[key] ||= []).push(normalized[index]);
+  });
+  // Flagship sheets are templates too; rebuild them from the selected source.
+  for (const sheet of FLAGSHIP_JASNE_EXAMS) Object.assign(sheet, generateFullMaturaExam(sheet.id, sheet.name));
+}
 
 /**
  * Picks a random task from a lesson pool.

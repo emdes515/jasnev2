@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import rawTasks from '../math/generated/all_1500_tasks.json';
+import rawTasks from '../offline/math/generated/all_1500_tasks.json';
 import {
   MATH_TOPIC_BLUEPRINTS,
   MATH_CURRICULUM_TOPICS,

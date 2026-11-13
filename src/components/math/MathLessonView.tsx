@@ -1,3 +1,4 @@
+import { taskProvenance } from '../../lib/taskProvenance';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Clock,
@@ -540,10 +541,10 @@ export const MathLessonView: React.FC<MathLessonViewProps> = ({
             {userState && (
               <div className="hidden md:flex items-center gap-3 bg-[#0e1522] px-3 py-1.5 rounded-xl border border-[#141d2e] text-xs">
                 <span className="flex items-center gap-1 text-rose-400 font-semibold" title="Serca">
-                  ❤️ {userState.hearts ?? 5}
+                   {userState.hearts ?? 5}
                 </span>
                 <span className="flex items-center gap-1 text-[#ffdca1] font-semibold" title="Monety">
-                  🪙 {userState.coins ?? 0}
+                   {userState.coins ?? 0}
                 </span>
                 <span className="flex items-center gap-1 text-orange-400 font-semibold" title="Dni streaku">
                   <Flame className="w-3.5 h-3.5 fill-orange-500" /> {userState.streakDays ?? 0}
@@ -997,7 +998,7 @@ export const MathLessonView: React.FC<MathLessonViewProps> = ({
                               {t.lessonTitle || t.title || `Zadanie ${idx + 1}`}
                             </span>
                             <span className="text-[10px] text-[#94a3b8] block truncate">
-                              {t.source || 'CKE Formuła 2023'} • {t.points || 1} pkt
+                              {taskProvenance(t).label} • {t.points || 1} pkt
                             </span>
                           </div>
                         </div>
@@ -1073,7 +1074,7 @@ export const MathLessonView: React.FC<MathLessonViewProps> = ({
 
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] sm:text-xs text-[#94a3b8] font-mono">
-                        {currentTask.source || 'CKE Formuła 2023'}
+                        {taskProvenance(currentTask).label}
                       </span>
                       <span className="lg:hidden text-[11px] font-bold text-[#ffdca1] bg-[#070a0f] px-2 py-0.5 rounded-md border border-[#141d2e]">
                         {completedTasksCount}/{lessonTasks.length}
@@ -1300,7 +1301,7 @@ export const MathLessonView: React.FC<MathLessonViewProps> = ({
                 <div className="w-px h-8 bg-[#141d2e]" />
                 <div className="text-center">
                   <span className="text-xs text-[#94a3b8] block">Monety</span>
-                  <span className="text-lg font-black text-[#ffb800]">+50 🪙</span>
+                  <span className="text-lg font-black text-[#ffb800]">+50 </span>
                 </div>
               </div>
 
@@ -1497,7 +1498,7 @@ export const MathLessonView: React.FC<MathLessonViewProps> = ({
                               {t.lessonTitle || t.title || `Zadanie ${idx + 1}`}
                             </span>
                             <span className="text-[10px] text-[#94a3b8] block truncate">
-                              {t.source || 'CKE Formuła 2023'} • {t.points || 1} pkt
+                              {taskProvenance(t).label} • {t.points || 1} pkt
                             </span>
                           </div>
                         </div>

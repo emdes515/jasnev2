@@ -1,0 +1,3704 @@
+{
+  "createdAt": "2026-11-13T22:08:44.533Z",
+  "methodology": "Exact normalized prompt and sorted answer text; metadata is not proof of authenticity.",
+  "subjects": [
+    {
+      "id": "matematyka-podstawowa",
+      "topics": 15,
+      "lessons": 75,
+      "exam": {
+        "tasks": 211,
+        "payloadKeys": [
+          "id",
+          "section",
+          "topicId",
+          "type",
+          "content",
+          "options",
+          "correctAnswer",
+          "points",
+          "isClosed",
+          "explanation",
+          "ckeTrap",
+          "source",
+          "year",
+          "session",
+          "isCke",
+          "diagram",
+          "plot",
+          "taskNumber",
+          "examId",
+          "examName",
+          "statements",
+          "parts",
+          "partScoring",
+          "multiSelect",
+          "numberLine"
+        ],
+        "uniqueIds": 211,
+        "uniquePrompts": 211,
+        "uniquePromptAndOptions": 211,
+        "repeatedEntriesBeyondFirst": 0,
+        "missingPrompt": 0,
+        "officialByMetadata": 211,
+        "claimsCkeWithoutCompleteMetadata": 0,
+        "byType": {
+          "SINGLE_CHOICE": 138,
+          "OPEN_PROOF": 6,
+          "TRUE_FALSE": 10,
+          "OPEN_CALCULATION": 38,
+          "TWO_PART": 11,
+          "MULTI_CHOICE": 5,
+          "NUMERIC_INPUT": 3
+        },
+        "byTopic": {
+          "dzial-1": 22,
+          "dzial-2": 14,
+          "dzial-3": 17,
+          "dzial-5": 19,
+          "dzial-6": 14,
+          "dzial-4": 15,
+          "dzial-7": 20,
+          "dzial-8": 12,
+          "dzial-9": 20,
+          "dzial-10": 16,
+          "dzial-11": 17,
+          "dzial-12": 6,
+          "dzial-14": 6,
+          "dzial-13": 7,
+          "dzial-15": 6
+        },
+        "byExam": {
+          "matura-maj-2024": 35,
+          "matura-czerwiec-2024": 36,
+          "matura-sierpien-2024": 34,
+          "matura-maj-2023": 34,
+          "matura-czerwiec-2023": 36,
+          "matura-sierpien-2023": 36
+        },
+        "audio": 0,
+        "largestDuplicates": []
+      },
+      "practice": {
+        "tasks": 1500,
+        "payloadKeys": [
+          "id",
+          "lessonId",
+          "lessonKey",
+          "topicId",
+          "sectionTitle",
+          "archetypeCode",
+          "category",
+          "title",
+          "points",
+          "type",
+          "content",
+          "options",
+          "correct_answer",
+          "explanation",
+          "matura_tip",
+          "requirements",
+          "maxPoints",
+          "rubric_stages",
+          "scoring_key",
+          "official_solution_steps",
+          "zero_rules",
+          "statements",
+          "diagram"
+        ],
+        "uniqueIds": 1500,
+        "uniquePrompts": 1473,
+        "uniquePromptAndOptions": 1500,
+        "repeatedEntriesBeyondFirst": 0,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 0,
+        "byType": {
+          "SINGLE_CHOICE": 1128,
+          "OPEN_CALCULATION": 290,
+          "OPEN_PROOF": 10,
+          "TRUE_FALSE": 40,
+          "NUMERIC_INPUT": 32
+        },
+        "byTopic": {
+          "dzial-1": 100,
+          "dzial-2": 100,
+          "dzial-3": 100,
+          "dzial-4": 100,
+          "dzial-5": 100,
+          "dzial-6": 100,
+          "dzial-7": 100,
+          "dzial-8": 100,
+          "dzial-9": 100,
+          "dzial-10": 100,
+          "dzial-11": 100,
+          "dzial-12": 100,
+          "dzial-13": 100,
+          "dzial-14": 100,
+          "dzial-15": 100
+        },
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": []
+      },
+      "lessonSummary": {
+        "taskInstances": 1500,
+        "missing": [],
+        "noTasks": [],
+        "requiredExceedsUnique": [],
+        "counts": {
+          "20 tasks / 20 unique": 75
+        }
+      },
+      "lessonsDetail": [
+        {
+          "id": "math-lesson-1-1",
+          "topic": "dzial-1",
+          "title": "Potęgi o wykładnikach całkowitych i wymiernych",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-1-2",
+          "topic": "dzial-1",
+          "title": "Pierwiastki: własności i usuwanie niewymierności",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-1-3",
+          "topic": "dzial-1",
+          "title": "Logarytmy i ich własności",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-1-4",
+          "topic": "dzial-1",
+          "title": "Wartość bezwzględna i przedziały na osi liczbowej",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-1-5",
+          "topic": "dzial-1",
+          "title": "Procenty, kolejne zmiany cen i procent składany",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-2-1",
+          "topic": "dzial-2",
+          "title": "Wzory skróconego mnożenia",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-2-2",
+          "topic": "dzial-2",
+          "title": "Działania na sumach algebraicznych i wielomianach",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-2-3",
+          "topic": "dzial-2",
+          "title": "Rozkład na czynniki: wyłączanie i grupowanie",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-2-4",
+          "topic": "dzial-2",
+          "title": "Wyrażenia wymierne: dziedzina, skracanie i działania",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-2-5",
+          "topic": "dzial-2",
+          "title": "Dowody algebraiczne: podzielność, reszty i nierówności",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-3-1",
+          "topic": "dzial-3",
+          "title": "Równania i nierówności liniowe",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-3-2",
+          "topic": "dzial-3",
+          "title": "Równania kwadratowe: wyróżnik i pierwiastki",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-3-3",
+          "topic": "dzial-3",
+          "title": "Nierówności kwadratowe: szkic paraboli",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-3-4",
+          "topic": "dzial-3",
+          "title": "Równania wielomianowe: iloczyn i grupowanie",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-3-5",
+          "topic": "dzial-3",
+          "title": "Równania wymierne i dziedzina",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-4-1",
+          "topic": "dzial-4",
+          "title": "Pojęcie funkcji: wartość, dziedzina i miejsce zerowe ze wzoru",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-4-2",
+          "topic": "dzial-4",
+          "title": "Wykres funkcji: dziedzina, zbiór wartości i równanie f(x) = m",
+          "tasks": 20,
+          "uniquePrompts": 13,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-4-3",
+          "topic": "dzial-4",
+          "title": "Wykres funkcji: monotoniczność, znak i wartości skrajne",
+          "tasks": 20,
+          "uniquePrompts": 14,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-4-4",
+          "topic": "dzial-4",
+          "title": "Przesunięcia wykresów: y = f(x − p) oraz y = f(x) + q",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-4-5",
+          "topic": "dzial-4",
+          "title": "Funkcja wykładnicza i logarytmiczna w zastosowaniach",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-5-1",
+          "topic": "dzial-5",
+          "title": "Funkcja liniowa: współczynnik kierunkowy, wyraz wolny i miejsce zerowe",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-5-2",
+          "topic": "dzial-5",
+          "title": "Wyznaczanie wzoru funkcji liniowej",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-5-3",
+          "topic": "dzial-5",
+          "title": "Układy równań liniowych: podstawianie i przeciwne współczynniki",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-5-4",
+          "topic": "dzial-5",
+          "title": "Interpretacja geometryczna układu równań",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-5-5",
+          "topic": "dzial-5",
+          "title": "Zadania tekstowe prowadzące do układu równań",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-6-1",
+          "topic": "dzial-6",
+          "title": "Trzy postacie wzoru: ogólna, kanoniczna, iloczynowa",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-6-2",
+          "topic": "dzial-6",
+          "title": "Wierzchołek paraboli, oś symetrii i zbiór wartości",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-6-3",
+          "topic": "dzial-6",
+          "title": "Miejsca zerowe i postać iloczynowa",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-6-4",
+          "topic": "dzial-6",
+          "title": "Wartość największa i najmniejsza w przedziale domkniętym",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-6-5",
+          "topic": "dzial-6",
+          "title": "Wyznaczanie wzoru funkcji kwadratowej",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-7-1",
+          "topic": "dzial-7",
+          "title": "Ciąg liczbowy: wzór ogólny, rekurencja i monotoniczność",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-7-2",
+          "topic": "dzial-7",
+          "title": "Ciąg arytmetyczny: różnica i wzór na n-ty wyraz",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-7-3",
+          "topic": "dzial-7",
+          "title": "Suma początkowych wyrazów ciągu arytmetycznego",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-7-4",
+          "topic": "dzial-7",
+          "title": "Ciąg geometryczny: iloraz, n-ty wyraz i suma",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-7-5",
+          "topic": "dzial-7",
+          "title": "Trzy kolejne wyrazy i zadania mieszane",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-8-1",
+          "topic": "dzial-8",
+          "title": "Sinus, cosinus i tangens w trójkącie prostokątnym",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-8-2",
+          "topic": "dzial-8",
+          "title": "Wartości funkcji dla kątów 30°, 45° i 60°",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-8-3",
+          "topic": "dzial-8",
+          "title": "Jedynka trygonometryczna i tangens",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-8-4",
+          "topic": "dzial-8",
+          "title": "Funkcje trygonometryczne kątów od 0° do 180°",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-8-5",
+          "topic": "dzial-8",
+          "title": "Pole trójkąta z sinusem i twierdzenie cosinusów",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-9-1",
+          "topic": "dzial-9",
+          "title": "Twierdzenie Pitagorasa i pola trójkątów",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-9-2",
+          "topic": "dzial-9",
+          "title": "Podobieństwo figur, skala i twierdzenie Talesa",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-9-3",
+          "topic": "dzial-9",
+          "title": "Czworokąty: równoległobok, romb, trapez",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-9-4",
+          "topic": "dzial-9",
+          "title": "Kąty w okręgu i styczna do okręgu",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-9-5",
+          "topic": "dzial-9",
+          "title": "Koło: łuk, wycinek, okrąg wpisany i opisany",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-10-1",
+          "topic": "dzial-10",
+          "title": "Odległość dwóch punktów i środek odcinka",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-10-2",
+          "topic": "dzial-10",
+          "title": "Równanie prostej: postać kierunkowa i ogólna",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-10-3",
+          "topic": "dzial-10",
+          "title": "Wzajemne położenie prostych i proste równoległe",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-10-4",
+          "topic": "dzial-10",
+          "title": "Równanie okręgu",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-10-5",
+          "topic": "dzial-10",
+          "title": "Symetrie w układzie współrzędnych",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-11-1",
+          "topic": "dzial-11",
+          "title": "Graniastosłupy: objętość, pole powierzchni i przekątne",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-11-2",
+          "topic": "dzial-11",
+          "title": "Ostrosłupy: objętość, ściany boczne i krawędzie",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-11-3",
+          "topic": "dzial-11",
+          "title": "Kąty w bryłach: krawędź, ściana i przekątna",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-11-4",
+          "topic": "dzial-11",
+          "title": "Bryły obrotowe: walec, stożek i kula",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-11-5",
+          "topic": "dzial-11",
+          "title": "Bryły podobne: skala, pola i objętości",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-12-1",
+          "topic": "dzial-12",
+          "title": "Reguła mnożenia",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-12-2",
+          "topic": "dzial-12",
+          "title": "Reguła dodawania i łączenie obu reguł",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-12-3",
+          "topic": "dzial-12",
+          "title": "Liczby o zadanych własnościach",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-12-4",
+          "topic": "dzial-12",
+          "title": "Ustawienia i wybory bez powtórzeń",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-12-5",
+          "topic": "dzial-12",
+          "title": "Pary, dopełnienie i zliczanie przez wypisanie",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-13-1",
+          "topic": "dzial-13",
+          "title": "Klasyczna definicja prawdopodobieństwa",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-13-2",
+          "topic": "dzial-13",
+          "title": "Dwukrotny rzut kostką",
+          "tasks": 20,
+          "uniquePrompts": 12,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-13-3",
+          "topic": "dzial-13",
+          "title": "Losowanie liczb ze zbioru",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-13-4",
+          "topic": "dzial-13",
+          "title": "Losowanie dwóch elementów i drzewo prawdopodobieństwa",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-13-5",
+          "topic": "dzial-13",
+          "title": "Zdarzenie przeciwne i własności prawdopodobieństwa",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-14-1",
+          "topic": "dzial-14",
+          "title": "Średnia arytmetyczna",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-14-2",
+          "topic": "dzial-14",
+          "title": "Średnia ważona",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-14-3",
+          "topic": "dzial-14",
+          "title": "Mediana",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-14-4",
+          "topic": "dzial-14",
+          "title": "Dominanta i dane pogrupowane",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-14-5",
+          "topic": "dzial-14",
+          "title": "Odczytywanie danych z tabel i diagramów",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-15-1",
+          "topic": "dzial-15",
+          "title": "Funkcja pola przy stałym obwodzie",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-15-2",
+          "topic": "dzial-15",
+          "title": "Dziedzina modelu i wierzchołek paraboli",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-15-3",
+          "topic": "dzial-15",
+          "title": "Ogrodzenia z przegrodami i wspólnymi ścianami",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-15-4",
+          "topic": "dzial-15",
+          "title": "Przychód, cena i sprzedaż",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-lesson-15-5",
+          "topic": "dzial-15",
+          "title": "Zadania liczbowe i schemat pełnego rozwiązania",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        }
+      ],
+      "publicFirestore": {
+        "exam": {
+          "status": 200,
+          "count": 211,
+          "revision": "c0c2675db7ad0ffb",
+          "localRevision": "c0c2675db7ad0ffb",
+          "sameRevision": true,
+          "chunkCount": 1
+        },
+        "practice": {
+          "status": 200,
+          "count": 1500,
+          "revision": "071fd00732c2f50b",
+          "localRevision": "071fd00732c2f50b",
+          "sameRevision": true,
+          "chunkCount": 6
+        }
+      }
+    },
+    {
+      "id": "jezyk-polski",
+      "topics": 28,
+      "lessons": 34,
+      "exam": {
+        "tasks": 31,
+        "payloadKeys": [
+          "id",
+          "part",
+          "partName",
+          "taskType",
+          "title",
+          "points",
+          "passage",
+          "passage2",
+          "question",
+          "trueFalseStatements",
+          "explanation",
+          "sourceYear",
+          "correctAnswerText",
+          "ckeKeyCriteria",
+          "options",
+          "correctOptionIndex",
+          "synthesisTheme",
+          "synthesisAuthor1Stance",
+          "synthesisAuthor2Stance",
+          "synthesisModelSummary",
+          "matchingPairs",
+          "epoch",
+          "lektura",
+          "isStarRequired",
+          "imageCaption",
+          "essayBlueprint"
+        ],
+        "uniqueIds": 31,
+        "uniquePrompts": 31,
+        "uniquePromptAndOptions": 31,
+        "repeatedEntriesBeyondFirst": 0,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 31,
+        "byType": {
+          "(missing)": 31
+        },
+        "byTopic": {
+          "(missing)": 31
+        },
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": []
+      },
+      "practice": {
+        "tasks": 910,
+        "payloadKeys": [
+          "id",
+          "part",
+          "partName",
+          "taskType",
+          "granularType",
+          "title",
+          "question",
+          "passage",
+          "trueFalseStatements",
+          "points",
+          "explanation",
+          "tags",
+          "difficulty",
+          "correctAnswerText",
+          "ckeKeyCriteria",
+          "options",
+          "correctOptionIndex",
+          "passage2",
+          "synthesisTheme",
+          "synthesisAuthor1Stance",
+          "synthesisAuthor2Stance",
+          "synthesisModelSummary",
+          "epoch",
+          "lektura",
+          "isStarRequired",
+          "image",
+          "imageUrl",
+          "imageCaption",
+          "imageAlt",
+          "fallbackDescription",
+          "matchingPairs",
+          "distractors",
+          "hintCke",
+          "essayBlueprint"
+        ],
+        "uniqueIds": 910,
+        "uniquePrompts": 403,
+        "uniquePromptAndOptions": 435,
+        "repeatedEntriesBeyondFirst": 475,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 0,
+        "byType": {
+          "(missing)": 910
+        },
+        "byTopic": {
+          "(missing)": 910
+        },
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": [
+          {
+            "count": 10,
+            "ids": [
+              "POL_P1_T6_001",
+              "POL_P1_T6_006",
+              "POL_P1_T6_011",
+              "POL_P1_T6_016",
+              "POL_P1_T6_021",
+              "POL_P1_T6_026",
+              "POL_P1_T6_031",
+              "POL_P1_T6_036"
+            ],
+            "prompt": "Na podstawie obu artykułów (Anna Zielińska (tekst ćwiczeniowy JASNE), „W pogoni za autentyzmem” oraz Ewa Nowicka (tekst ćwiczeniowy JASNE), „Pochwała spotkania z Innym”) napisz notatkę syntetyzującą n"
+          },
+          {
+            "count": 10,
+            "ids": [
+              "POL_P1_T6_002",
+              "POL_P1_T6_007",
+              "POL_P1_T6_012",
+              "POL_P1_T6_017",
+              "POL_P1_T6_022",
+              "POL_P1_T6_027",
+              "POL_P1_T6_032",
+              "POL_P1_T6_037"
+            ],
+            "prompt": "Na podstawie obu artykułów (Paweł Górecki (tekst ćwiczeniowy JASNE), „Koniec epoki pisma?” oraz Daniel Brooks (tekst ćwiczeniowy JASNE), „Kradzież ludzkiego głosu: AI a język”) napisz notatkę syntetyz"
+          },
+          {
+            "count": 10,
+            "ids": [
+              "POL_P1_T6_003",
+              "POL_P1_T6_008",
+              "POL_P1_T6_013",
+              "POL_P1_T6_018",
+              "POL_P1_T6_023",
+              "POL_P1_T6_028",
+              "POL_P1_T6_033",
+              "POL_P1_T6_038"
+            ],
+            "prompt": "Na podstawie obu artykułów (Stefan Borowski (tekst ćwiczeniowy JASNE), „O pamięci i tożsamości” oraz Mark Fuller (tekst ćwiczeniowy JASNE), „Kiedy pamięć dzieli”) napisz notatkę syntetyzującą na temat"
+          },
+          {
+            "count": 10,
+            "ids": [
+              "POL_P1_T6_004",
+              "POL_P1_T6_009",
+              "POL_P1_T6_014",
+              "POL_P1_T6_019",
+              "POL_P1_T6_024",
+              "POL_P1_T6_029",
+              "POL_P1_T6_034",
+              "POL_P1_T6_039"
+            ],
+            "prompt": "Na podstawie obu artykułów (Krzysztof Wrona (tekst ćwiczeniowy JASNE), „Język propagandy dawniej i dziś” oraz Tadeusz Kos (tekst ćwiczeniowy JASNE), „O odpowiedzialności za słowo i kulturze sporu”) na"
+          },
+          {
+            "count": 10,
+            "ids": [
+              "POL_P1_T6_005",
+              "POL_P1_T6_010",
+              "POL_P1_T6_015",
+              "POL_P1_T6_020",
+              "POL_P1_T6_025",
+              "POL_P1_T6_030",
+              "POL_P1_T6_035",
+              "POL_P1_T6_040"
+            ],
+            "prompt": "Na podstawie obu artykułów (Maria Lewicka (tekst ćwiczeniowy JASNE), „O czułości w opowiadaniu” oraz Thomas Reed (tekst ćwiczeniowy JASNE), „Umysł w trybie przewijania”) napisz notatkę syntetyzującą n"
+          }
+        ]
+      },
+      "lessonSummary": {
+        "taskInstances": 141,
+        "missing": [],
+        "noTasks": [],
+        "requiredExceedsUnique": [],
+        "counts": {
+          "7 tasks / 7 unique": 12,
+          "3 tasks / 3 unique": 8,
+          "2 tasks / 2 unique": 7,
+          "1 tasks / 1 unique": 4,
+          "5 tasks / 5 unique": 3
+        }
+      },
+      "lessonsDetail": [
+        {
+          "id": "pol-lesson-1-1",
+          "topic": "pol-dzial-1",
+          "title": "Fakty, opinie i manipulacja semantyczna w tekście nieliterackim",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-2",
+          "topic": "pol-dzial-2",
+          "title": "Teza, hipoteza i hierarchia argumentacji w eseju",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-3",
+          "topic": "pol-dzial-3",
+          "title": "Słowa-klucze i logiczna spójność akapitów (Kohezja)",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-2",
+          "topic": "pol-dzial-4",
+          "title": "Teza, hipoteza i hierarchia argumentacji w eseju",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-1",
+          "topic": "pol-dzial-5",
+          "title": "Fakty, opinie i manipulacja semantyczna w tekście nieliterackim",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-3",
+          "topic": "pol-dzial-6",
+          "title": "Słowa-klucze i logiczna spójność akapitów (Kohezja)",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-4",
+          "topic": "pol-dzial-7",
+          "title": "Tabela Prawda/Fałsz – Strategia eliminacji pułapek CKE",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-1-5",
+          "topic": "pol-dzial-7",
+          "title": "Streszczenie logiczne i parafraza w zadaniach otwartych",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-1",
+          "topic": "pol-dzial-8",
+          "title": "Kryteria oceny notatki syntetyzującej: Matryca CKE (4 pkt)",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-1",
+          "topic": "pol-dzial-9",
+          "title": "Kryteria oceny notatki syntetyzującej: Matryca CKE (4 pkt)",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-2",
+          "topic": "pol-dzial-10",
+          "title": "Selekcja informacji i wspólny temat dwóch tekstów źródłowych",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-3",
+          "topic": "pol-dzial-11",
+          "title": "Architektura jednoakapitowej notatki (Model 3 zdań)",
+          "tasks": 1,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 1,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-3",
+          "topic": "pol-dzial-12",
+          "title": "Architektura jednoakapitowej notatki (Model 3 zdań)",
+          "tasks": 1,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 1,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-4",
+          "topic": "pol-dzial-13",
+          "title": "Zakaz własnej opinii i cytatów w notatce syntetyzującej",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-4",
+          "topic": "pol-dzial-14",
+          "title": "Zakaz własnej opinii i cytatów w notatce syntetyzującej",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-4",
+          "topic": "pol-dzial-15",
+          "title": "Zakaz własnej opinii i cytatów w notatce syntetyzującej",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-5",
+          "topic": "pol-dzial-16",
+          "title": "Trening liczenia słów i żelazna autokorekta brudnopisu",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-2-5",
+          "topic": "pol-dzial-17",
+          "title": "Trening liczenia słów i żelazna autokorekta brudnopisu",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-3-1",
+          "topic": "pol-dzial-18",
+          "title": "Funkcje tekstu i wypowiedzi w arkuszu CKE",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-3-2",
+          "topic": "pol-dzial-18",
+          "title": "Środki stylistyczne i ich funkcje w tekście nieliterackim",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-3-3",
+          "topic": "pol-dzial-19",
+          "title": "Klasyczna retoryka: Etos, Logos i Pathos w argumentacji",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-3-3",
+          "topic": "pol-dzial-20",
+          "title": "Klasyczna retoryka: Etos, Logos i Pathos w argumentacji",
+          "tasks": 3,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-3-4",
+          "topic": "pol-dzial-21",
+          "title": "Błędy logiczno-językowe i manipulacja w dyskursie",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-3-5",
+          "topic": "pol-dzial-22",
+          "title": "Styl naukowy, publicystyczny i potoczny – Rozpoznawanie rejestru",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-4-1",
+          "topic": "pol-dzial-23",
+          "title": "Biblia: Sens cierpienia w Księdze Hioba i motyw teodycei",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-4-2",
+          "topic": "pol-dzial-24",
+          "title": "Księga Koheleta i topos Vanitas (Marność nad marnościami)",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-4-2",
+          "topic": "pol-dzial-25",
+          "title": "Księga Koheleta i topos Vanitas (Marność nad marnościami)",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-4-3",
+          "topic": "pol-dzial-25",
+          "title": "Apokalipsa św. Jana: Język symboli, katastrofizm i Nowe Jeruzalem",
+          "tasks": 2,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-4-4",
+          "topic": "pol-dzial-26",
+          "title": "Mitologia grecka: Archetypy, toposy i fatum w losach bohaterów",
+          "tasks": 7,
+          "uniquePrompts": 7,
+          "uniqueTasks": 7,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-4-5",
+          "topic": "pol-dzial-27",
+          "title": "Tragedia grecka: Antygona Sofoklesa i konflikt tragiczny",
+          "tasks": 1,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 1,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-5-1",
+          "topic": "pol-dzial-27",
+          "title": "Teocentryzm i hierarchizm w kulturze średniowiecza",
+          "tasks": 1,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 1,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-5-2",
+          "topic": "pol-dzial-28",
+          "title": "Bogurodzica – Arcydzieło liryki religijnej i motyw Deesis",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-5-3",
+          "topic": "pol-dzial-28",
+          "title": "Lament świętokrzyski – Humanizacja cierpienia Maryi",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "pol-lesson-5-4",
+          "topic": "pol-dzial-28",
+          "title": "Wzorce osobowe: Asceza w Legendzie o św. Aleksym i etos rycerski",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        }
+      ],
+      "publicFirestore": {
+        "exam": {
+          "status": 200,
+          "count": 31,
+          "revision": "271c8c9190dde755",
+          "localRevision": "271c8c9190dde755",
+          "sameRevision": true,
+          "chunkCount": 1
+        },
+        "practice": {
+          "status": 200,
+          "count": 910,
+          "revision": "d1bb226b0ebdb56a",
+          "localRevision": "d1bb226b0ebdb56a",
+          "sameRevision": true,
+          "chunkCount": 8
+        }
+      }
+    },
+    {
+      "id": "jezyk-angielski",
+      "topics": 15,
+      "lessons": 49,
+      "exam": {
+        "tasks": 1500,
+        "payloadKeys": [
+          "id",
+          "pillarId",
+          "pillarName",
+          "topicId",
+          "sectionTitle",
+          "sectionNumber",
+          "lessonId",
+          "type",
+          "title",
+          "question",
+          "options",
+          "optionsDetailed",
+          "correctAnswer",
+          "explanation",
+          "ckeTrap",
+          "source",
+          "points",
+          "acceptedVariants",
+          "transcriptSnippet",
+          "contextText",
+          "ai_tutor_rubric"
+        ],
+        "uniqueIds": 1500,
+        "uniquePrompts": 90,
+        "uniquePromptAndOptions": 90,
+        "repeatedEntriesBeyondFirst": 1410,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 1500,
+        "byType": {
+          "SINGLE_CHOICE": 960,
+          "WORD_INPUT": 435,
+          "TRUE_FALSE": 45,
+          "OPEN_TASK": 60
+        },
+        "byTopic": {
+          "eng-dzial-2": 75,
+          "eng-dzial-1": 75,
+          "eng-dzial-4": 60,
+          "eng-dzial-5": 120,
+          "eng-dzial-3": 45,
+          "eng-dzial-7": 120,
+          "eng-dzial-6": 120,
+          "eng-dzial-8": 135,
+          "eng-dzial-9": 130,
+          "eng-dzial-10": 120,
+          "eng-dzial-11": 250,
+          "eng-dzial-12": 80,
+          "eng-dzial-13": 60,
+          "eng-dzial-14": 50,
+          "eng-dzial-15": 60
+        },
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": [
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_001",
+              "eng_read_003",
+              "eng_read_005",
+              "eng_read_007",
+              "eng_read_009",
+              "eng_read_011",
+              "eng_read_013",
+              "eng_read_015"
+            ],
+            "prompt": "Przeczytaj poniższy akapit artykułu \"The Transformation of Urban Rooftops\". Wybierz nagłówek (A–D), który najlepiej podsumowuje jego treść: \"Across European capitals, thousands of square metres of fla"
+          },
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_002",
+              "eng_read_004",
+              "eng_read_006",
+              "eng_read_008",
+              "eng_read_010",
+              "eng_read_012",
+              "eng_read_014",
+              "eng_read_016"
+            ],
+            "prompt": "Przeczytaj poniższy akapit artykułu \"The Evolution of Digital Sound and Vinyl\". Wybierz nagłówek (A–D), który najlepiej podsumowuje jego treść: \"Yet against all technological logic, vinyl records have"
+          },
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_251",
+              "eng_read_253",
+              "eng_read_255",
+              "eng_read_257",
+              "eng_read_259",
+              "eng_read_261",
+              "eng_read_263",
+              "eng_read_265"
+            ],
+            "prompt": "Przeczytaj poniższy tekst. Z podanych opcji (A–D) wybierz właściwą, zgodną z treścią tekstu: When Marcus realized what the mountain trail looked like, he:"
+          },
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_252",
+              "eng_read_254",
+              "eng_read_256",
+              "eng_read_258",
+              "eng_read_260",
+              "eng_read_262",
+              "eng_read_264",
+              "eng_read_266"
+            ],
+            "prompt": "Przeczytaj poniższy tekst. Z podanych opcji (A–D) wybierz właściwą, zgodną z treścią tekstu: Why did Sophie feel embarrassed when she arrived at the studio?"
+          },
+          {
+            "count": 60,
+            "ids": [
+              "eng_read_381",
+              "eng_read_383",
+              "eng_read_385",
+              "eng_read_387",
+              "eng_read_389",
+              "eng_read_391",
+              "eng_read_393",
+              "eng_read_395"
+            ],
+            "prompt": "Przeczytaj teksty źródłowe. Na ich podstawie uzupełnij lukę [GAP] w wiadomości (wpisz maksymalnie 2 wyrazy lub liczbę): Cześć Aniu, Wraz z Tomkiem zapisujemy naszego szczeniaka na warsztaty. Zajęcia o"
+          }
+        ]
+      },
+      "practice": {
+        "tasks": 1500,
+        "payloadKeys": [
+          "id",
+          "pillarId",
+          "pillarName",
+          "topicId",
+          "sectionTitle",
+          "sectionNumber",
+          "lessonId",
+          "type",
+          "title",
+          "question",
+          "options",
+          "optionsDetailed",
+          "correctAnswer",
+          "explanation",
+          "ckeTrap",
+          "source",
+          "points",
+          "acceptedVariants",
+          "transcriptSnippet",
+          "contextText",
+          "ai_tutor_rubric"
+        ],
+        "uniqueIds": 1500,
+        "uniquePrompts": 90,
+        "uniquePromptAndOptions": 90,
+        "repeatedEntriesBeyondFirst": 1410,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 1500,
+        "byType": {
+          "SINGLE_CHOICE": 960,
+          "WORD_INPUT": 435,
+          "TRUE_FALSE": 45,
+          "OPEN_TASK": 60
+        },
+        "byTopic": {
+          "eng-dzial-2": 75,
+          "eng-dzial-1": 75,
+          "eng-dzial-4": 60,
+          "eng-dzial-5": 120,
+          "eng-dzial-3": 45,
+          "eng-dzial-7": 120,
+          "eng-dzial-6": 120,
+          "eng-dzial-8": 135,
+          "eng-dzial-9": 130,
+          "eng-dzial-10": 120,
+          "eng-dzial-11": 250,
+          "eng-dzial-12": 80,
+          "eng-dzial-13": 60,
+          "eng-dzial-14": 50,
+          "eng-dzial-15": 60
+        },
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": [
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_001",
+              "eng_read_003",
+              "eng_read_005",
+              "eng_read_007",
+              "eng_read_009",
+              "eng_read_011",
+              "eng_read_013",
+              "eng_read_015"
+            ],
+            "prompt": "Przeczytaj poniższy akapit artykułu \"The Transformation of Urban Rooftops\". Wybierz nagłówek (A–D), który najlepiej podsumowuje jego treść: \"Across European capitals, thousands of square metres of fla"
+          },
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_002",
+              "eng_read_004",
+              "eng_read_006",
+              "eng_read_008",
+              "eng_read_010",
+              "eng_read_012",
+              "eng_read_014",
+              "eng_read_016"
+            ],
+            "prompt": "Przeczytaj poniższy akapit artykułu \"The Evolution of Digital Sound and Vinyl\". Wybierz nagłówek (A–D), który najlepiej podsumowuje jego treść: \"Yet against all technological logic, vinyl records have"
+          },
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_251",
+              "eng_read_253",
+              "eng_read_255",
+              "eng_read_257",
+              "eng_read_259",
+              "eng_read_261",
+              "eng_read_263",
+              "eng_read_265"
+            ],
+            "prompt": "Przeczytaj poniższy tekst. Z podanych opcji (A–D) wybierz właściwą, zgodną z treścią tekstu: When Marcus realized what the mountain trail looked like, he:"
+          },
+          {
+            "count": 65,
+            "ids": [
+              "eng_read_252",
+              "eng_read_254",
+              "eng_read_256",
+              "eng_read_258",
+              "eng_read_260",
+              "eng_read_262",
+              "eng_read_264",
+              "eng_read_266"
+            ],
+            "prompt": "Przeczytaj poniższy tekst. Z podanych opcji (A–D) wybierz właściwą, zgodną z treścią tekstu: Why did Sophie feel embarrassed when she arrived at the studio?"
+          },
+          {
+            "count": 60,
+            "ids": [
+              "eng_read_381",
+              "eng_read_383",
+              "eng_read_385",
+              "eng_read_387",
+              "eng_read_389",
+              "eng_read_391",
+              "eng_read_393",
+              "eng_read_395"
+            ],
+            "prompt": "Przeczytaj teksty źródłowe. Na ich podstawie uzupełnij lukę [GAP] w wiadomości (wpisz maksymalnie 2 wyrazy lub liczbę): Cześć Aniu, Wraz z Tomkiem zapisujemy naszego szczeniaka na warsztaty. Zajęcia o"
+          }
+        ]
+      },
+      "lessonSummary": {
+        "taskInstances": 245,
+        "missing": [],
+        "noTasks": [],
+        "requiredExceedsUnique": [
+          {
+            "id": "eng-lesson-1-1",
+            "topic": "eng-dzial-1",
+            "title": "Present Simple vs Present Continuous & Czasowniki Statyczne",
+            "tasks": 5,
+            "uniquePrompts": 1,
+            "uniqueTasks": 1,
+            "requiredCorrect": 2,
+            "missing": false,
+            "missingTheory": false,
+            "sample": [
+              {
+                "id": "eng_uoe_088",
+                "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+                "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+              },
+              {
+                "id": "eng_uoe_103",
+                "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+                "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+              },
+              {
+                "id": "eng_uoe_118",
+                "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+                "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+              },
+              {
+                "id": "eng_uoe_133",
+                "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+                "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+              },
+              {
+                "id": "eng_uoe_148",
+                "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+                "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+              }
+            ]
+          },
+          {
+            "id": "eng-lesson-1-2",
+            "topic": "eng-dzial-1",
+            "title": "Past Simple vs Past Continuous – Opowiadanie, Tło i Przerywanie Czynności",
+            "tasks": 5,
+            "uniquePrompts": 1,
+            "uniqueTasks": 1,
+            "requiredCorrect": 2,
+            "missing": false,
+            "missingTheory": false
+          },
+          {
+            "id": "eng-lesson-1-3",
+            "topic": "eng-dzial-1",
+            "title": "Present Perfect Simple – Skutek tu i teraz, Doświadczenia i Duet Since vs For",
+            "tasks": 5,
+            "uniquePrompts": 1,
+            "uniqueTasks": 1,
+            "requiredCorrect": 2,
+            "missing": false,
+            "missingTheory": false
+          },
+          {
+            "id": "eng-lesson-1-4",
+            "topic": "eng-dzial-1",
+            "title": "Kontrast Gigantów: Present Perfect Simple vs Past Simple",
+            "tasks": 5,
+            "uniquePrompts": 1,
+            "uniqueTasks": 1,
+            "requiredCorrect": 2,
+            "missing": false,
+            "missingTheory": false
+          },
+          {
+            "id": "eng-lesson-1-5",
+            "topic": "eng-dzial-1",
+            "title": "Past Perfect & Chronologia Zdarzeń – Zaprzeszłość (had + V₃)",
+            "tasks": 5,
+            "uniquePrompts": 1,
+            "uniqueTasks": 1,
+            "requiredCorrect": 2,
+            "missing": false,
+            "missingTheory": false
+          },
+          {
+            "id": "eng-lesson-1-7",
+            "topic": "eng-dzial-1",
+            "title": "Aspekty Ciągłe (Present Perfect Continuous) & Wielki Maturalny Miks Czasów",
+            "tasks": 5,
+            "uniquePrompts": 1,
+            "uniqueTasks": 1,
+            "requiredCorrect": 2,
+            "missing": false,
+            "missingTheory": false
+          }
+        ],
+        "counts": {
+          "5 tasks / 1 unique": 6,
+          "5 tasks / 2 unique": 13,
+          "5 tasks / 5 unique": 12,
+          "5 tasks / 3 unique": 15,
+          "5 tasks / 4 unique": 3
+        }
+      },
+      "lessonsDetail": [
+        {
+          "id": "eng-lesson-1-1",
+          "topic": "eng-dzial-1",
+          "title": "Present Simple vs Present Continuous & Czasowniki Statyczne",
+          "tasks": 5,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false,
+          "sample": [
+            {
+              "id": "eng_uoe_088",
+              "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+              "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+            },
+            {
+              "id": "eng_uoe_103",
+              "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+              "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+            },
+            {
+              "id": "eng_uoe_118",
+              "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+              "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+            },
+            {
+              "id": "eng_uoe_133",
+              "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+              "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+            },
+            {
+              "id": "eng_uoe_148",
+              "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\"",
+              "source": "CKE Formuła 2023 • Zadanie 9 (Środki językowe)"
+            }
+          ]
+        },
+        {
+          "id": "eng-lesson-1-2",
+          "topic": "eng-dzial-1",
+          "title": "Past Simple vs Past Continuous – Opowiadanie, Tło i Przerywanie Czynności",
+          "tasks": 5,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-1-3",
+          "topic": "eng-dzial-1",
+          "title": "Present Perfect Simple – Skutek tu i teraz, Doświadczenia i Duet Since vs For",
+          "tasks": 5,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-1-4",
+          "topic": "eng-dzial-1",
+          "title": "Kontrast Gigantów: Present Perfect Simple vs Past Simple",
+          "tasks": 5,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-1-5",
+          "topic": "eng-dzial-1",
+          "title": "Past Perfect & Chronologia Zdarzeń – Zaprzeszłość (had + V₃)",
+          "tasks": 5,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-1-6",
+          "topic": "eng-dzial-1",
+          "title": "Czasy Przyszłe: Will vs Be Going To vs Present Continuous vs Rozkłady Jazdy",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-1-7",
+          "topic": "eng-dzial-1",
+          "title": "Aspekty Ciągłe (Present Perfect Continuous) & Wielki Maturalny Miks Czasów",
+          "tasks": 5,
+          "uniquePrompts": 1,
+          "uniqueTasks": 1,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-2-1",
+          "topic": "eng-dzial-2",
+          "title": "Gerund vs Infinitive – Formy z -ing i bezokolicznik po czasownikach",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-2-2",
+          "topic": "eng-dzial-2",
+          "title": "Czasowniki modalne: Must, Can't, Should, Have to w zadaniach CKE",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-2-3",
+          "topic": "eng-dzial-2",
+          "title": "Minidialogi i oficjalny vs nieoficjalny rejestr w reakcjach językowych",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-3-1",
+          "topic": "eng-dzial-3",
+          "title": "Zero & First Conditional – Prawdy ogólne i realne plany z if / unless",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-3-2",
+          "topic": "eng-dzial-3",
+          "title": "Second Conditional – Gdybanie i rady („If I were you”)",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-3-3",
+          "topic": "eng-dzial-3",
+          "title": "Zdania czasowe z as soon as, when, until oraz konstrukcje w lukach",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-4-1",
+          "topic": "eng-dzial-4",
+          "title": "Przedrostki zaprzeczające un-, in-, im-, dis- i ir- w zadaniach CKE",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-4-2",
+          "topic": "eng-dzial-4",
+          "title": "Sufiksy tworzące rzeczowniki i przymiotniki (-tion, -ment, -ful, -less, -ity)",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-4-3",
+          "topic": "eng-dzial-4",
+          "title": "Leksykalne False Friends – Pułapki fałszywych przyjaciół na maturze",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-5-1",
+          "topic": "eng-dzial-5",
+          "title": "Strona bierna (Passive Voice) w transformacjach maturalnych",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-5-2",
+          "topic": "eng-dzial-5",
+          "title": "Mowa zależna (Reported Speech) i pytania pośrednie w kluczu CKE",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-5-3",
+          "topic": "eng-dzial-5",
+          "title": "Konstrukcje kluczowe: so / such, too / enough oraz used to w tłumaczeniach PL->EN",
+          "tasks": 5,
+          "uniquePrompts": 5,
+          "uniqueTasks": 5,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-6-1",
+          "topic": "eng-dzial-6",
+          "title": "Wychwytywanie intencji i nastawienia emocjonalnego mówcy ze słuchu",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-6-2",
+          "topic": "eng-dzial-6",
+          "title": "Selekcja informacji faktograficznych i eliminacja zmyłek w wywiadach",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-6-3",
+          "topic": "eng-dzial-6",
+          "title": "Komunikaty publiczne i ogłoszenia – słuchanie pod kątem miejsca i celu",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-7-1",
+          "topic": "eng-dzial-7",
+          "title": "Główna myśl vs poboczne szczegóły w 4 różnych wypowiedziach (Zadanie 2 CKE)",
+          "tasks": 5,
+          "uniquePrompts": 4,
+          "uniqueTasks": 4,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-7-2",
+          "topic": "eng-dzial-7",
+          "title": "Pułapka „word-spotting” – jak nie dać się złapać na dosłowne powtórzenia",
+          "tasks": 5,
+          "uniquePrompts": 4,
+          "uniqueTasks": 4,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-7-3",
+          "topic": "eng-dzial-7",
+          "title": "Wnioskowanie po spójnikach zwrotu akcji (however, but, actually, on the other hand)",
+          "tasks": 5,
+          "uniquePrompts": 4,
+          "uniqueTasks": 4,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-8-1",
+          "topic": "eng-dzial-8",
+          "title": "Zapisywanie liczb, dat, cen i nazw własnych z nagrania CKE (Zadanie 3)",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-8-2",
+          "topic": "eng-dzial-8",
+          "title": "Prawda czy Fałsz ze słuchu – Pułapka kwantyfikatorów (always, all vs some, rarely)",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-8-3",
+          "topic": "eng-dzial-8",
+          "title": "Uzupełnianie streszczenia i notatki ze słuchu z poprawnością gramatyczną luki",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-9-1",
+          "topic": "eng-dzial-9",
+          "title": "Identyfikacja Topic Sentence (zdania przewodniego akapitu) w czytaniu CKE",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-9-2",
+          "topic": "eng-dzial-9",
+          "title": "Nagłówek podsumowujący vs zbyt wąski detal – eliminacja zmyłek w Zadaniu 4",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-9-3",
+          "topic": "eng-dzial-9",
+          "title": "Szybkie skanowanie (Skimming) i parafrazy słownikowe nagłówków",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-10-1",
+          "topic": "eng-dzial-10",
+          "title": "Zaimki anaforiczne (he, they, this, such) jako drogowskazy w luce (Zadanie 5)",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-10-2",
+          "topic": "eng-dzial-10",
+          "title": "Łączniki logiczne i związki przyczynowo-skutkowe w spójności tekstu",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-10-3",
+          "topic": "eng-dzial-10",
+          "title": "Analiza kontekstu obustronnego: zdanie przed luką i zdanie po luce",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-11-1",
+          "topic": "eng-dzial-11",
+          "title": "Mediacja językowa: Przenoszenie informacji z artykułu do e-maila / notatki (Zadanie 7)",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-11-2",
+          "topic": "eng-dzial-11",
+          "title": "Fakty vs Opinie autora – Wykrywanie tonu, ironii i intencji w artykule prasowym",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-11-3",
+          "topic": "eng-dzial-11",
+          "title": "Teksty wieloźródłowe: Wyszukiwanie informacji w 3 różnych ofertach i recenzjach",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-12-1",
+          "topic": "eng-dzial-12",
+          "title": "Zasada 2-elementowego rozwinięcia: Różnica między wzmianką a rozwinięciem",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-12-2",
+          "topic": "eng-dzial-12",
+          "title": "Kryteria CKE dla treści (0–5 pkt): Jak nie stracić punktu za pominięcie podpunktu",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-12-3",
+          "topic": "eng-dzial-12",
+          "title": "Płynne łączenie 4 wątków w jedną całość bez sztucznego wyliczania",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-13-1",
+          "topic": "eng-dzial-13",
+          "title": "Eliminacja kalk z języka polskiego (Ponglish: depend of, congratulate for, explain me)",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-13-2",
+          "topic": "eng-dzial-13",
+          "title": "Szyk zdania angielskiego (S-V-O) i unikanie podwójnych przeczeń",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-13-3",
+          "topic": "eng-dzial-13",
+          "title": "Poprawność ortograficzna i interpunkcyjna w słowach kluczowych matury",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-14-1",
+          "topic": "eng-dzial-14",
+          "title": "Złota siódemka łączników: First of all, What is more, However, As a result",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-14-2",
+          "topic": "eng-dzial-14",
+          "title": "Kompozycja akapitu: Wstęp, rozwinięcie z argumentacją i podsumowanie",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-14-3",
+          "topic": "eng-dzial-14",
+          "title": "Płynność i naturalność tekstu – eliminacja urywanych, izolowanych zdań",
+          "tasks": 5,
+          "uniquePrompts": 3,
+          "uniqueTasks": 3,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-15-1",
+          "topic": "eng-dzial-15",
+          "title": "Wzorcowy e-mail nieformalny (80–130 słów) – szablon, 4 kropki i podpis XYZ",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-15-2",
+          "topic": "eng-dzial-15",
+          "title": "Wzorcowy wpis na blogu internetowym – chwytliwy tytuł i wezwanie do dyskusji",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "eng-lesson-15-3",
+          "topic": "eng-dzial-15",
+          "title": "Strategia 5 minut przed oddaniem arkusza: Liczenie słów, autokorekta i podpis XYZ",
+          "tasks": 5,
+          "uniquePrompts": 2,
+          "uniqueTasks": 2,
+          "requiredCorrect": 2,
+          "missing": false,
+          "missingTheory": false
+        }
+      ],
+      "publicFirestore": {
+        "exam": {
+          "status": 200,
+          "count": 1500,
+          "revision": "90d2501106021fa4",
+          "localRevision": "90d2501106021fa4",
+          "sameRevision": true,
+          "chunkCount": 7
+        },
+        "practice": {
+          "status": 200,
+          "count": 1500,
+          "revision": "90d2501106021fa4",
+          "localRevision": "90d2501106021fa4",
+          "sameRevision": true,
+          "chunkCount": 7
+        }
+      }
+    },
+    {
+      "id": "matematyka-rozszerzona",
+      "topics": 15,
+      "lessons": 75,
+      "exam": {
+        "tasks": 0,
+        "payloadKeys": [],
+        "uniqueIds": 0,
+        "uniquePrompts": 0,
+        "uniquePromptAndOptions": 0,
+        "repeatedEntriesBeyondFirst": 0,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 0,
+        "byType": {},
+        "byTopic": {},
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": []
+      },
+      "practice": {
+        "tasks": 1500,
+        "payloadKeys": [
+          "id",
+          "lessonId",
+          "lessonKey",
+          "topicId",
+          "sectionTitle",
+          "archetypeCode",
+          "category",
+          "title",
+          "points",
+          "type",
+          "content",
+          "options",
+          "correct_answer",
+          "explanation",
+          "matura_tip",
+          "requirements",
+          "statements",
+          "maxPoints",
+          "rubric_stages",
+          "scoring_key",
+          "official_solution_steps",
+          "zero_rules"
+        ],
+        "uniqueIds": 1500,
+        "uniquePrompts": 1211,
+        "uniquePromptAndOptions": 1500,
+        "repeatedEntriesBeyondFirst": 0,
+        "missingPrompt": 0,
+        "officialByMetadata": 0,
+        "claimsCkeWithoutCompleteMetadata": 0,
+        "byType": {
+          "SINGLE_CHOICE": 495,
+          "NUMERIC_INPUT": 411,
+          "TRUE_FALSE": 294,
+          "OPEN_CALCULATION": 243,
+          "OPEN_PROOF": 57
+        },
+        "byTopic": {
+          "pr-dzial-1": 100,
+          "pr-dzial-2": 100,
+          "pr-dzial-3": 100,
+          "pr-dzial-4": 100,
+          "pr-dzial-5": 100,
+          "pr-dzial-6": 100,
+          "pr-dzial-7": 100,
+          "pr-dzial-8": 100,
+          "pr-dzial-9": 100,
+          "pr-dzial-10": 100,
+          "pr-dzial-11": 100,
+          "pr-dzial-12": 100,
+          "pr-dzial-13": 100,
+          "pr-dzial-14": 100,
+          "pr-dzial-15": 100
+        },
+        "byExam": {},
+        "audio": 0,
+        "largestDuplicates": []
+      },
+      "lessonSummary": {
+        "taskInstances": 1500,
+        "missing": [],
+        "noTasks": [],
+        "requiredExceedsUnique": [],
+        "counts": {
+          "20 tasks / 20 unique": 75
+        }
+      },
+      "lessonsDetail": [
+        {
+          "id": "math-pr-lesson-1-1",
+          "topic": "pr-dzial-1",
+          "title": "Zamiana podstawy logarytmu",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-1-2",
+          "topic": "pr-dzial-1",
+          "title": "Wyrażenia logarytmiczne i dziedzina",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-1-3",
+          "topic": "pr-dzial-1",
+          "title": "Dowody podzielności i reszt",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-1-4",
+          "topic": "pr-dzial-1",
+          "title": "Dowody nierówności: kwadrat różnicy",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-1-5",
+          "topic": "pr-dzial-1",
+          "title": "Sześciany, aⁿ − bⁿ i dwumian Newtona",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-2-1",
+          "topic": "pr-dzial-2",
+          "title": "Dzielenie wielomianu przez dwumian i reszta",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-2-2",
+          "topic": "pr-dzial-2",
+          "title": "Pierwiastki całkowite wielomianu",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-2-3",
+          "topic": "pr-dzial-2",
+          "title": "Rozkład na czynniki: grupowanie i wzory",
+          "tasks": 20,
+          "uniquePrompts": 19,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-2-4",
+          "topic": "pr-dzial-2",
+          "title": "Równania wielomianowe i dwukwadratowe",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-2-5",
+          "topic": "pr-dzial-2",
+          "title": "Nierówności wielomianowe – metoda wężyka",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-3-1",
+          "topic": "pr-dzial-3",
+          "title": "Dodawanie i odejmowanie wyrażeń wymiernych",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-3-2",
+          "topic": "pr-dzial-3",
+          "title": "Równania wymierne",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-3-3",
+          "topic": "pr-dzial-3",
+          "title": "Nierówności wymierne",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-3-4",
+          "topic": "pr-dzial-3",
+          "title": "Równania z wartością bezwzględną",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-3-5",
+          "topic": "pr-dzial-3",
+          "title": "Nierówności z wartością bezwzględną",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-4-1",
+          "topic": "pr-dzial-4",
+          "title": "Symetrie wykresu: −f(x) i f(−x)",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-4-2",
+          "topic": "pr-dzial-4",
+          "title": "Wykresy z modułem i liczba rozwiązań f(x) = m",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-4-3",
+          "topic": "pr-dzial-4",
+          "title": "Złożenie funkcji i jego dziedzina",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-4-4",
+          "topic": "pr-dzial-4",
+          "title": "Dowód monotoniczności z definicji",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-4-5",
+          "topic": "pr-dzial-4",
+          "title": "Modele wykładnicze i logarytmiczne",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-5-1",
+          "topic": "pr-dzial-5",
+          "title": "Wzory Viète’a i wyrażenia symetryczne",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-5-2",
+          "topic": "pr-dzial-5",
+          "title": "Liczba rozwiązań w zależności od parametru",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-5-3",
+          "topic": "pr-dzial-5",
+          "title": "Znaki rozwiązań w zależności od parametru",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-5-4",
+          "topic": "pr-dzial-5",
+          "title": "Warunki z rozwiązaniami: suma kwadratów i różnica",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-5-5",
+          "topic": "pr-dzial-5",
+          "title": "Pełne rozwiązanie za 6 pkt: etapy i część wspólna",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-6-1",
+          "topic": "pr-dzial-6",
+          "title": "Granica ciągu: dzielenie przez najwyższą potęgę",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-6-2",
+          "topic": "pr-dzial-6",
+          "title": "Granice z pierwiastkami i twierdzenie o trzech ciągach",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-6-3",
+          "topic": "pr-dzial-6",
+          "title": "Szereg geometryczny: zbieżność i suma",
+          "tasks": 20,
+          "uniquePrompts": 15,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-6-4",
+          "topic": "pr-dzial-6",
+          "title": "Szereg geometryczny w równaniach i nierównościach",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-6-5",
+          "topic": "pr-dzial-6",
+          "title": "Ciąg arytmetyczny i geometryczny w jednym zadaniu",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-7-1",
+          "topic": "pr-dzial-7",
+          "title": "Miara łukowa i koło trygonometryczne",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-7-2",
+          "topic": "pr-dzial-7",
+          "title": "Wykresy i okresowość funkcji trygonometrycznych",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-7-3",
+          "topic": "pr-dzial-7",
+          "title": "Wzory redukcyjne",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-7-4",
+          "topic": "pr-dzial-7",
+          "title": "Suma, różnica i kąt podwojony",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-7-5",
+          "topic": "pr-dzial-7",
+          "title": "Tożsamości trygonometryczne i dowody",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-8-1",
+          "topic": "pr-dzial-8",
+          "title": "Równania elementarne: sin x = a, cos x = a, tg x = a",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-8-2",
+          "topic": "pr-dzial-8",
+          "title": "Rozwiązania w zadanym przedziale",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-8-3",
+          "topic": "pr-dzial-8",
+          "title": "Równania sprowadzalne do kwadratowego",
+          "tasks": 20,
+          "uniquePrompts": 15,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-8-4",
+          "topic": "pr-dzial-8",
+          "title": "Kąt podwojony w równaniach",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-8-5",
+          "topic": "pr-dzial-8",
+          "title": "Równania iloczynowe i pełny zapis rozwiązania",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-9-1",
+          "topic": "pr-dzial-9",
+          "title": "Czworokąt wpisany w okrąg",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-9-2",
+          "topic": "pr-dzial-9",
+          "title": "Czworokąt opisany na okręgu",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-9-3",
+          "topic": "pr-dzial-9",
+          "title": "Twierdzenie sinusów",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-9-4",
+          "topic": "pr-dzial-9",
+          "title": "Rozwiązywanie trójkątów: sinusy i cosinusy",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-9-5",
+          "topic": "pr-dzial-9",
+          "title": "Odwrotne twierdzenie Talesa i zadania wieloetapowe",
+          "tasks": 20,
+          "uniquePrompts": 19,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-10-1",
+          "topic": "pr-dzial-10",
+          "title": "Założenie, teza, uzasadnienie",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-10-2",
+          "topic": "pr-dzial-10",
+          "title": "Kąty wpisane i środkowe w dowodach",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-10-3",
+          "topic": "pr-dzial-10",
+          "title": "Podobieństwo i przystawanie w dowodach",
+          "tasks": 20,
+          "uniquePrompts": 15,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-10-4",
+          "topic": "pr-dzial-10",
+          "title": "Pola i długości odcinków w dowodach",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-10-5",
+          "topic": "pr-dzial-10",
+          "title": "Czworokąty i okręgi w dowodach",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-11-1",
+          "topic": "pr-dzial-11",
+          "title": "Wektory na płaszczyźnie",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-11-2",
+          "topic": "pr-dzial-11",
+          "title": "Prosta prostopadła i styczna do okręgu",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-11-3",
+          "topic": "pr-dzial-11",
+          "title": "Prosta i okrąg – układ równań",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-11-4",
+          "topic": "pr-dzial-11",
+          "title": "Dwa okręgi",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-11-5",
+          "topic": "pr-dzial-11",
+          "title": "Zadania wieloetapowe: figury, pola, parametry",
+          "tasks": 20,
+          "uniquePrompts": 20,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-12-1",
+          "topic": "pr-dzial-12",
+          "title": "Trzy prostopadłe i kąt dwuścienny",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-12-2",
+          "topic": "pr-dzial-12",
+          "title": "Kąty w ostrosłupach",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-12-3",
+          "topic": "pr-dzial-12",
+          "title": "Przekroje sześcianu",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-12-4",
+          "topic": "pr-dzial-12",
+          "title": "Przekroje ostrosłupów prawidłowych",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-12-5",
+          "topic": "pr-dzial-12",
+          "title": "Bryły z trygonometrią – zadanie 5–6 pkt",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-13-1",
+          "topic": "pr-dzial-13",
+          "title": "Permutacje, wariacje i kombinacje",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-13-2",
+          "topic": "pr-dzial-13",
+          "title": "Symbol Newtona i trójkąt Pascala",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-13-3",
+          "topic": "pr-dzial-13",
+          "title": "Prawdopodobieństwo warunkowe",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-13-4",
+          "topic": "pr-dzial-13",
+          "title": "Prawdopodobieństwo całkowite i wzór Bayesa",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-13-5",
+          "topic": "pr-dzial-13",
+          "title": "Schemat Bernoullego",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-14-1",
+          "topic": "pr-dzial-14",
+          "title": "Granica funkcji w punkcie i granice jednostronne",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-14-2",
+          "topic": "pr-dzial-14",
+          "title": "Ciągłość funkcji i własność Darboux",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-14-3",
+          "topic": "pr-dzial-14",
+          "title": "Definicja pochodnej i styczna",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-14-4",
+          "topic": "pr-dzial-14",
+          "title": "Pochodna iloczynu, ilorazu i funkcji złożonej",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-14-5",
+          "topic": "pr-dzial-14",
+          "title": "Monotoniczność i ekstrema",
+          "tasks": 20,
+          "uniquePrompts": 17,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-15-1",
+          "topic": "pr-dzial-15",
+          "title": "Model, funkcja celu i dziedzina",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-15-2",
+          "topic": "pr-dzial-15",
+          "title": "Schemat 4 pkt: pochodna, zero, znak, wartość",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-15-3",
+          "topic": "pr-dzial-15",
+          "title": "Bryły: prostopadłościan i walec",
+          "tasks": 20,
+          "uniquePrompts": 16,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-15-4",
+          "topic": "pr-dzial-15",
+          "title": "Układ współrzędnych i figury płaskie",
+          "tasks": 20,
+          "uniquePrompts": 19,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        },
+        {
+          "id": "math-pr-lesson-15-5",
+          "topic": "pr-dzial-15",
+          "title": "Kontekst praktyczny: pełna wiązka 2 + 4",
+          "tasks": 20,
+          "uniquePrompts": 18,
+          "uniqueTasks": 20,
+          "requiredCorrect": 3,
+          "missing": false,
+          "missingTheory": false
+        }
+      ],
+      "publicFirestore": {
+        "exam": {
+          "status": 404,
+          "localRevision": "4f53cda18c2baa0c",
+          "sameRevision": false
+        },
+        "practice": {
+          "status": 200,
+          "count": 1500,
+          "revision": "e6f7a1c01d4662d8",
+          "localRevision": "e6f7a1c01d4662d8",
+          "sameRevision": true,
+          "chunkCount": 6
+        }
+      }
+    }
+  ],
+  "cloudEnglishFirstLesson": {
+    "status": 200,
+    "summary": {
+      "tasks": 5,
+      "payloadKeys": [
+        "id",
+        "lesson_id",
+        "topic_id",
+        "type",
+        "title",
+        "question",
+        "options",
+        "correctAnswer",
+        "correct_answer",
+        "explanation",
+        "ckeTrap",
+        "source",
+        "points",
+        "correctOptionIndex",
+        "optionsDetailed"
+      ],
+      "uniqueIds": 5,
+      "uniquePrompts": 1,
+      "uniquePromptAndOptions": 1,
+      "repeatedEntriesBeyondFirst": 4,
+      "missingPrompt": 0,
+      "officialByMetadata": 0,
+      "claimsCkeWithoutCompleteMetadata": 5,
+      "byType": {
+        "SINGLE_CHOICE": 5
+      },
+      "byTopic": {
+        "eng-dzial-1": 5
+      },
+      "byExam": {},
+      "audio": 0,
+      "largestDuplicates": [
+        {
+          "count": 5,
+          "ids": [
+            "eng_uoe_088",
+            "eng_uoe_103",
+            "eng_uoe_118",
+            "eng_uoe_133",
+            "eng_uoe_148"
+          ],
+          "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\""
+        }
+      ]
+    },
+    "sample": [
+      {
+        "id": "eng_uoe_088",
+        "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\""
+      },
+      {
+        "id": "eng_uoe_103",
+        "prompt": "Wybierz wyraz lub frazę, która poprawnie uzupełnia lukę w zdaniu: \"If it ______ so heavily tomorrow, we will go hiking in the national park.\""
+      }
+    ]
+  },
+  "englishExtended": {
+    "topics": 0,
+    "examTasks": 0,
+    "practiceTasks": 0,
+    "publicSubject": {
+      "status": 200,
+      "data": {
+        "key": "eng-roz",
+        "short_name": "Ang. Roz.",
+        "icon": "Globe",
+        "tasks_count": 72,
+        "name": "Język Angielski Rozszerzony",
+        "id": "jezyk-angielski-rozszerzony",
+        "topics_metadata": [
+          {
+            "id": "eng-roz-dzial-1",
+            "numericId": 1,
+            "title": "Dział 1: Inwersja stylistyczna i struktury emfatyczne (Inversion & Cleft Sentences)",
+            "name": "Dział 1: Inwersja stylistyczna i struktury emfatyczne (Inversion & Cleft Sentences)",
+            "short_title": "Inwersja i emfaza",
+            "icon": "Zap",
+            "color": "#8B5CF6",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-2",
+            "numericId": 2,
+            "title": "Dział 2: Tryby warunkowe mieszane i inwersja warunkowa (Mixed & Inverted Conditionals)",
+            "name": "Dział 2: Tryby warunkowe mieszane i inwersja warunkowa (Mixed & Inverted Conditionals)",
+            "short_title": "Mixed & Inverted Conditionals",
+            "icon": "GitFork",
+            "color": "#3B82F6",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-3",
+            "numericId": 3,
+            "title": "Dział 3: Życzenia, preferencje i tryb łączący (Wish, Rather & Subjunctive)",
+            "name": "Dział 3: Życzenia, preferencje i tryb łączący (Wish, Rather & Subjunctive)",
+            "short_title": "Wish, Rather & Subjunctive",
+            "icon": "Heart",
+            "color": "#EC4899",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-4",
+            "numericId": 4,
+            "title": "Dział 4: Czasowniki modalne w przeszłości i dedukcja (Modals in the Past)",
+            "name": "Dział 4: Czasowniki modalne w przeszłości i dedukcja (Modals in the Past)",
+            "short_title": "Modals in the Past",
+            "icon": "HelpCircle",
+            "color": "#10B981",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-5",
+            "numericId": 5,
+            "title": "Dział 5: Imiesłowowe równoważniki zdań (Participle Clauses)",
+            "name": "Dział 5: Imiesłowowe równoważniki zdań (Participle Clauses)",
+            "short_title": "Participle Clauses",
+            "icon": "Scissors",
+            "color": "#F59E0B",
+            "lessons_count": 1,
+            "tasks_count": 4
+          },
+          {
+            "id": "eng-roz-dzial-6",
+            "numericId": 6,
+            "title": "Dział 6: Strona bierna rozszerzona i konstrukcje kauzatywne (Advanced Passive & Causatives)",
+            "name": "Dział 6: Strona bierna rozszerzona i konstrukcje kauzatywne (Advanced Passive & Causatives)",
+            "short_title": "Strona bierna i kauzatywy",
+            "icon": "Layers",
+            "color": "#06B6D4",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-7",
+            "numericId": 7,
+            "title": "Dział 7: Słowotwórstwo zaawansowane (Advanced Word Formation)",
+            "name": "Dział 7: Słowotwórstwo zaawansowane (Advanced Word Formation)",
+            "short_title": "Słowotwórstwo zaawansowane",
+            "icon": "Sparkles",
+            "color": "#10B981",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-8",
+            "numericId": 8,
+            "title": "Dział 8: Phrasal Verbs, idiomy i kolokacje (Advanced Lexis & Collocations)",
+            "name": "Dział 8: Phrasal Verbs, idiomy i kolokacje (Advanced Lexis & Collocations)",
+            "short_title": "Phrasal Verbs i kolokacje",
+            "icon": "Compass",
+            "color": "#F59E0B",
+            "lessons_count": 2,
+            "tasks_count": 8
+          },
+          {
+            "id": "eng-roz-dzial-9",
+            "numericId": 9,
+            "title": "Dział 9: Parafrazy ze słowem-kluczem (Key Word Transformations)",
+            "name": "Dział 9: Parafrazy ze słowem-kluczem (Key Word Transformations)",
+            "short_title": "Key Word Transformations",
+            "icon": "RefreshCw",
+            "color": "#8B5CF6",
+            "lessons_count": 1,
+            "tasks_count": 4
+          },
+          {
+            "id": "eng-roz-dzial-10",
+            "numericId": 10,
+            "title": "Dział 10: Czytanie krytyczne, rejestr formalny i wypowiedź pisemna (Advanced Reading & Writing)",
+            "name": "Dział 10: Czytanie krytyczne, rejestr formalny i wypowiedź pisemna (Advanced Reading & Writing)",
+            "short_title": "Wypowiedź pisemna i leksyka",
+            "icon": "PenTool",
+            "color": "#EC4899",
+            "lessons_count": 2,
+            "tasks_count": 8
+          }
+        ],
+        "color": "#06B6D4",
+        "level": "Nowa Formuła 2023 (Poziom Rozszerzony • B2+/C1)",
+        "title": "Język Angielski (Poziom Rozszerzony • Formuła 2023)",
+        "updatedAt": "2026-09-20T18:21:17.567Z",
+        "topics_count": 10,
+        "lessons_count": 18
+      }
+    },
+    "cloudLessons": 18,
+    "cloudTasks": {
+      "tasks": 72,
+      "payloadKeys": [
+        "id",
+        "type",
+        "points",
+        "source",
+        "content",
+        "options",
+        "correct_answer",
+        "explanation",
+        "hint",
+        "hint_cost",
+        "correctAnswer"
+      ],
+      "uniqueIds": 72,
+      "uniquePrompts": 72,
+      "uniquePromptAndOptions": 72,
+      "repeatedEntriesBeyondFirst": 0,
+      "missingPrompt": 0,
+      "officialByMetadata": 0,
+      "claimsCkeWithoutCompleteMetadata": 72,
+      "byType": {
+        "SINGLE_CHOICE": 72
+      },
+      "byTopic": {
+        "(missing)": 72
+      },
+      "byExam": {},
+      "audio": 0,
+      "largestDuplicates": []
+    }
+  }
+}

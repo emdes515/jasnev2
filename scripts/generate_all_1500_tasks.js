@@ -156,7 +156,7 @@ console.log(`\n--- 📊 ROZKŁAD KLUCZA ODPOWIEDZI (Dystrybucja A/B/C/D) ---`);
 console.log(answerDistribution);
 
 // Zapis do pliku produkcyjnego
-const outputPath = path.join(__dirname, '../src/data/math/generated/all_1500_tasks.json');
+const outputPath = path.join(__dirname, '../src/data/offline/math/generated/all_1500_tasks.json');
 fs.writeFileSync(outputPath, JSON.stringify(final1500Tasks, null, 2), 'utf8');
 
 console.log(`\n🎉 SUKCES! Zsyntetyzowano i zweryfikowano bezbłędną bazę 1500 zadań.`);

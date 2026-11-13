@@ -9,7 +9,7 @@ import React from 'react';
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import rawTasks from '../math/generated/all_1500_tasks.json';
+import rawTasks from '../offline/math/generated/all_1500_tasks.json';
 import { MATH_TOPIC_BLUEPRINTS } from '../mathCurriculumData';
 import { toFormulaBoxContent } from '../../lib/formulaBox';
 import { CKE_FORMULAS_DATA } from '../ckeFormulasData';

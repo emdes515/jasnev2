@@ -46,7 +46,7 @@ export interface AchievementContext {
 export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'first_step',
-    name: 'Pierwszy Krok',
+    name: 'Pierwsze zadanie',
     description: 'Rozwiąż swoje pierwsze zadanie maturalne.',
     category: 'tasks',
     iconName: 'Zap',
@@ -62,15 +62,15 @@ export const ACHIEVEMENTS: Achievement[] = [
         rewardCoins: 60,
         rewardTokens: 15,
         rewardXp: 80,
-        rewardPerkDesc: '1x Tarcza Serii (Streak Freeze)',
+        rewardPerkDesc: '1x Ochrona serii',
         perkEffect: { streakFreezes: 1 }
       }
     ]
   },
   {
     id: 'powers_master',
-    name: 'Mistrz Potęg – Dział 1',
-    description: 'Opanuj potęgi, pierwiastki i logarytmy z Działu 1 Matury.',
+    name: 'Początek nauki',
+    description: 'Rozwiąż 3, a następnie 8 zadań.',
     category: 'tasks',
     iconName: 'Trophy',
     accentColor: 'text-[#FFB800]',
@@ -102,7 +102,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'streak_3_days',
-    name: 'Seria 3 Dni',
+    name: 'Trzy dni nauki',
     description: 'Utrzymuj nieprzerwaną, codzienną serię nauki przez 3 dni z rzędu.',
     category: 'streak',
     iconName: 'Flame',
@@ -118,15 +118,15 @@ export const ACHIEVEMENTS: Achievement[] = [
         rewardCoins: 100,
         rewardTokens: 25,
         rewardXp: 150,
-        rewardPerkDesc: '1x Tarcza Serii (Streak Freeze)',
+        rewardPerkDesc: '1x Ochrona serii',
         perkEffect: { streakFreezes: 1 }
       }
     ]
   },
   {
     id: 'flawless_exam',
-    name: 'Bezbłędny Sprawdzian',
-    description: 'Uzyskaj 100% poprawnych odpowiedzi w sprawdzianie lub wygraj pojedynek bezbłędnie.',
+    name: 'Wynik 100%',
+    description: 'Uzyskaj 100% w arkuszu maturalnym lub wygraj pojedynek na Arenie.',
     category: 'matura',
     iconName: 'CheckCircle2',
     accentColor: 'text-emerald-400',
@@ -148,8 +148,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'tasks_master',
-    name: 'Mistrz Zadań Maturalnych',
-    description: 'Rozwiązuj zadania z bazy egzaminacyjnej matematyki.',
+    name: 'Rozwiązane zadania',
+    description: 'Rozwiązuj zadania z dowolnego przedmiotu.',
     category: 'tasks',
     iconName: 'CheckCircle2',
     accentColor: 'text-blue-400',
@@ -164,7 +164,7 @@ export const ACHIEVEMENTS: Achievement[] = [
         rewardCoins: 75,
         rewardTokens: 10,
         rewardXp: 100,
-        rewardPerkDesc: '1x Tarcza Serii (Streak Freeze)',
+        rewardPerkDesc: '1x Ochrona serii',
         perkEffect: { streakFreezes: 1 }
       },
       {
@@ -317,8 +317,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'matura_specialist',
-    name: 'Symulator Matury',
-    description: 'Podejmuj próby egzaminacyjne w Symulatorze Matury.',
+    name: 'Arkusze maturalne',
+    description: 'Rozwiązuj arkusze w symulatorze matury.',
     category: 'matura',
     iconName: 'GraduationCap',
     accentColor: 'text-amber-400',
@@ -333,7 +333,7 @@ export const ACHIEVEMENTS: Achievement[] = [
         rewardCoins: 50,
         rewardTokens: 15,
         rewardXp: 100,
-        rewardPerkDesc: '1x Tarcza Serii (Streak Freeze)',
+        rewardPerkDesc: '1x Ochrona serii',
         perkEffect: { streakFreezes: 1 }
       },
       {
@@ -360,7 +360,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'streak_keeper',
-    name: 'Płomień Wytrwałości',
+    name: 'Regularna nauka',
     description: 'Utrzymuj codzienną serię nauki i rozwiązuj regularnie zadania.',
     category: 'streak',
     iconName: 'Flame',
@@ -413,7 +413,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'level_ascent',
-    name: 'Poziom Mistrza',
+    name: 'Kolejne poziomy',
     description: 'Zbieraj punkty doświadczenia i podnoś poziom swojego konta.',
     category: 'levels',
     iconName: 'Zap',
@@ -536,8 +536,8 @@ export interface ShopItem {
 export const SHOP_ITEMS: ShopItem[] = [
   {
     id: 'streak_freeze',
-    name: 'Tarcza Serii (Streak Freeze)',
-    description: 'Chroni Twój licznik dni nauki przed przerwaniem i natychmiast usuwa rdzę (Campus Rust). (Maks. 2 w ekwipunku).',
+    name: 'Ochrona serii',
+    description: 'Zachowuje passę po dniu bez nauki. Może też odświeżyć materiał wymagający powtórki. Limit: 2 sztuki.',
     icon: 'Shield',
     tokenPrice: 35,
     coinPrice: 200,
@@ -558,8 +558,8 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     id: 'xp_double',
-    name: 'Doładowanie 2x XP (Cała Sesja)',
-    description: 'Podwaja zdobywane punkty doświadczenia (XP) z całej kolejnej rozwiązanej lekcji.',
+    name: 'Podwójne XP',
+    description: 'Podwaja XP z następnej ukończonej lekcji. Jeden zakup daje jeden bonus.',
     icon: 'Zap',
     tokenPrice: 40,
     coinPrice: 150,
@@ -569,8 +569,8 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
   {
     id: 'champion_avatar',
-    name: 'Złoty Awatar Mistrza',
-    description: 'Prestiżowy awatar z koroną i lśniącą aurą mistrzowską, wyróżniający Twój profil w grze.',
+    name: 'Złoty awatar',
+    description: 'Dodatkowy wygląd profilu. Funkcja nie jest jeszcze dostępna.',
     icon: 'Crown',
     tokenPrice: 60,
     coinPrice: 500,

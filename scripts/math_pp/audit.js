@@ -16,7 +16,7 @@ import katex from 'katex';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const level = (process.argv[2] || 'pp').toLowerCase();
 const args = Object.fromEntries(process.argv.slice(3).map((a) => a.replace(/^--/, '').split('=')));
-const GEN = path.join(__dirname, '../../src/data/math/generated');
+const GEN = path.join(__dirname, '../../src/data/offline/math/generated');
 const tasks = JSON.parse(fs.readFileSync(path.join(GEN, level === 'pr' ? 'pr_tasks.json' : 'all_1500_tasks.json'), 'utf8'));
 const blueprints = JSON.parse(fs.readFileSync(path.join(GEN, level === 'pr' ? 'pr_blueprints.json' : 'math_blueprints.json'), 'utf8'));
 

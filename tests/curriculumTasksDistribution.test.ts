@@ -1,4 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+// This suite verifies sampling, not network transport. Model an already loaded lesson cache.
+vi.mock('../src/services/curriculumRepository', async () => {
+  const { getMathLessonDocument } = await import('../src/data/mathCurriculumData');
+  return { curriculumRepository: { getCachedLesson: (id: string) => getMathLessonDocument(undefined, id) } };
+});
 import { MATH_CURRICULUM_TOPICS, getMathLessonDocument } from '../src/data/mathCurriculumData';
 import { drawSessionTasks } from '../src/data/dzial1TaskPool';
 

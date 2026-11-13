@@ -58,10 +58,10 @@ describe('EnglishTrapInteractive & englishTrapData', () => {
         <EnglishTrapInteractive lessonId="eng-lesson-1-1" topicId="eng-dzial-1" />
       );
 
-      expect(container.textContent).toContain('PUŁAPKA EGZAMINACYJNA CKE • TYPOWY BŁĄD');
-      expect(container.textContent).toContain('Częsty błąd maturzystów');
+      expect(container.textContent).toContain('Typowy błąd');
+      expect(container.textContent).toContain('Błędnie');
       expect(container.textContent).toContain('Poprawne podejście');
-      expect(container.textContent).toContain('Wskazówka egzaminatora');
+      expect(container.textContent).toContain('Jak zapamiętać');
     });
 
     it('handles A_VS_B selection: fails on wrong answer without losing hearts, unlocks on correct answer', () => {

@@ -44,9 +44,10 @@ import {
   X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { ENGLISH_SECTIONS, EnglishSection, EnglishTask } from '../../types/englishTypes';
-import { ALL_ENGLISH_TASKS } from '../../data/english/allEnglishTasks';
-import { getEnglishLessonsByTopic, EnglishLessonData, ENGLISH_LESSONS } from '../../data/english/englishLessonsData';
+import { EnglishSection, EnglishTask } from '../../types/englishTypes';
+import { useTaskBank } from '../../hooks/useTaskBank';
+import type { EnglishLessonData } from '../../data/english/englishLessonsData';
+import { useStudyCatalog } from '../../hooks/useStudyCatalog';
 import { getEnglishLessonDocument } from '../../data/englishCurriculumData';
 import { getDuetDataForLesson } from '../../data/english/englishDuetData';
 import { playSuccessSound, playErrorSound, triggerHaptic } from '../../utils';
@@ -385,6 +386,9 @@ export const EnglishStudyHub: React.FC<EnglishStudyHubProps> = ({
   userState
 }) => {
   const isDev = Boolean(userState?.isDev || userState?.isPro);
+  const ALL_ENGLISH_TASKS = useTaskBank('jezyk-angielski');
+  const { lessons: ENGLISH_LESSONS, sections: ENGLISH_SECTIONS } = useStudyCatalog('jezyk-angielski');
+  const getEnglishLessonsByTopic = (topic: string) => ENGLISH_LESSONS.filter(lesson => lesson.topicId === topic);
 
   // Tryb widoku: Kurs Działowy (15 Działów) vs Baza Zadań CKE (1500 zadań)
   const [hubMode, setHubMode] = useState<'lessons' | 'task_browser'>(initialActiveLessonId ? 'lessons' : initialMode);
@@ -502,7 +506,7 @@ export const EnglishStudyHub: React.FC<EnglishStudyHubProps> = ({
 
       return true;
     });
-  }, [selectedSectionFilter, selectedPillarFilter, selectedTypeFilter, searchQuery]);
+  }, [selectedSectionFilter, selectedPillarFilter, selectedTypeFilter, searchQuery, ALL_ENGLISH_TASKS]);
 
   // Paginacja
   const totalPages = Math.ceil(filteredTasks.length / TASKS_PER_PAGE);
@@ -670,10 +674,10 @@ export const EnglishStudyHub: React.FC<EnglishStudyHubProps> = ({
             {userState && (
               <div className="hidden sm:flex items-center gap-2 sm:gap-3 bg-[#0e1522] px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#141d2e] text-[11px] sm:text-xs">
                 <span className="flex items-center gap-1 text-rose-400 font-semibold" title="Serca">
-                  ❤️ {userState.hearts ?? 5}
+                   {userState.hearts ?? 5}
                 </span>
                 <span className="flex items-center gap-1 text-[#ffdca1] font-semibold" title="Monety">
-                  🪙 {userState.coins ?? 0}
+                   {userState.coins ?? 0}
                 </span>
                 <span className="flex items-center gap-1 text-orange-400 font-semibold" title="Dni streaku">
                   <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-orange-500" /> {userState.streakDays ?? 0}
@@ -1617,7 +1621,7 @@ export const EnglishStudyHub: React.FC<EnglishStudyHubProps> = ({
                                               PEWNIAKI MATURALNE
                                             </span>
                                             <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#ffb800]/10 text-[#ffdca1] border border-[#ffb800]/20 tracking-wider shrink-0">
-                                              🔥 {pewniakData.ckeFrequency}
+                                               {pewniakData.ckeFrequency}
                                             </span>
                                           </div>
                                           <h4 className="text-base sm:text-lg font-bold text-white break-words">

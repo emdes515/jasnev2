@@ -383,6 +383,16 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
 
+      // Public curriculum content only. Publishing uses the Admin SDK.
+      match /taskBanks/{bankId}/chunks/{chunkId} {
+        allow read: if true;
+        allow write: if false;
+      }
+      match /taskBanks/{bankId} {
+        allow read: if true;
+        allow write: if false;
+      }
+
       match /topics/{topicId} {
         allow read: if true;
         allow write: if false;

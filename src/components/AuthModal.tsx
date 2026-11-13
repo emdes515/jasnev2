@@ -181,7 +181,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, promoContext }: AuthModa
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-        className="relative w-full max-w-md bg-surface-card border-t sm:border border-surface-border rounded-t-[32px] sm:rounded-3xl p-6 sm:p-7 shadow-2xl overflow-y-auto max-h-[92vh] z-10"
+        className="relative w-full max-w-md bg-surface-card border-t sm:border border-surface-border rounded-t-[32px] sm:rounded-3xl p-6 sm:p-7 shadow-2xl focus-scroll overflow-y-auto max-h-[92dvh] z-10"
       >
         {/* Subtle Cyber Amber Accent Bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D97706] via-[#FFB800] to-[#F59E0B]" />
@@ -189,7 +189,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, promoContext }: AuthModa
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-text-muted hover:text-text-primary p-2 rounded-xl hover:bg-white/5 transition-colors z-20 cursor-pointer"
+          className="min-w-11 min-h-11 flex items-center justify-center absolute top-4 right-4 text-text-muted hover:text-text-primary p-2 rounded-xl hover:bg-white/5 transition-colors z-20 cursor-pointer"
           aria-label="Zamknij"
         >
           <X size={18} />
@@ -201,7 +201,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, promoContext }: AuthModa
             <JasneLogo variant="icon" size={44} glow={true} />
           </div>
           <h2 className="font-display font-black text-xl text-text-primary">
-            {mode === 'login' ? 'Witaj ponownie!' : 'Dołącz do Kampusu JASNE'}
+            {mode === 'login' ? 'Zaloguj się' : 'Utwórz konto'}
           </h2>
           <p className="text-xs text-text-secondary mt-1 max-w-xs">
             {mode === 'login' 
@@ -299,13 +299,13 @@ export function AuthModal({ isOpen, onClose, onSuccess, promoContext }: AuthModa
         <form onSubmit={handleEmailAuth} className="space-y-3">
           {mode === 'register' && (
             <div>
-              <label className="block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5 text-left">
+              <label htmlFor="auth-name" className="block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5 text-left">
                 Twoje Imię lub Pseudonim
               </label>
               <div className="relative">
                 <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
-                  type="text"
+                  id="auth-name" autoComplete="nickname" type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="np. Aleksander"
@@ -316,13 +316,13 @@ export function AuthModal({ isOpen, onClose, onSuccess, promoContext }: AuthModa
           )}
 
           <div>
-            <label className="block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5 text-left">
+            <label htmlFor="auth-email" className="block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5 text-left">
               Adres E-mail
             </label>
             <div className="relative">
               <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
-                type="email"
+                id="auth-email" autoComplete="email" type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -333,13 +333,13 @@ export function AuthModal({ isOpen, onClose, onSuccess, promoContext }: AuthModa
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5 text-left">
+            <label htmlFor="auth-password" className="block text-[11px] font-bold text-text-muted uppercase tracking-wider mb-1.5 text-left">
               Hasło {mode === 'register' && <span className="text-text-muted normal-case">(min. 6 znaków)</span>}
             </label>
             <div className="relative">
               <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
-                type="password"
+                id="auth-password" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

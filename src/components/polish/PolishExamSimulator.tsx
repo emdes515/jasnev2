@@ -22,6 +22,7 @@ import {
 import confetti from 'canvas-confetti';
 import { PolishTask } from '../../types/maturaTypes';
 import { generateMockExam } from '../../data/polish';
+import { useTaskBank } from '../../hooks/useTaskBank';
 import { TaskVisualAssetCard } from './TaskVisualAssetCard';
 import { recordMistake } from '../../data/mistakesManager';
 import { PartOneReadingRoom } from './PartOneReadingRoom';
@@ -36,7 +37,8 @@ export const PolishExamSimulator: React.FC<PolishExamSimulatorProps> = ({
   onExit
 }) => {
   // Generowanie próbnego arkusza zbalansowanego wg formuły 2023
-  const examData = useMemo(() => generateMockExam(), []);
+  const bank = useTaskBank('jezyk-polski');
+  const examData = useMemo(() => generateMockExam(bank), [bank]);
   const allExamTasks = useMemo(() => {
     return [...examData.part1Tasks, ...examData.part2Tasks];
   }, [examData]);
@@ -463,6 +465,7 @@ export const PolishExamSimulator: React.FC<PolishExamSimulatorProps> = ({
     );
   };
 
+  if (bank.length === 0) return <div role="status" className="p-6 text-text-secondary">Wczytywanie arkusza…</div>;
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Pasek Górny Symulatora CKE */}
@@ -609,7 +612,7 @@ export const PolishExamSimulator: React.FC<PolishExamSimulatorProps> = ({
                 title="Otwórz pełną czytelnię tekstów źródłowych CKE"
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>📖 Teksty CKE</span>
+                <span> Teksty CKE</span>
               </button>
 
               {allExamTasks.map((t, i) => {

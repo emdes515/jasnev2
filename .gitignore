@@ -89,4 +89,5 @@ extract_pdfs.py
 strip_plots.py
 tmp_inject.py
 audit_screenshots/
+artifacts/curriculum-backups/
 wypchnij_na_github.bat

@@ -3,8 +3,8 @@
  * w tym 4 zadania otwarte oceniane etapami z zasad oceniania CKE.
  * Narzędzia (PRNG, konstruktory zadań, parser kontrolny, pigułka) są wspólne z kursem PP: scripts/math_pp/lib.js.
  * Wyjście:
- *   src/data/math/generated/pr_blueprints.json   – działy i lekcje (pigułki teorii)
- *   src/data/math/generated/pr_tasks.json        – zadania przypisane do lekcji
+ *   src/data/offline/math/generated/pr_blueprints.json   – działy i lekcje (pigułki teorii)
+ *   src/data/offline/math/generated/pr_tasks.json        – zadania przypisane do lekcji
  *   seed/curriculum/curriculum_matematyka_pr.json – ten sam kurs w schemacie Firestore
  * Uruchomienie: node scripts/math_pr/build.js [--sample=plik.txt]
  */
@@ -15,7 +15,7 @@ import { makeR, finalize, Retry, evalTex, close } from '../math_pp/lib.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
-const OUT_DIR = path.join(ROOT, 'src', 'data', 'math', 'generated');
+const OUT_DIR = path.join(ROOT, 'src', 'data', 'offline', 'math', 'generated');
 const SEED_PATH = path.join(ROOT, 'seed', 'curriculum', 'curriculum_matematyka_pr.json');
 const TASKS_PER_LESSON = 20;
 const OPEN_PER_LESSON = 4;

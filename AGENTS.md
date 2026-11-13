@@ -70,3 +70,15 @@ Podczas projektowania widoków, logiki sesji, modyfikacji zadań i backendu agen
 3. **Respektowanie Mechaniki Campus Rust:** Przy wyliczaniu opanowania materiału i prezentacji kafelków na Dashboardzie/LearnView należy uwzględniać współczynnik "rdzewienia wiedzy" wg krzywej zapominania Ebbinghausa.
 4. **Spójność Wirtualnej Ekonomii:** Ceny podpowiedzi, koszt pełnego odnowienia serc (`HEARTS_REFILL_COIN_COST = 150`), interwał regeneracji (`REGEN_INTERVAL_MS = 30 min`) oraz limity darmowych analiz AI (`DAILY_FREE_AI_VISION_LIMIT = 3`) muszą być ściśle zachowane zgodnie z `heartsManager.ts` i `types.ts`.
 5. **Pętle Wirusowe i Społeczność:** Projektując funkcje społecznościowe (Arena ELO, ligi szkolne, sponsoring znajomego z ławki), priorytetyzować niski próg wejścia i zerowe tarcie.
+
+
+## Dobór skilli przed rozpoczęciem zadania
+
+Przed każdym nowym zadaniem użyj zainstalowanego skilla `find-skills` (Vercel), aby dobrać odpowiednie umiejętności. Sprawdź najpierw dostępne lokalnie skille i nie instaluj ponownie już dostępnych pakietów.
+
+## Wspólne szablony interfejsu
+
+- Przed zmianą lekcji, egzaminu, podsumowania lub większego okna przeczytaj `docs/FOCUS_SCREENS.md`. Korzystaj ze wspólnych klas w `src/styles/focus-layout.css` oraz komponentu `ui/Modal.tsx` zamiast tworzyć kolejny niezależny układ.
+- Wybór przedmiotu korzysta z `src/lib/subjects.ts` i `SubjectPicker.tsx`. Nie dodawaj drugiego selektora z osobnymi nazwami i ikonami.
+- Nie dodawaj emoji do interfejsu. Używaj spójnych ikon Lucide, prostych polskich nazw i wspólnych tokenów typografii.
+- Oznaczenia pochodzenia zadań korzystają z `taskProvenance`; dekoracyjny badge nie potwierdza pochodzenia CKE.

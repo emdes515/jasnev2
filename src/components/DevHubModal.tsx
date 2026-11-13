@@ -195,7 +195,7 @@ export function DevHubModal({
                 : 'text-text-muted hover:text-text-primary'
             }`}
           >
-            ⚡ Super-Moce i Zasoby
+             Super-Moce i Zasoby
           </button>
           <button
             onClick={() => setActiveTab('teleport')}
@@ -205,7 +205,7 @@ export function DevHubModal({
                 : 'text-text-muted hover:text-text-primary'
             }`}
           >
-            🧭 Szybki Skok (Teleport)
+             Szybki Skok (Teleport)
           </button>
           <button
             onClick={() => setActiveTab('debug')}
@@ -215,7 +215,7 @@ export function DevHubModal({
                 : 'text-text-muted hover:text-text-primary'
             }`}
           >
-            🔍 Diagnostyka Stanu
+             Diagnostyka Stanu
           </button>
         </div>
 

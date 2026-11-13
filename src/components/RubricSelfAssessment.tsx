@@ -26,7 +26,7 @@ export function RubricSelfAssessment({ stages, zeroRules, maxPoints, onConfirm }
         className="w-full flex items-center justify-center gap-2 rounded-2xl border border-[#FFB800]/40 bg-[#FFB800]/10 hover:bg-[#FFB800]/15 px-4 py-3 text-sm font-bold text-[#FFB800] transition active:scale-[0.99] cursor-pointer"
       >
         <ListChecks size={16} />
-        Oceń się etapami CKE (bez AI)
+        Samoocena według etapów CKE
       </button>
     );
   }
@@ -36,7 +36,7 @@ export function RubricSelfAssessment({ stages, zeroRules, maxPoints, onConfirm }
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-[#141D2E]/80 p-4 sm:p-5 space-y-3 shadow-[0_4px_20px_rgba(0,0,0,0.25)]">
       <div>
-        <p className="text-sm font-bold text-white">Oceń się jak egzaminator CKE</p>
+        <p className="text-sm font-bold text-white">Samoocena zadania otwartego</p>
         <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
           Zaznacz najwyższy etap, który masz w całości. Punkty za etap obejmują wszystkie wcześniejsze.
         </p>

@@ -142,14 +142,14 @@ export const MaturalnyDuetGame: React.FC<MaturalnyDuetGameProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-bold uppercase text-[#ffdca1] tracking-wider">
-                SZYBKI TRENING PEWNIAKA
+                Krótka rozgrzewka
               </span>
               <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#ffb800]/10 text-[#ffdca1] border border-[#ffb800]/20 shrink-0">
-                TAP-TO-MATCH ({pairs.length} PARY)
+                Dopasuj ({pairs.length} PARY)
               </span>
             </div>
             <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 break-words">
-              Maturalny Duet: Połącz w pary
+              Połącz w pary
             </h4>
           </div>
         </div>
@@ -162,7 +162,7 @@ export const MaturalnyDuetGame: React.FC<MaturalnyDuetGameProps> = ({
               ZALICZONE
             </span>
           )}
-          <span className="text-xs font-mono font-bold text-[#94a3b8] bg-[#070a0f] border border-[#141d2e] px-3 py-1 rounded-full">
+          <span className="text-xs font-sans font-bold text-[#94a3b8] bg-[#070a0f] border border-[#141d2e] px-3 py-1 rounded-full">
             Dopasowano: <strong className="text-[#ffdca1]">{matchedIds.length}</strong>/{pairs.length}
           </span>
           {matchedIds.length > 0 && (

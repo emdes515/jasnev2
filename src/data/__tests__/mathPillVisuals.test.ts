@@ -3,7 +3,7 @@
  * Regresja: flaga noAutoVisual odcinała wszystkie 75 pigułek od rejestru schematów.
  */
 import { describe, it, expect } from 'vitest';
-import blueprints from '../math/generated/math_blueprints.json';
+import blueprints from '../offline/math/generated/math_blueprints.json';
 import {
   MATH_PP_LESSON_VISUALS,
   resolveLessonDiagram,

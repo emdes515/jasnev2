@@ -6,7 +6,7 @@
 //   node scripts/math_pp/build_cke.js --sample=plik.txt
 //
 // Pliki docelowe (wszystkie powstają z tego samego źródła, więc nie mogą się rozjechać):
-//   src/data/math/allMathTasks.ts                       (AUTHENTIC_CKE_TASKS)
+//   src/data/offline/math/allMathTasks.ts                       (AUTHENTIC_CKE_TASKS)
 //   seed/curriculum/exams/<examId>.json
 //   seed/curriculum/zadania_matura.json
 //   seed/curriculum/cke_tasks_matematyka.json           (wyłącznie zadania z arkuszy)
@@ -264,8 +264,8 @@ writeJson(
 const refToExam = new Map(exams.map((e) => [e.exam.refLabel.toLowerCase(), e.exam.examId]));
 writeJson('seed/curriculum/official_cke_tasks_reference.json', replaceIn(readJson('seed/curriculum/official_cke_tasks_reference.json'), refTask, (x) => refToExam.get(String(x.exam).toLowerCase()) || ''));
 
-// 3) src/data/math/allMathTasks.ts – literał AUTHENTIC_CKE_TASKS
-const tsPath = path.join(root, 'src/data/math/allMathTasks.ts');
+// 3) src/data/offline/math/allMathTasks.ts – literał AUTHENTIC_CKE_TASKS
+const tsPath = path.join(root, 'src/data/offline/math/allMathTasks.ts');
 let ts = fs.readFileSync(tsPath, 'utf8').replace(/\r\n/g, '\n');
 const marker = 'export const AUTHENTIC_CKE_TASKS: MathTask[] = ';
 const a = ts.indexOf(marker) + marker.length;

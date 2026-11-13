@@ -3,8 +3,8 @@
  * 16 zamkniętych / krótkich (gens) i 4 otwarte oceniane etapami CKE (open) – jak w kursie rozszerzonym.
  * Każda lekcja deklaruje wymagania podstawy programowej 2024 (requirements), sprawdzane z wymagania_2024.json.
  * Wyjście:
- *   src/data/math/generated/math_blueprints.json  – działy i lekcje (pigułki teorii)
- *   src/data/math/generated/all_1500_tasks.json   – zadania przypisane do lekcji
+ *   src/data/offline/math/generated/math_blueprints.json  – działy i lekcje (pigułki teorii)
+ *   src/data/offline/math/generated/all_1500_tasks.json   – zadania przypisane do lekcji
  * Uruchomienie: node scripts/math_pp/build.js [--only=3] [--sample=plik.txt]
  */
 import fs from 'fs';
@@ -15,7 +15,7 @@ import { OPEN } from './open.js';
 import { LESSON_REQUIREMENTS } from './requirements.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = path.join(__dirname, '../../src/data/math/generated');
+const OUT_DIR = path.join(__dirname, '../../src/data/offline/math/generated');
 const TASKS_PER_LESSON = 20;
 // Na arkuszach PP od grudnia 2024 r. połowa punktów to zadania otwarte (ok. 10 zadań po 2–4 pkt),
 // dlatego każda lekcja ma w puli 4 zadania otwarte z etapami z zasad oceniania CKE.

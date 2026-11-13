@@ -1,3 +1,4 @@
+import { taskProvenance } from '../../lib/taskProvenance';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Clock,
@@ -37,7 +38,7 @@ import {
 import confetti from 'canvas-confetti';
 import { EnglishLessonData } from '../../data/english/englishLessonsData';
 import { EnglishTask } from '../../types/englishTypes';
-import { ALL_ENGLISH_TASKS, getEnglishTaskById } from '../../data/english/allEnglishTasks';
+import { useTaskBank } from '../../hooks/useTaskBank';
 import { getDuetDataForLesson } from '../../data/english/englishDuetData';
 import { EnglishConceptFormatter } from './EnglishConceptFormatter';
 import { EnglishTrapInteractive } from './EnglishTrapInteractive';
@@ -80,6 +81,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
   isPro = false,
   onOpenProModal
 }) => {
+  const ALL_ENGLISH_TASKS = useTaskBank('jezyk-angielski', true);
   // Etap lekcji: 1. Wstęp Teoretyczny, 2. Zadania CKE, 3. Podsumowanie
   const [currentStage, setCurrentStage] = useState<EnglishLessonStage>('intro');
 
@@ -111,7 +113,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
 
     if (lesson.taskIds && lesson.taskIds.length > 0) {
       tasks = lesson.taskIds
-        .map(id => getEnglishTaskById(id))
+        .map(id => ALL_ENGLISH_TASKS.find(task => task.id === id))
         .filter((t): t is EnglishTask => t !== undefined);
     }
 
@@ -120,7 +122,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
     }
 
     return tasks;
-  }, [lesson]);
+  }, [lesson, ALL_ENGLISH_TASKS]);
 
   const [activeTaskIndex, setActiveTaskIndex] = useState(0);
   const currentTask = lessonTasks[activeTaskIndex] || lessonTasks[0];
@@ -514,7 +516,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
                   {lesson.topicId.toUpperCase()}
                 </span>
                 <span className="text-[11px] text-[#94a3b8] hidden sm:inline px-2 py-0.5 rounded-md bg-[#0e1522] border border-[#141d2e]">
-                  🔥 {pewniakData.ckeFrequency}
+                   {pewniakData.ckeFrequency}
                 </span>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#0e1522] text-[#ffb800] border border-[#141d2e] hidden md:inline">
                   FORMUŁA 2023
@@ -552,10 +554,10 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
             {userState && (
               <div className="hidden md:flex items-center gap-3 bg-[#0e1522] px-3 py-1.5 rounded-xl border border-[#141d2e] text-xs">
                 <span className="flex items-center gap-1 text-rose-400 font-semibold" title="Serca">
-                  ❤️ {userState.hearts ?? 5}
+                   {userState.hearts ?? 5}
                 </span>
                 <span className="flex items-center gap-1 text-[#ffdca1] font-semibold" title="Monety">
-                  🪙 {userState.coins ?? 0}
+                   {userState.coins ?? 0}
                 </span>
                 <span className="flex items-center gap-1 text-orange-400 font-semibold" title="Dni streaku">
                   <Flame className="w-3.5 h-3.5 fill-orange-500" /> {userState.streakDays ?? 0}
@@ -1053,7 +1055,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#141d2e] pb-4 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap min-w-0">
                       <span className="text-xs font-bold text-[#ffdca1] bg-[#ffb800]/10 border border-[#ffb800]/20 px-3 py-1 rounded-full">
-                        {currentTask.source || 'CKE Formuła 2023'}
+                        {taskProvenance(currentTask).label}
                       </span>
                       <span className="text-xs font-bold text-[#dfe2f1] bg-white/5 border border-[#141d2e] px-3 py-1 rounded-full">
                         {currentTask.points || 1} PKT
@@ -1303,7 +1305,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
               <div className="w-px h-8 bg-[#141d2e]" />
               <div className="text-center">
                 <span className="text-xs text-[#94a3b8] block">Monety</span>
-                <span className="text-lg font-black text-[#ffb800]">+50 🪙</span>
+                <span className="text-lg font-black text-[#ffb800]">+50 </span>
               </div>
             </div>
 

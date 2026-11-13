@@ -1,3 +1,4 @@
+import { uniqueLessonMistakes } from '../lib/lessonMistakes';
 import React, { useMemo, useState, useEffect } from 'react';
 import { 
   Flame, 
@@ -103,13 +104,7 @@ export function DashboardView({
 
   // 2. SKUTECZNOŚĆ - Rzeczywisty procent wyliczony z rozwiązanych zadań oraz popełnionych błędów
   const { accuracyPercent, totalMistakes, accuracyBadgeLabel } = useMemo(() => {
-    const uniqueMistakes: Record<string, number> = {};
-    Object.entries(lessonMistakes).forEach(([k, count]) => {
-      const cleanKey = k.replace('lesson-', '').replace('-', '.');
-      if (uniqueMistakes[cleanKey] === undefined || count > uniqueMistakes[cleanKey]) {
-        uniqueMistakes[cleanKey] = count;
-      }
-    });
+    const uniqueMistakes = uniqueLessonMistakes(lessonMistakes);
 
     const mistakesSum = Object.values(uniqueMistakes).reduce((acc, curr) => acc + curr, 0);
     const solvedCount = actualCompletedTasks.length;
@@ -403,7 +398,7 @@ export function DashboardView({
           </div>
           <p className="text-text-secondary text-[11px] leading-tight mt-0.5">
             {isCompletedToday 
-              ? "Dzisiejszy cel serii zaliczony! Ogień płonie dalej."
+              ? "Dzisiejsza nauka zaliczona."
               : `Cel na dziś: rozwiąż zadanie, aby zaliczyć Dzień ${todayTargetDayNumber}!`}
           </p>
         </div>
@@ -459,86 +454,7 @@ export function DashboardView({
       id="dashboard-scroll-content"
       className="flex flex-col p-4 sm:p-6 lg:p-8 pt-5 pb-28 sm:pb-32 md:pb-24 max-w-6xl xl:max-w-7xl mx-auto w-full"
     >
-      {/* 0. PASEK WYBORU PRZEDMIOTU (SEGMENTED CONTROL, CYBER-TACTILE) */}
-      <div className="w-full shrink-0 mb-6 select-none flex justify-center">
-        <div 
-          id="dashboard-subject-pills"
-          className="bg-surface-card border border-surface-border p-1.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto max-w-full scrollbar-none touch-pan-x"
-        >
-          {getCkeAvailableSubjects().filter(s => s.isAvailable).map((sub) => {
-            const isActive = sub.key === selectedSubjectKey;
-            const SubIcon = sub.key === 'pol' ? BookOpen : sub.key.includes('eng') ? Globe : Calculator;
-            const accentColor = sub.accentColor || (sub.key === 'pol' ? '#F43F5E' : '#FFB800');
-
-            return (
-              <button
-                key={sub.id}
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  handleSelectSubject(sub.key);
-                }}
-                className={`group relative flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-bold border cursor-pointer shrink-0 whitespace-nowrap min-h-[42px] transition-colors ${
-                  isActive
-                    ? 'border-transparent text-text-primary shadow-sm'
-                    : 'border-transparent text-text-muted hover:text-text-secondary hover:bg-white/[0.04]'
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeDashboardSubjectPill"
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    style={{
-                      border: `1px solid ${accentColor}55`,
-                      backgroundColor: `${accentColor}18`,
-                      boxShadow: `0 0 16px -2px ${accentColor}28`
-                    }}
-                    transition={{ type: 'spring', stiffness: 440, damping: 32 }}
-                  />
-                )}
-                <div 
-                  className={`relative z-10 w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                    isActive
-                      ? 'text-white'
-                      : 'bg-white/5 text-text-muted group-hover:text-text-primary'
-                  }`}
-                  style={isActive ? {
-                    backgroundColor: accentColor,
-                    color: accentColor === '#FFB800' ? '#080B11' : '#FFFFFF'
-                  } : undefined}
-                >
-                  <SubIcon size={13} />
-                </div>
-
-                <div className="relative z-10 flex flex-col text-left">
-                  <div className="flex items-center gap-1.5 leading-none">
-                    <span className="font-extrabold text-xs sm:text-sm tracking-tight">{sub.shortName}</span>
-                    {isActive && (
-                      <span 
-                        className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ backgroundColor: accentColor }}
-                      />
-                    )}
-                  </div>
-                  <span className="text-[10px] text-text-muted font-medium leading-tight mt-0.5">
-                    {sub.examTag}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-
-          {/* Kafelek kolejnych przedmiotów w przygotowaniu na końcu rzędu */}
-          <div className="hidden sm:flex items-center gap-2 text-[11px] text-text-muted bg-white/[0.02] border border-white/5 px-3 py-1.5 rounded-xl shrink-0 whitespace-nowrap">
-            <span className="font-bold text-text-muted uppercase tracking-wider text-[10px]">Wkrótce:</span>
-            <span className="text-text-secondary font-medium">Biologia</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-text-secondary font-medium">Chemia</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-text-secondary font-medium">Fizyka</span>
-          </div>
-        </div>
-      </div>
+      <h1 className="mb-5 text-xl font-semibold text-text-primary">Twoja nauka</h1>
 
       {/* GŁÓWNA SIATKA DASHBOARDU: 2 KOLUMNY NA DESKTOPIE, 1 NA MOBILE */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -595,7 +511,7 @@ export function DashboardView({
                   {/* Tytuł lekcji */}
                   <div>
                     <h2 className="font-display font-black text-text-primary text-lg sm:text-2xl leading-tight">
-                      {nextUp ? nextUp.lessonName : 'Wszystkie działy ukończone!'}
+                      {nextUp ? nextUp.lessonName : topics.length === 0 ? 'Wczytywanie materiałów…' : 'Wszystkie działy ukończone!'}
                     </h2>
                     {nextUp?.topicName && (
                       <p className="text-xs sm:text-sm text-text-secondary font-medium mt-1">
@@ -612,7 +528,7 @@ export function DashboardView({
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-bg border border-surface-border text-xs font-medium text-text-secondary">
                       <FileText size={13} className="text-text-muted" />
-                      <span>{nextUp ? `Cel: ${nextUp.totalCount} poprawne` : 'Powtórka'}</span>
+                      <span>{nextUp ? `Zadania: ${nextUp.totalCount}` : 'Powtórka'}</span>
                     </span>
                     <span 
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold"
@@ -623,7 +539,7 @@ export function DashboardView({
                       }}
                     >
                       <Target size={13} />
-                      <span>Pewniak maturalny</span>
+                      <span>Program maturalny</span>
                     </span>
                   </div>
                 </div>
@@ -631,7 +547,7 @@ export function DashboardView({
                 {/* Stopka karty: postęp i wyrazisty CTA */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pt-4 mt-2 border-t border-surface-border relative z-10">
                   <span className="text-xs sm:text-sm font-medium text-text-secondary">
-                    {nextUp ? `${nextUp.completedCount}/${nextUp.totalCount} zadań zaliczonych w tej lekcji` : 'Wszystko zaliczone!'}
+                    {nextUp ? `${nextUp.completedCount}/${nextUp.totalCount} zadań zaliczonych w tej lekcji` : topics.length === 0 ? 'Pobieramy program nauki.' : 'Wszystko zaliczone!'}
                   </span>
 
                   <button
@@ -642,7 +558,7 @@ export function DashboardView({
                     style={{
                       backgroundColor: accentColor,
                       color: accentColor === '#FFB800' ? '#070A0F' : '#FFFFFF',
-                      boxShadow: accentColor === '#FFB800' ? '0 0 25px rgba(255,184,0,0.35)' : '0 0 25px rgba(244,63,94,0.35)'
+                      boxShadow: 'none'
                     }}
                   >
                     <span>{nextUp ? ((nextUp.completedCount || 0) > 0 ? 'Wznów lekcję' : 'Rozpocznij lekcję') : 'Otwórz mapę'}</span>
@@ -658,154 +574,16 @@ export function DashboardView({
             {renderStreakWidget()}
           </div>
 
-          {/* CENTRUM EGZAMINACYJNE CKE (BENTO TRIGGER CARD) */}
-          <motion.div
-            initial={{ y: 15, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.05, duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-            onClick={(e) => {
-              if ((e.target as HTMLElement).closest('button')) return;
-              triggerHaptic('medium');
-              if (selectedSubjectKey === 'pol') {
-                onNavigate?.('simulator', 'hub');
-              } else {
-                setIsExamHubOpen(true);
-              }
-            }}
-            className="bg-surface-card border border-surface-border hover:border-amber-500/40 rounded-2xl p-5 sm:p-6 relative overflow-hidden transition-all duration-200 shadow-md group cursor-pointer"
-          >
-            {/* Ambient luminous glow */}
-            <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-amber-500/10 pointer-events-none blur-3xl opacity-30 group-hover:opacity-50 transition-opacity" />
-
-            <div className="flex flex-col gap-4 relative z-10">
-              {/* Header tags */}
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/25">
-                    <GraduationCap size={13} className="text-amber-400" />
-                    Centrum Egzaminacyjne CKE
-                  </span>
-                  <span className="text-xs font-semibold text-text-secondary">
-                    {getCkeAvailableSubjects().find(s => s.key === selectedSubjectKey)?.fullName || (selectedSubjectKey === 'pol' ? 'Język Polski' : selectedSubjectKey === 'eng' ? 'Język Angielski' : 'Matematyka')}
-                  </span>
-                </div>
-                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full tabular-nums">
-                  {selectedSubjectKey === 'pol' ? '1056 zadań z kluczem' : selectedSubjectKey === 'eng' ? '780 zadań z kluczem' : '211 zadań CKE z kluczem'}
-                </span>
-              </div>
-
-              {/* Title and subtitle */}
-              <div>
-                <h3 className="font-display font-black text-text-primary text-base sm:text-xl leading-tight">
-                  Oficjalna Baza Zadań i Arkuszy CKE
-                </h3>
-                <p className="text-xs sm:text-sm text-text-secondary font-medium mt-1 leading-relaxed">
-                  Rozwiązuj zadania według wybranej strategii: maraton pytań z bazy CKE, szybki trening egzaminacyjny lub autentyczne arkusze maturalne.
-                </p>
-              </div>
-
-              {/* 3 Interactive Quick-action pills */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    if (selectedSubjectKey === 'pol') {
-                      onNavigate?.('simulator', 'hub');
-                    } else {
-                      onNavigate?.('simulator', 'maraton');
-                    }
-                  }}
-                  className="p-3.5 rounded-xl bg-surface-elevated/80 hover:bg-surface-card-hover border border-white/10 hover:border-amber-500/40 text-left transition-all group/btn cursor-pointer flex flex-col justify-between shadow-xs"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-wider">Tryb 1</span>
-                    <Layers size={14} className="text-amber-400 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-text-primary">
-                    {selectedSubjectKey === 'pol' ? 'Zeszyt 1: Test' : 'Wszystkie zadania'}
-                  </div>
-                  <div className="text-[11px] text-text-muted mt-0.5">
-                    {selectedSubjectKey === 'pol' ? '18 zadań z czytelnią CKE' : 'Maraton pytań CKE'}
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    if (selectedSubjectKey === 'pol') {
-                      onNavigate?.('simulator', 'hub');
-                    } else {
-                      onNavigate?.('simulator', 'exam_setup');
-                    }
-                  }}
-                  className="p-3.5 rounded-xl bg-surface-elevated/80 hover:bg-surface-card-hover border border-white/10 hover:border-purple-500/40 text-left transition-all group/btn cursor-pointer flex flex-col justify-between shadow-xs"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-extrabold text-purple-400 uppercase tracking-wider">Tryb 2</span>
-                    <GraduationCap size={14} className="text-purple-400 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-text-primary">
-                    {selectedSubjectKey === 'pol' ? 'Zeszyt 2: Wypracowanie' : 'Mini Matura'}
-                  </div>
-                  <div className="text-[11px] text-text-muted mt-0.5">
-                    {selectedSubjectKey === 'pol' ? 'Wybór tematu • Konspekt' : 'Szybki test 20–35 min'}
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    if (selectedSubjectKey === 'pol') {
-                      onNavigate?.('simulator', 'hub');
-                    } else {
-                      onNavigate?.('simulator', 'full_exams');
-                    }
-                  }}
-                  className="p-3.5 rounded-xl bg-surface-elevated/80 hover:bg-surface-card-hover border border-white/10 hover:border-sky-500/40 text-left transition-all group/btn cursor-pointer flex flex-col justify-between shadow-xs"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-extrabold text-sky-400 uppercase tracking-wider">Tryb 3</span>
-                    <FileText size={14} className="text-sky-400 group-hover/btn:translate-x-0.5 transition-transform" />
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-text-primary">
-                    {selectedSubjectKey === 'pol' ? 'Pełny Egzamin (240m)' : 'Pełne Arkusze'}
-                  </div>
-                  <div className="text-[11px] text-text-muted mt-0.5">
-                    {selectedSubjectKey === 'pol' ? 'Test + Wypracowanie • 60 pkt' : 'Maj, czerwiec i sierpień 2023–2024'}
-                  </div>
-                </button>
-              </div>
-
-              {/* Main CTA button */}
-              <div className="pt-2 border-t border-surface-border flex items-center justify-between gap-3">
-                <span className="text-xs text-text-secondary font-medium hidden sm:inline">
-                  {selectedSubjectKey === 'pol'
-                    ? 'Napisz oficjalną maturę z języka polskiego Formuła 2023'
-                    : 'Wybierz format treningu i zacznij rozwiązywać arkusz'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    if (selectedSubjectKey === 'pol') {
-                      onNavigate?.('simulator', 'hub');
-                    } else {
-                      setIsExamHubOpen(true);
-                    }
-                  }}
-                  className="w-full sm:w-auto font-display font-black text-xs sm:text-sm py-2.5 px-5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/20 ml-auto"
-                >
-                  <span>
-                    {selectedSubjectKey === 'pol' ? 'Otwórz Arkusz Maturalny' : 'Otwórz Centrum Egzaminacyjne'}
-                  </span>
-                  <ArrowRight size={14} strokeWidth={2.5} />
-                </button>
-              </div>
+          <section className="border-y border-surface-border py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-text-primary">Sprawdź się na maturze</h3>
+              <p className="text-sm text-text-secondary mt-1">Wybierz krótki trening lub pełny arkusz.</p>
             </div>
-          </motion.div>
+            <button type="button" onClick={() => onNavigate?.('simulator', 'hub')}
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-surface-border text-text-primary hover:bg-surface-card-hover font-semibold text-sm focus-visible:outline-2 focus-visible:outline-primary">
+              Wybierz trening <ArrowRight size={16} />
+            </button>
+          </section>
 
           {/* 2. DYNAMICZNY PREDYKTOR WYNIKU MATURALNEGO CKE */}
           <PredictorWidget
@@ -816,134 +594,27 @@ export function DashboardView({
             onNavigate={onNavigate}
           />
 
-          {/* 3. SEKCJA: PANEL STATYSTYK NAUKI */}
-          <motion.div
-            initial={{ y: 15, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-          >
-            <div className="flex items-center justify-center mb-2.5 px-0.5">
-              <div className="flex items-center gap-2">
-                <BarChart3 size={15} className="text-[#FFB800]" />
-                <h3 className="text-sm font-bold text-slate-200 text-center">
-                  Twoje postępy
-                </h3>
+          <section aria-labelledby="study-progress-title" className="pt-2">
+            <h2 id="study-progress-title" className="text-base font-semibold text-text-primary mb-3">Twoje postępy</h2>
+            <div id="dashboard-study-stats-panel" className="rounded-2xl border border-surface-border bg-surface-card divide-y sm:divide-y-0 sm:divide-x divide-surface-border grid grid-cols-1 sm:grid-cols-3">
+              <div className="p-5 flex flex-col gap-2">
+                <span className="text-sm leading-5 min-h-10 text-text-secondary">Rozwiązane zadania</span>
+                <strong className="text-2xl font-semibold text-text-primary tabular-nums">{masteredTasksCount}</strong>
+                <span className="text-xs text-text-secondary">Łącznie ze wszystkich przedmiotów</span>
+              </div>
+              <button type="button" disabled={!onOpenMistakesBank} onClick={onOpenMistakesBank}
+                className="p-5 flex flex-col items-start gap-2 text-left hover:bg-surface-card-hover focus-visible:outline-2 focus-visible:outline-primary disabled:cursor-default">
+                <span className="text-sm leading-5 min-h-10 text-text-secondary">Skuteczność</span>
+                <strong className="text-2xl font-semibold text-text-primary tabular-nums">{accuracyPercent}%</strong>
+                <span className="text-xs text-text-secondary">{totalMistakes > 0 ? 'Przejdź do błędnych odpowiedzi' : 'Brak błędów do powtórki'}</span>
+              </button>
+              <div className="p-5 flex flex-col gap-2">
+                <span className="text-sm leading-5 min-h-10 text-text-secondary">Czas nauki</span>
+                <strong className="text-2xl font-semibold text-text-primary tabular-nums">{studyTimeValue} <span className="text-sm font-normal text-text-secondary">{studyTimeUnit}</span></strong>
+                <span className="text-xs text-text-secondary">Zapisany czas aktywności</span>
               </div>
             </div>
-
-            <div 
-              id="dashboard-study-stats-panel"
-              className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3"
-            >
-              {/* KARTA 1: UKOŃCZONE ZADANIA */}
-              <motion.div 
-                whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                className="bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-emerald-500/25 rounded-2xl p-4 flex flex-col items-center text-center justify-between relative overflow-hidden transition-all shadow-sm group cursor-default"
-              >
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 mb-3 group-hover:scale-110 transition-transform duration-200 mx-auto">
-                  <CheckCircle2 size={16} strokeWidth={2.2} />
-                </div>
-
-                <div className="w-full flex flex-col items-center text-center">
-                  <div className="font-display font-bold text-2xl sm:text-3xl text-text-primary tracking-tight leading-none text-center tabular-nums font-mono">
-                    {masteredTasksCount}
-                  </div>
-                  <div className="mt-1.5 flex flex-col items-center text-center">
-                    <span className="text-xs sm:text-sm font-medium text-text-secondary leading-tight text-center">
-                      Ukończone zadania
-                    </span>
-                    <span className="text-[10px] sm:text-[11px] text-text-muted font-normal mt-0.5 truncate text-center">
-                      W wybranym programie
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* KARTA 2: SKUTECZNOŚĆ & BANK BŁĘDÓW */}
-              <motion.div 
-                role={onOpenMistakesBank ? "button" : undefined}
-                tabIndex={onOpenMistakesBank ? 0 : undefined}
-                onClick={() => {
-                  if (onOpenMistakesBank) {
-                    triggerHaptic('light');
-                    onOpenMistakesBank();
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (onOpenMistakesBank && (e.key === 'Enter' || e.key === ' ')) {
-                    e.preventDefault();
-                    onOpenMistakesBank();
-                  }
-                }}
-                whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                className={`bg-surface-card hover:bg-surface-card-hover border rounded-2xl p-4 flex flex-col items-center text-center justify-between relative overflow-hidden transition-all shadow-sm group select-none ${
-                  onOpenMistakesBank ? 'cursor-pointer hover:border-amber-500/40 hover:shadow-md border-surface-border' : 'cursor-default border-surface-border'
-                }`}
-                title={onOpenMistakesBank ? "Kliknij, aby otworzyć Bank Błędów i sesję rehabilitacyjną" : undefined}
-              >
-                <div className="absolute top-3.5 right-3.5">
-                  {totalMistakes > 0 ? (
-                    <span className="text-[10px] font-extrabold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-                      <span>{totalMistakes} {totalMistakes === 1 ? 'błąd' : totalMistakes < 5 ? 'błędy' : 'błędów'}</span>
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                      0 błędów
-                    </span>
-                  )}
-                </div>
-
-                <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 mb-3 group-hover:scale-110 transition-transform duration-200 mx-auto">
-                  <Zap size={16} strokeWidth={2.2} />
-                </div>
-
-                <div className="w-full flex flex-col items-center text-center">
-                  <div className="font-display font-bold text-2xl sm:text-3xl text-text-primary tracking-tight leading-none text-center tabular-nums font-mono">
-                    {accuracyPercent}%
-                  </div>
-                  <div className="mt-1.5 flex flex-col items-center text-center">
-                    <div className="flex items-center justify-center gap-1 text-center">
-                      <span className="text-xs sm:text-sm font-medium text-text-secondary leading-tight text-center">
-                        Skuteczność
-                      </span>
-                      {onOpenMistakesBank && totalMistakes > 0 && (
-                        <span className="text-[10px] text-amber-400 font-bold group-hover:underline">
-                          →
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] sm:text-[11px] text-text-muted font-normal mt-0.5 truncate text-center">
-                      {totalMistakes > 0 ? `${totalMistakes} do powtórki` : '0 błędów'}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* KARTA 3: CZAS NAUKI */}
-              <motion.div 
-                whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                className="bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-amber-500/25 rounded-2xl p-4 flex flex-col items-center text-center justify-between relative overflow-hidden transition-all shadow-sm group cursor-default"
-              >
-                <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mb-3 group-hover:scale-110 transition-transform duration-200 mx-auto">
-                  <Clock size={16} strokeWidth={2.2} />
-                </div>
-
-                <div className="w-full flex flex-col items-center text-center">
-                  <div className="font-display font-bold text-2xl sm:text-3xl text-text-primary tracking-tight leading-none whitespace-nowrap text-center tabular-nums font-mono">
-                    {studyTimeValue} <span className="text-xs sm:text-sm font-medium text-text-muted font-sans">{studyTimeUnit}</span>
-                  </div>
-                  <div className="mt-1.5 flex flex-col items-center text-center">
-                    <span className="text-xs sm:text-sm font-medium text-text-secondary leading-tight text-center">
-                      Czas nauki
-                    </span>
-                    <span className="text-[10px] sm:text-[11px] text-text-muted font-normal mt-0.5 truncate text-center">
-                      W tym tygodniu
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
+          </section>
         </div>
 
         {/* PRAWA KOLUMNA: SERIA DNI (STREAK) + SZYBKIE NARZĘDZIA */}
@@ -962,8 +633,10 @@ export function DashboardView({
             onOpenMistakesBank={onOpenMistakesBank}
           />
 
-          {/* SZYBKIE AKCJE AI & DIAGNOSTYKA */}
-          <div className="flex flex-col gap-2.5">
+          {/* Dodatkowe narzędzia nie konkurują ze startem lekcji. */}
+          <details className="group">
+            <summary className="cursor-pointer text-sm font-semibold text-text-secondary py-3">Więcej sposobów nauki</summary>
+          <div className="flex flex-col gap-2.5 pt-2">
             <div className="flex items-center gap-2 px-0.5">
               <Cpu size={14} className="text-primary" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-text-muted">
@@ -994,7 +667,7 @@ export function DashboardView({
                       </span>
                     </div>
                     <p className="text-xs font-bold text-text-primary truncate mt-0.5">
-                      Oceń poziom i skalibruj predyktor
+                      Sprawdź, co już umiesz
                     </p>
                   </div>
                 </div>
@@ -1025,7 +698,7 @@ export function DashboardView({
                       </span>
                     </div>
                     <p className="text-xs font-bold text-text-primary truncate mt-0.5">
-                      Nowe zadania z kluczem CKE
+                      Wygeneruj dodatkowe ćwiczenia
                     </p>
                   </div>
                 </div>
@@ -1052,11 +725,11 @@ export function DashboardView({
                         Bank Błędów
                       </span>
                       <span className="text-[10px] font-extrabold text-primary bg-primary/15 border border-primary/30 px-1.5 py-0.5 rounded-full">
-                        {totalMistakes} do powtórki
+                        Otwórz bank błędów
                       </span>
                     </div>
                     <p className="text-xs font-bold text-text-primary truncate mt-0.5">
-                      Rozpocznij sesję rehabilitacji
+                      Powtórz zadania z błędami
                     </p>
                   </div>
                 </div>
@@ -1064,6 +737,7 @@ export function DashboardView({
               </button>
             )}
           </div>
+          </details>
         </div>
 
       </div>

@@ -37,7 +37,9 @@ import {
 import confetti from 'canvas-confetti';
 import { PolishTask, PolishEpoch, PolishPartNumber, PolishTaskType } from '../../types/maturaTypes';
 import { PolishLesson, PolishModuleType } from '../../types/lessonTypes';
-import { ALL_POLISH_TASKS, POLISH_EPOCHS, POLISH_LESSONS, POLISH_SECTIONS, PolishSection } from '../../data/polish';
+import type { PolishSection } from '../../data/polish';
+import { useTaskBank } from '../../hooks/useTaskBank';
+import { useStudyCatalog } from '../../hooks/useStudyCatalog';
 import { PolishLessonView } from './PolishLessonView';
 import { TaskVisualAssetCard } from './TaskVisualAssetCard';
 import { TaskMatchingInteractive } from './TaskMatchingInteractive';
@@ -108,6 +110,8 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
   onClose,
 }) => {
   const isDev = Boolean(userState?.isDev || userState?.isPro);
+  const ALL_POLISH_TASKS = useTaskBank('jezyk-polski');
+  const { lessons: POLISH_LESSONS, sections: POLISH_SECTIONS, epochs: POLISH_EPOCHS } = useStudyCatalog('jezyk-polski');
 
   // Główny tryb: Kurs Lekcyjny (24 lekcje po 45 min) vs Baza Zadań (Filtry)
   const [hubMode, setHubMode] = useState<'lessons' | 'task_browser'>(initialMode || 'lessons');
@@ -257,7 +261,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
       }
       return true;
     });
-  }, [selectedLessonModule, lessonSearchQuery]);
+  }, [selectedLessonModule, lessonSearchQuery, POLISH_LESSONS]);
 
   // Stan bazy pojedynczych zadań
   const [selectedPart, setSelectedPart] = useState<PolishPartNumber | 'all'>('all');
@@ -296,7 +300,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
       }
       return true;
     });
-  }, [selectedPart, selectedEpoch, selectedType, taskSearchQuery]);
+  }, [selectedPart, selectedEpoch, selectedType, taskSearchQuery, ALL_POLISH_TASKS]);
 
   const currentTask = filteredTasks[activeTaskIndex] || filteredTasks[0];
 
@@ -626,8 +630,8 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
       feedback: {
         isCorrect: isFull,
         message: isFull
-          ? `✅ Znakomita analiza! Poprawnie dopasowano wszystkie pozycje i zneutralizowano dystraktor (+${earnedPoints} pkt).`
-          : `⚠️ Poprawne dopasowanie w procedurze 2. szansy (+${earnedPoints} pkt).`,
+          ? ` Znakomita analiza! Poprawnie dopasowano wszystkie pozycje i zneutralizowano dystraktor (+${earnedPoints} pkt).`
+          : ` Poprawne dopasowanie w procedurze 2. szansy (+${earnedPoints} pkt).`,
       },
     });
 
@@ -712,13 +716,13 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                 <span className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded bg-[#ffb800]/10 text-[#ffdca1] border border-[#ffb800]/20 shrink-0">
                   Formuła 2023
                 </span>
-                <h1 className="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-1.5 truncate">
+                <h1 className="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-1.5 flex-wrap">
                   <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[#ffdca1] shrink-0" />
-                  <span>Język Polski CKE</span>
+                  <span>Język polski</span>
                 </h1>
               </div>
               <p className="text-xs text-[#94a3b8] hidden sm:block mt-0.5">
-                15 modułów egzaminacyjnych • 75 autentycznych lekcji Core-4 • Baza zadań CKE
+                Lekcje i zadania z języka polskiego
               </p>
             </div>
           </div>
@@ -734,23 +738,11 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
               title="Notatki i synteza CKE"
             >
               <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ffb800]" />
-              <span className="hidden sm:inline">Warsztat & Synteza</span>
+              <span className="hidden sm:inline">Pisanie i synteza</span>
               <span className="sm:hidden text-[11px]">Synteza</span>
             </button>
 
-            {userState && (
-              <div className="hidden sm:flex items-center gap-2 sm:gap-3 bg-[#0e1522] px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#141d2e] text-[11px] sm:text-xs">
-                <span className="flex items-center gap-1 text-rose-400 font-semibold" title="Serca">
-                  ❤️ {userState.hearts ?? 5}
-                </span>
-                <span className="flex items-center gap-1 text-[#ffdca1] font-semibold" title="Monety">
-                  🪙 {userState.coins ?? 0}
-                </span>
-                <span className="flex items-center gap-1 text-orange-400 font-semibold" title="Dni streaku">
-                  <Flame className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-orange-500" /> {userState.streakDays ?? 0}
-                </span>
-              </div>
-            )}
+
           </div>
         </div>
 
@@ -765,7 +757,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
             }`}
           >
             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Kurs Działowy <span className="hidden sm:inline">(15 Działów)</span></span>
+            <span>Kurs według działów <span className="hidden sm:inline">(15 Działów)</span></span>
           </button>
           <button
             onClick={() => setHubMode('task_browser')}
@@ -776,7 +768,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
             }`}
           >
             <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Baza Zadań CKE ({filteredTasks.length})</span>
+            <span>Zadania ({filteredTasks.length})</span>
           </button>
         </div>
       </header>
@@ -793,22 +785,22 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="px-2.5 py-0.5 rounded-lg bg-[#ffb800]/10 border border-[#ffb800]/20 text-[#ffdca1] text-xs font-bold">
-                    Kompletny Kurs Maturalny CKE
+                    Program nauki
                   </span>
                   <span className="text-xs text-[#94a3b8]">15 Działów • 75 Lekcji Core-4</span>
                 </div>
                 <h2 className="text-base sm:text-lg font-bold text-white">
-                  Wybierz dział egzaminacyjny i rozpocznij lekcję
+                  Wybierz dział
                 </h2>
                 <p className="text-xs text-[#94a3b8] mt-1">
-                  Każdy dział zawiera dokładnie 5 dedykowanych mikrolekcji z Pigułką Bento, pułapkami CKE i zadaniami treningowymi.
+                  Otwórz dział, aby przeczytać teorię i przejść do ćwiczeń.
                 </p>
               </div>
 
               <div className="text-left sm:text-right shrink-0">
                 <span className="text-xs text-[#94a3b8]">Ukończone lekcje w kursie:</span>
                 <div className="text-sm font-bold text-[#ffdca1]">
-                  {isDev ? 75 : completedLessonIds.length} / 75 lekcji CKE
+                  {isDev ? 75 : completedLessonIds.length} / 75 lekcji
                 </div>
               </div>
             </div>
@@ -837,7 +829,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
               {POLISH_SECTIONS.map((section) => {
                 const sectionTasks = getSectionTasks(section.id);
                 const sectionLessons = POLISH_LESSONS.filter(l => section.lessonIds.includes(l.id));
@@ -854,7 +846,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                   >
                     <div className="min-w-0">
                       {/* Górny nagłówek z numerem i wagą CKE (klikalny na mobile jako akordeon) */}
-                      <div 
+                      <div
                         onClick={() => toggleMobileSection(section.id)}
                         className="flex items-center justify-between gap-2 min-w-0 cursor-pointer sm:cursor-default select-none pb-1"
                       >
@@ -867,11 +859,11 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                               <span className="text-[10px] font-bold uppercase text-[#ffdca1] bg-[#ffb800]/10 px-2 py-0.5 rounded-md border border-[#ffb800]/20 shrink-0">
                                 Dział {section.numericId}
                               </span>
-                              <span className="text-[10px] text-[#94a3b8] font-medium truncate max-w-[120px]">
+                              <span className="text-xs text-[#94a3b8] font-medium leading-relaxed">
                                 {section.pillarName}
                               </span>
                             </div>
-                            <h4 className="text-xs sm:text-sm font-bold text-white leading-tight mt-1 truncate">
+                            <h4 className="text-xs sm:text-sm font-bold text-white leading-snug mt-1 break-words">
                               {section.short_title}
                             </h4>
                           </div>
@@ -908,31 +900,15 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                           {section.description}
                         </p>
 
-                        {/* ŚCIEŻKA LEKCJI (MINI ROADMAP) */}
-                        <div className="space-y-1.5 my-3 p-3 rounded-xl bg-[#070a0f] border border-[#141d2e] min-w-0">
-                          <div className="flex items-center justify-between text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1 min-w-0">
-                            <span className="truncate">Ścieżka mikrolekcji Core-4:</span>
-                            <span className="text-[#ffdca1] font-mono shrink-0 ml-1">{completedLessonsCount}/{sectionLessons.length}</span>
-                          </div>
-                          {sectionLessons.map((l, lIdx) => {
-                            const isLComp = isDev || completedLessonIds.includes(l.id);
-                            return (
-                              <div key={l.id} className="flex items-center justify-between text-xs py-0.5 gap-2 min-w-0">
-                                <div className="flex items-center gap-2 min-w-0 flex-1">
-                                  <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 ${
-                                    isLComp ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300' : 'bg-[#0e1522] text-[#94a3b8] border border-[#141d2e]'
-                                  }`}>
-                                    {isLComp ? '✓' : `${section.numericId}.${lIdx + 1}`}
-                                  </span>
-                                  <span className={`truncate text-xs min-w-0 flex-1 ${isLComp ? 'text-[#94a3b8] line-through' : 'text-[#dfe2f1] font-medium'}`}>
-                                    {l.title.replace(/^Lekcja \d+:\s*/i, '')}
-                                  </span>
-                                </div>
-                                <span className="text-[10px] text-[#94a3b8]/80 font-mono shrink-0">~{l.durationMinutes || 5} min</span>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <details className="my-4 border-t border-surface-border pt-3">
+                          <summary className="text-sm font-medium text-text-secondary cursor-pointer py-1">Zobacz lekcje ({sectionLessons.length})</summary>
+                          <ol className="mt-2 space-y-3">
+                            {sectionLessons.map((lesson, index) => <li key={lesson.id} className="flex items-start gap-2 text-sm leading-relaxed text-text-primary">
+                              <span className="text-text-secondary shrink-0">{index + 1}.</span>
+                              <span>{lesson.title.replace(/^Lekcja \d+:\s*/i, '')}</span>
+                            </li>)}
+                          </ol>
+                        </details>
 
                         {/* PASEK POSTĘPU DZIAŁU */}
                         <div className="space-y-1.5 mb-4 min-w-0">
@@ -962,7 +938,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                         className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#ea580c] to-[#ffb800] hover:brightness-110 text-[#070a0f] text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer min-w-0"
                       >
                         <Play className="w-3.5 h-3.5 fill-[#070a0f] shrink-0" />
-                        <span className="truncate">Otwórz dział i 5 lekcji</span>
+                        <span className="truncate">Otwórz dział</span>
                         <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                       </button>
 
@@ -974,7 +950,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                         className="w-full py-2 rounded-xl bg-[#070a0f] hover:bg-[#141d2e] border border-[#141d2e] text-[#94a3b8] hover:text-[#dfe2f1] text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer min-w-0"
                       >
                         <Target className="w-3.5 h-3.5 text-[#ffb800] shrink-0" />
-                        <span className="truncate">Przeglądaj wszystkie {sectionTasks.length} zadań CKE</span>
+                        <span className="truncate">Zadania w dziale: {sectionTasks.length}</span>
                       </button>
                     </div>
                   </div>
@@ -1185,7 +1161,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                                   <span>•</span>
                                   <span className="text-[#ffdca1] font-medium flex items-center gap-1">
                                     <Star className="w-3 h-3 text-[#ffb800] shrink-0" />
-                                    Pewniaki CKE
+                                    Zadania do ćwiczeń
                                   </span>
                                 </div>
                               </div>
@@ -1263,7 +1239,7 @@ export const PolishStudyHub: React.FC<PolishStudyHubProps> = ({
                                           PEWNIAKI MATURALNE
                                         </span>
                                         <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#ffb800]/10 text-[#ffdca1] border border-[#ffb800]/20 tracking-wider shrink-0">
-                                          🔥 100% CKE STANDARD
+                                           100% CKE STANDARD
                                         </span>
                                       </div>
                                       <h4 className="text-base sm:text-lg font-bold text-white break-words">

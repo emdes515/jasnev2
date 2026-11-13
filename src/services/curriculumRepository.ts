@@ -1,6 +1,6 @@
 /**
  * Central Curriculum & Progress Data Repository (Cloud Firestore)
- * 
+ *
  * Cost-Optimized Strategy:
  * - CACHE_FIRST Policy with in-memory + persistentLocalCache.
  * - getTopics(): loads topics list once (topics/{topic_id}).
@@ -9,35 +9,34 @@
  * - Repeated navigation between screens inside fetched topics/lessons costs 0 extra reads!
  */
 
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
   setDoc,
   query,
   orderBy
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { 
-  TopicDocument, 
-  LessonDocument, 
+import { resolveCurriculum, clearCurriculumSources } from './curriculumSource';
+import { readFirestoreTaskBank } from './firestoreTaskBank';
+import { offlineSubjects, offlineTopics, offlineLesson, offlineTasks, offlineExam, offlinePracticeTasks, offlineStudyCatalog, subjectId as canonicalSubject } from '../data/offline/catalog';
+import {
+  TopicDocument,
+  LessonDocument,
   UserTopicProgressDocument,
   SubjectDocument
 } from '../schema_firestore';
 import { MaturaTask } from '../types';
 import { normalizeTask } from '../data/mathTasks';
-import { enrichTaskWithVisual, enrichTheoryPillWithVisual } from '../data/mathVisualRegistry';
-import { POLISH_CURRICULUM_TOPICS, getPolishLessonDocument } from '../data/polishCurriculumData';
-import { ENGLISH_PILLARS } from '../data/english/englishPillars';
-import { loadEnglishCurriculum, getEnglishCurriculumIfLoaded } from '../data/englishDataLoader';
-import { loadMathCurriculum, loadMathRozCurriculum, getMathCurriculumIfLoaded } from '../data/mathDataLoader';
+import { enrichTaskWithVisual } from '../data/mathVisualRegistry';
 
 export const DEFAULT_SUBJECT_ID = 'matematyka-podstawowa';
 
 const isTestEnv = typeof process !== 'undefined' && (process.env.NODE_ENV === 'test' || typeof (process.env as any).VITEST !== 'undefined');
 
-export const CURRICULUM_CACHE_VERSION = 1;
+export const CURRICULUM_CACHE_VERSION = 3;
 export const CURRICULUM_CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 interface CurriculumCacheEnvelope<T> {
@@ -97,6 +96,7 @@ const lessonByIdCache = new Map<string, LessonDocument>();
 const userTopicProgressCache = new Map<string, UserTopicProgressDocument>();
 
 export function __clearCurriculumMemoryAndStorageForTests(): void {
+  clearCurriculumSources();
   subjectsCache = null;
   topicsBySubjectCache.clear();
   topicByIdCache.clear();
@@ -149,357 +149,68 @@ export function getLessonKeyVariants(lessonId: string): string[] {
   return Array.from(variants).filter(Boolean);
 }
 
-
-
 export const curriculumRepository = {
   /**
    * Fetches all registered subjects (e.g. Matematyka Podstawowa, Język Polski, etc.).
    */
   async getSubjects(): Promise<SubjectDocument[]> {
-    if (subjectsCache && subjectsCache.length > 0) {
-      return subjectsCache;
-    }
-
-    const localCached = getFromCurriculumStorage<SubjectDocument[]>('jasne_curriculum_subjects_v1');
-    if (localCached && Array.isArray(localCached.data) && localCached.data.length > 0) {
-      subjectsCache = localCached.data;
-      if (localCached.isStale && !isTestEnv) {
-        this._fetchSubjectsFromFirestore().catch(() => {});
-      }
-      return subjectsCache;
-    }
-
-    if (isTestEnv) {
-      subjectsCache = [
-        {
-          id: 'jezyk-polski',
-          key: 'pol',
-          name: 'Język Polski (Formuła 2023)',
-          short_name: 'Polski',
-          formula: '2023',
-          description: 'Przygotowanie do matury podstawowej z języka polskiego CKE Formuła 2023',
-          icon: 'BookOpen',
-          color: '#F43F5E',
-          pillars: [],
-          is_active: true,
-          order: 2
-        }
-      ];
-      saveToCurriculumStorage('jasne_curriculum_subjects_v1', subjectsCache);
-      return subjectsCache;
-    }
-
-    return this._fetchSubjectsFromFirestore();
-  },
-
-  async _fetchSubjectsFromFirestore(): Promise<SubjectDocument[]> {
-    try {
-      const subjectsColRef = collection(db, 'subjects');
-      const snap = await getDocs(query(subjectsColRef));
-      if (!snap.empty) {
-        const list: SubjectDocument[] = [];
-        snap.forEach(d => {
-          list.push({ ...d.data(), id: d.id } as SubjectDocument);
-        });
-        subjectsCache = list;
-        saveToCurriculumStorage('jasne_curriculum_subjects_v1', list);
-        return list;
-      }
-    } catch (err) {
-      console.warn('[curriculumRepository] Failed to fetch subjects from Firestore:', err);
-    }
-    return subjectsCache || [];
+    return resolveCurriculum('subjects', async () => {
+      const snapshot = await getDocs(collection(db, 'subjects'));
+      if (snapshot.empty) throw new Error('Subjects not published');
+      const subjects: SubjectDocument[] = [];
+      snapshot.forEach(d => subjects.push({ ...d.data(), id: d.id } as SubjectDocument));
+      return subjects;
+    }, offlineSubjects);
   },
 
   /**
    * Fetches a single subject metadata document: subjects/{subjectId}.
    */
   async getSubject(subjectId: string = DEFAULT_SUBJECT_ID): Promise<SubjectDocument | null> {
-    if (subjectId === 'jezyk-polski' || subjectId === 'pol') {
-      const existing = subjectsCache?.find(s => s.id === subjectId || s.key === subjectId);
-      if (existing) return existing;
-      return {
-        id: 'jezyk-polski',
-        key: 'pol',
-        name: 'Język Polski (Formuła 2023)',
-        short_name: 'Polski',
-        formula: '2023',
-        description: 'Przygotowanie do matury podstawowej z języka polskiego CKE Formuła 2023',
-        icon: 'BookOpen',
-        color: '#F43F5E',
-        pillars: [],
-        is_active: true,
-        order: 2
-      };
-    }
-    if (subjectId === 'jezyk-angielski' || subjectId === 'eng') {
-      const existing = subjectsCache?.find(s => s.id === subjectId || s.key === subjectId);
-      if (existing) return existing;
-      return {
-        id: 'jezyk-angielski',
-        key: 'eng',
-        name: 'Język Angielski (Formuła 2023)',
-        short_name: 'Angielski',
-        formula: '2023',
-        description: 'Przygotowanie do matury podstawowej z języka angielskiego CKE Formuła 2023',
-        icon: 'Globe',
-        color: '#10B981',
-        pillars: ENGLISH_PILLARS,
-        is_active: true,
-        order: 3
-      };
-    }
-    const subjects = await this.getSubjects();
-    return subjects.find(s => s.id === subjectId || s.key === subjectId) || null;
+    subjectId = canonicalSubject(subjectId);
+    return resolveCurriculum(`subject/${subjectId}`, async () => {
+      const snapshot = await getDoc(doc(db, 'subjects', subjectId));
+      if (!snapshot.exists()) throw new Error('Subject not published');
+      return { ...snapshot.data(), id: snapshot.id } as SubjectDocument;
+    }, async () => (await offlineSubjects()).find(s => s.id === subjectId) || null);
   },
 
   /**
    * Fetches all topic cards (metadata + lessons_metadata) for a subject.
-   * Checks subjects/{subjectId}/topics first, then falls back to /topics.
+   * Reads the published subject hierarchy; the shared resolver owns cache and offline recovery.
    * Reads from RAM cache -> localStorage persistent cache -> Firestore.
    */
   async getTopics(subjectId: string = DEFAULT_SUBJECT_ID): Promise<TopicDocument[]> {
-    // 0. Język Polski - 17 Działów CKE Formuła 2023
-    if (subjectId === 'jezyk-polski' || subjectId === 'pol') {
-      if (!topicsBySubjectCache.has(subjectId)) {
-        topicsBySubjectCache.set(subjectId, POLISH_CURRICULUM_TOPICS);
-        for (const t of POLISH_CURRICULUM_TOPICS) {
-          topicByIdCache.set(`${subjectId}/${t.id}`, t);
-          topicByIdCache.set(t.id, t);
-        }
-      }
-      return topicsBySubjectCache.get(subjectId)!;
-    }
-
-    // 0.1. Język Angielski - 15 Działów CKE Formuła 2023
-    if (subjectId === 'jezyk-angielski' || subjectId === 'eng') {
-      if (!topicsBySubjectCache.has(subjectId)) {
-        const { ENGLISH_CURRICULUM_TOPICS } = await loadEnglishCurriculum();
-        topicsBySubjectCache.set(subjectId, ENGLISH_CURRICULUM_TOPICS);
-        for (const t of ENGLISH_CURRICULUM_TOPICS) {
-          topicByIdCache.set(`${subjectId}/${t.id}`, t);
-          topicByIdCache.set(t.id, t);
-        }
-      }
-      return topicsBySubjectCache.get(subjectId)!;
-    }
-
-    // 0.15. Matematyka Rozszerzona – kurs z generatora scripts/math_pr (paczka, 0 odczytów Firestore)
-    if (!isTestEnv && (subjectId === 'matematyka-rozszerzona' || subjectId === 'math-roz')) {
-      if (!topicsBySubjectCache.has(subjectId)) {
-        const { MATH_ROZ_CURRICULUM_TOPICS } = await loadMathRozCurriculum();
-        topicsBySubjectCache.set(subjectId, MATH_ROZ_CURRICULUM_TOPICS);
-        for (const t of MATH_ROZ_CURRICULUM_TOPICS) {
-          topicByIdCache.set(`${subjectId}/${t.id}`, t);
-          topicByIdCache.set(t.id, t);
-        }
-      }
-      return topicsBySubjectCache.get(subjectId)!;
-    }
-
-    // 0.2. Matematyka Podstawowa - 15 Działów CKE Formuła 2023
-    if (!isTestEnv && (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'matematyka' || subjectId === 'math')) {
-      if (!topicsBySubjectCache.has(subjectId)) {
-        topicsBySubjectCache.set(subjectId, (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS);
-        for (const t of (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS) {
-          topicByIdCache.set(`${subjectId}/${t.id}`, t);
-          topicByIdCache.set(t.id, t);
-        }
-      }
-      return topicsBySubjectCache.get(subjectId)!;
-    }
-
-    // 1. In-memory RAM cache
-    if (topicsBySubjectCache.has(subjectId)) {
-      return topicsBySubjectCache.get(subjectId)!;
-    }
-
-    // 2. Persistent localStorage cache (Zero-cost across page refreshes)
-    const storageKey = `jasne_curriculum_topics_${subjectId}_v1`;
-    const localCached = getFromCurriculumStorage<TopicDocument[]>(storageKey);
-    if (localCached && Array.isArray(localCached.data) && localCached.data.length > 0) {
-      const topicsList = localCached.data;
-      topicsBySubjectCache.set(subjectId, topicsList);
-      for (const t of topicsList) {
-        topicByIdCache.set(`${subjectId}/${t.id}`, t);
-        topicByIdCache.set(t.id, t);
-      }
-      if (localCached.isStale && !isTestEnv) {
-        this._fetchTopicsFromFirestore(subjectId).catch(() => {});
-      }
-      return topicsList;
-    }
-
-    return this._fetchTopicsFromFirestore(subjectId);
+    subjectId = canonicalSubject(subjectId);
+    const topics = await resolveCurriculum(`topics/${subjectId}`, async () => {
+      const subject = await this.getSubject(subjectId);
+      const snapshot = await getDocs(query(collection(db, 'subjects', subjectId, 'topics')));
+      if (snapshot.empty) throw new Error('No published topics');
+      const list: TopicDocument[] = [];
+      snapshot.forEach(d => {
+        const data = d.data() as TopicDocument;
+        list.push({ ...data, id: d.id, name: data.name || data.title || d.id, title: data.title || data.name || d.id, lessons_metadata: data.lessons_metadata || [] });
+      });
+      const activeIds = (subject as any)?.publishedTopicIds;
+      const active = Array.isArray(activeIds) ? list.filter(t => activeIds.includes(t.id)) : list;
+      if (Array.isArray(activeIds) && active.length !== activeIds.length) throw new Error('Incomplete published curriculum');
+      saveToCurriculumStorage(`jasne_curriculum_topics_${subjectId}_v1`, active);
+      return active.sort((a, b) => (a.numericId || 0) - (b.numericId || 0));
+    }, () => offlineTopics(subjectId));
+    topicsBySubjectCache.set(subjectId, topics);
+    for (const topic of topics) topicByIdCache.set(`${subjectId}/${topic.id}`, topic);
+    return topics;
   },
 
-  async _fetchTopicsFromFirestore(subjectId: string = DEFAULT_SUBJECT_ID): Promise<TopicDocument[]> {
-    const storageKey = `jasne_curriculum_topics_${subjectId}_v1`;
-    try {
-      // 1. Sprawdź nową hierarchię wieloprzedmiotową: subjects/{subjectId}/topics
-      const subjectTopicsColRef = collection(db, 'subjects', subjectId, 'topics');
-      let snapshot = await getDocs(query(subjectTopicsColRef));
 
-      // 2. Fallback do root /topics TYLKO dla matematyki podstawowej (archiwalna kolekcja Firestore)
-      if (snapshot.empty && (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'math')) {
-        const rootTopicsColRef = collection(db, 'topics');
-        snapshot = await getDocs(query(rootTopicsColRef));
-      }
-
-      if (!snapshot.empty) {
-        const topicsList: TopicDocument[] = [];
-        snapshot.forEach(docSnap => {
-          const data = docSnap.data() as TopicDocument;
-          const topicDoc: TopicDocument = {
-            ...data,
-            id: docSnap.id || data.id,
-            numericId: data.numericId || parseInt(docSnap.id.replace(/\D/g, '') || '1', 10),
-            name: data.title || data.name || docSnap.id,
-            title: data.title || data.name || docSnap.id,
-            short_title: data.short_title || data.title || docSnap.id,
-            lessons_metadata: data.lessons_metadata || []
-          };
-          topicsList.push(topicDoc);
-          topicByIdCache.set(`${subjectId}/${topicDoc.id}`, topicDoc);
-          topicByIdCache.set(topicDoc.id, topicDoc); // fallback alias
-        });
-
-        // Dedyplikacja tematów po numericId (faworyzuj dzial- nad archiwalnymi topic-)
-        const dedupedMap = new Map<number, TopicDocument>();
-        for (const t of topicsList) {
-          const num = t.numericId || 1;
-          // Zapewnij, że tematy z Firestore mają pełne metadane lekcji z MATH_CURRICULUM_TOPICS jeśli ich brakuje
-          if ((!t.lessons_metadata || t.lessons_metadata.length === 0) && (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'math')) {
-            const fallbackTopic = (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS.find(m => m.id === t.id || m.numericId === num);
-            if (fallbackTopic?.lessons_metadata) {
-              t.lessons_metadata = fallbackTopic.lessons_metadata;
-            }
-          }
-          const existing = dedupedMap.get(num);
-          if (!existing) {
-            dedupedMap.set(num, t);
-          } else if (t.id.startsWith('dzial-') && !existing.id.startsWith('dzial-')) {
-            dedupedMap.set(num, t);
-          }
-        }
-        const finalTopicsList = Array.from(dedupedMap.values()).sort((a, b) => (a.numericId || 0) - (b.numericId || 0));
-        topicsBySubjectCache.set(subjectId, finalTopicsList);
-        saveToCurriculumStorage(storageKey, finalTopicsList);
-        return finalTopicsList;
-      }
-    } catch (err) {
-      console.warn(`[curriculumRepository] Failed to fetch topics for subject ${subjectId}:`, err);
-    }
-
-    // 3. Fallback do wbudowanego kurikulum matematyki Core-4 (Offline-First / Zero latency)
-    if (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'math') {
-      topicsBySubjectCache.set(subjectId, (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS);
-      for (const t of (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS) {
-        topicByIdCache.set(`${subjectId}/${t.id}`, t);
-        topicByIdCache.set(t.id, t);
-      }
-      saveToCurriculumStorage(storageKey, (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS);
-      return (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS;
-    }
-
-    return topicsBySubjectCache.get(subjectId) || [];
-  },
 
   /**
    * Fetches a single topic document: subjects/{subjectId}/topics/{topicId} or topics/{topicId}.
    * Exactly 1 document read.
    */
   async getTopic(topicId: string, subjectId: string = DEFAULT_SUBJECT_ID): Promise<TopicDocument | null> {
-    const cacheKey = `${subjectId}/${topicId}`;
-    if (topicByIdCache.has(cacheKey)) {
-      return topicByIdCache.get(cacheKey)!;
-    }
-    if (topicByIdCache.has(topicId)) {
-      return topicByIdCache.get(topicId)!;
-    }
-
-    // Język Polski topic resolution
-    if (subjectId === 'jezyk-polski' || subjectId === 'pol' || topicId.startsWith('pol-')) {
-      const found = POLISH_CURRICULUM_TOPICS.find(t => t.id === topicId || t.name === topicId || t.title === topicId);
-      if (found) {
-        topicByIdCache.set(cacheKey, found);
-        topicByIdCache.set(topicId, found);
-        return found;
-      }
-    }
-
-    // Język Angielski topic resolution
-    if (subjectId === 'jezyk-angielski' || subjectId === 'eng' || topicId.startsWith('eng-')) {
-      const { ENGLISH_CURRICULUM_TOPICS } = await loadEnglishCurriculum();
-      const found = ENGLISH_CURRICULUM_TOPICS.find(t => t.id === topicId || t.name === topicId || t.title === topicId);
-      if (found) {
-        topicByIdCache.set(cacheKey, found);
-        topicByIdCache.set(topicId, found);
-        return found;
-      }
-    }
-
-    // Matematyka Rozszerzona topic resolution
-    if (subjectId === 'matematyka-rozszerzona' || topicId.startsWith('pr-dzial-')) {
-      const found = (await loadMathRozCurriculum()).MATH_ROZ_CURRICULUM_TOPICS.find(t => t.id === topicId);
-      if (found) {
-        topicByIdCache.set(cacheKey, found);
-        topicByIdCache.set(topicId, found);
-        return found;
-      }
-    }
-
-    // Matematyka Podstawowa topic resolution
-    if (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'math' || topicId.startsWith('dzial-')) {
-      const found = (await loadMathCurriculum()).MATH_CURRICULUM_TOPICS.find(t => t.id === topicId || t.name === topicId || t.title === topicId || t.numericId === parseInt(topicId.replace(/\D/g, '') || '0', 10));
-      if (found) {
-        topicByIdCache.set(cacheKey, found);
-        topicByIdCache.set(topicId, found);
-        return found;
-      }
-    }
-
-    // Check if topics list was cached in localStorage
-    const localTopics = getFromCurriculumStorage<TopicDocument[]>(`jasne_curriculum_topics_${subjectId}_v1`);
-    if (localTopics && Array.isArray(localTopics.data)) {
-      const found = localTopics.data.find(t => t.id === topicId || t.name === topicId || t.title === topicId);
-      if (found) {
-        topicByIdCache.set(cacheKey, found);
-        topicByIdCache.set(topicId, found);
-        return found;
-      }
-    }
-
-    try {
-      // 1. Sprawdź subjects/{subjectId}/topics/{topicId}
-      let topicRef = doc(db, 'subjects', subjectId, 'topics', topicId);
-      let snap = await getDoc(topicRef);
-
-      // 2. Fallback do topics/{topicId} (TYLKO dla matematyki podstawowej)
-      if (!snap.exists() && (subjectId === DEFAULT_SUBJECT_ID || (!topicId.startsWith('pol-') && subjectId !== 'jezyk-polski' && subjectId !== 'pol'))) {
-        topicRef = doc(db, 'topics', topicId);
-        snap = await getDoc(topicRef);
-      }
-
-      if (snap.exists()) {
-        const data = snap.data() as TopicDocument;
-        const topicDoc: TopicDocument = {
-          ...data,
-          id: snap.id,
-          name: data.title || data.name || snap.id,
-          title: data.title || data.name || snap.id,
-          numericId: data.numericId || parseInt(snap.id.replace(/\D/g, '') || '1', 10),
-          lessons_metadata: data.lessons_metadata || []
-        };
-        topicByIdCache.set(cacheKey, topicDoc);
-        topicByIdCache.set(topicId, topicDoc);
-        return topicDoc;
-      }
-    } catch (err) {
-      console.warn(`[curriculumRepository] Error fetching topic ${topicId}:`, err);
-    }
-
-    return null;
+    const topics = await this.getTopics(canonicalSubject(subjectId));
+    return topics.find(t => t.id === topicId || t.name === topicId || t.title === topicId) || null;
   },
 
   /**
@@ -509,193 +220,26 @@ export const curriculumRepository = {
    * Exactly 1 document read. Cached in-memory & localStorage afterwards (0 reads on revisit/refresh).
    */
   async getLesson(topicId: string, lessonId: string, subjectId: string = DEFAULT_SUBJECT_ID): Promise<LessonDocument | null> {
-    const variants = getLessonKeyVariants(lessonId);
-
-    // 1. RAM check via lessonCache
-    for (const v of variants) {
-      const k1 = `${subjectId}/${topicId}/${v}`;
-      const k2 = `${topicId}/${v}`;
-      if (lessonCache.has(k1)) return lessonCache.get(k1)!;
-      if (lessonCache.has(k2)) return lessonCache.get(k2)!;
+    subjectId = canonicalSubject(subjectId);
+    const lesson = await resolveCurriculum(`lesson/${subjectId}/${topicId}/${lessonId}`, async () => {
+      for (const id of getLessonKeyVariants(lessonId)) {
+        const snapshot = await getDoc(doc(db, 'subjects', subjectId, 'topics', topicId, 'lessons', id));
+        if (!snapshot.exists()) continue;
+        const data = snapshot.data() as LessonDocument;
+        const result = { ...data, id: snapshot.id, topic_id: topicId, tasks: (data.tasks || []).map((task: any) => enrichTaskWithVisual(normalizeTask(task, { id: snapshot.id, title: data.title }, { id: topicId }))) };
+        for (const variant of getLessonKeyVariants(lessonId)) {
+          saveToCurriculumStorage(`jasne_curriculum_lesson_${subjectId}_${variant}_v1`, result);
+          saveToCurriculumStorage(`jasne_curriculum_lesson_${subjectId}_${topicId}_${variant}_v1`, result);
+        }
+        return result;
+      }
+      throw new Error('Lesson not published');
+    }, () => offlineLesson(subjectId, topicId, lessonId));
+    if (lesson) for (const id of new Set([...getLessonKeyVariants(lessonId), ...getLessonKeyVariants(lesson.id)])) {
+      lessonCache.set(`${subjectId}/${topicId}/${id}`, lesson);
+      lessonByIdCache.set(`${subjectId}:${id}`, lesson);
     }
-
-
-    // 1.5. Język Polski lesson resolution
-    if (subjectId === 'jezyk-polski' || subjectId === 'pol' || lessonId.startsWith('pol-') || topicId.startsWith('pol-') || lessonId.startsWith('lekcja-')) {
-      const polDoc = getPolishLessonDocument(topicId, lessonId);
-      if (polDoc) {
-        for (const v of variants) {
-          lessonCache.set(`${subjectId}/${topicId}/${v}`, polDoc);
-          lessonCache.set(`${topicId}/${v}`, polDoc);
-          lessonByIdCache.set(v, polDoc);
-          if (subjectId) lessonByIdCache.set(`${subjectId}:${v}`, polDoc);
-        }
-        return polDoc;
-      }
-    }
-
-    // 1.6. Język Angielski lesson resolution
-    if (subjectId === 'jezyk-angielski' || subjectId === 'eng' || lessonId.startsWith('eng-') || topicId.startsWith('eng-')) {
-      const engDoc = (await loadEnglishCurriculum()).getEnglishLessonDocument(lessonId, topicId);
-      if (engDoc) {
-        for (const v of variants) {
-          lessonCache.set(`${subjectId}/${topicId}/${v}`, engDoc);
-          lessonCache.set(`${topicId}/${v}`, engDoc);
-          lessonByIdCache.set(v, engDoc);
-          if (subjectId) lessonByIdCache.set(`${subjectId}:${v}`, engDoc);
-        }
-        return engDoc;
-      }
-    }
-
-    // 1.65. Matematyka Rozszerzona lesson resolution (przed PP: identyfikatory `math-pr-` nie mogą trafić do kursu podstawowego)
-    if (!isTestEnv && (subjectId === 'matematyka-rozszerzona' || lessonId.startsWith('math-pr-') || topicId.startsWith('pr-dzial-'))) {
-      const rozDoc = (await loadMathRozCurriculum()).getMathRozLessonDocument(topicId, lessonId);
-      if (rozDoc) {
-        for (const v of Array.from(new Set([...variants, ...getLessonKeyVariants(rozDoc.id)]))) {
-          lessonCache.set(`${subjectId}/${topicId}/${v}`, rozDoc);
-          lessonCache.set(`${topicId}/${v}`, rozDoc);
-          lessonByIdCache.set(v, rozDoc);
-          if (subjectId) lessonByIdCache.set(`${subjectId}:${v}`, rozDoc);
-        }
-        return rozDoc;
-      }
-    }
-
-    // 1.7. Matematyka lesson resolution
-    if (!isTestEnv && (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'matematyka' || subjectId === 'math' || topicId.startsWith('dzial-') || lessonId.startsWith('math-') || lessonId.match(/^\d+\.\d+$/))) {
-      const mathDoc = (await loadMathCurriculum()).getMathLessonDocument(topicId, lessonId);
-      if (mathDoc) {
-        const allDocVariants = Array.from(new Set([...variants, ...getLessonKeyVariants(mathDoc.id)]));
-        for (const v of allDocVariants) {
-          lessonCache.set(`${subjectId}/${topicId}/${v}`, mathDoc);
-          lessonCache.set(`${topicId}/${v}`, mathDoc);
-          lessonByIdCache.set(v, mathDoc);
-          if (subjectId) lessonByIdCache.set(`${subjectId}:${v}`, mathDoc);
-        }
-        return mathDoc;
-      }
-    }
-
-    // 2. RAM & LocalStorage check via getCachedLesson (Zero-cost across F5)
-    const cachedFast = this.getCachedLesson(lessonId, subjectId);
-    if (cachedFast) {
-      for (const v of variants) {
-        lessonCache.set(`${subjectId}/${topicId}/${v}`, cachedFast);
-      }
-      return cachedFast;
-    }
-
-    // 3. Sprawdź w trwałym localStorage z jawnym topicId
-    for (const v of variants) {
-      const localCached = getFromCurriculumStorage<LessonDocument>(`jasne_curriculum_lesson_${subjectId}_${topicId}_${v}_v1`) ||
-        getFromCurriculumStorage<LessonDocument>(`jasne_curriculum_lesson_${topicId}_${v}_v1`) ||
-        getFromCurriculumStorage<LessonDocument>(`jasne_curriculum_lesson_${subjectId}_${v}_v1`);
-
-      if (localCached && localCached.data) {
-        const lessonDoc = localCached.data;
-        const allDocVariants = Array.from(new Set([...variants, ...getLessonKeyVariants(lessonDoc.id)]));
-        for (const docV of allDocVariants) {
-          lessonCache.set(`${subjectId}/${topicId}/${docV}`, lessonDoc);
-          lessonByIdCache.set(docV, lessonDoc);
-          if (subjectId) lessonByIdCache.set(`${subjectId}:${docV}`, lessonDoc);
-        }
-        if (localCached.isStale && !isTestEnv) {
-          this._fetchLessonFromFirestore(topicId, lessonId, subjectId).catch(() => {});
-        }
-        return lessonDoc;
-      }
-    }
-
-    return this._fetchLessonFromFirestore(topicId, lessonId, subjectId);
-  },
-
-  async _fetchLessonFromFirestore(topicId: string, lessonId: string, subjectId: string = DEFAULT_SUBJECT_ID): Promise<LessonDocument | null> {
-    const variants = getLessonKeyVariants(lessonId);
-    const storageKey = `jasne_curriculum_lesson_${subjectId}_${topicId}_${lessonId}_v1`;
-
-    try {
-      // 1. Sprawdź subjects/{subjectId}/topics/{topicId}/lessons/{v}
-      let snap: any = null;
-      for (const v of variants) {
-        const lessonRef = doc(db, 'subjects', subjectId, 'topics', topicId, 'lessons', v);
-        const s = await getDoc(lessonRef);
-        if (s.exists()) {
-          snap = s;
-          break;
-        }
-      }
-
-      // 2. Fallback do topics/{topicId}/lessons/{v} (TYLKO dla matematyki podstawowej)
-      if ((!snap || !snap.exists()) && (subjectId === DEFAULT_SUBJECT_ID || (!lessonId.startsWith('pol-') && !topicId.startsWith('pol-') && subjectId !== 'jezyk-polski' && subjectId !== 'pol'))) {
-        for (const v of variants) {
-          const lessonRef = doc(db, 'topics', topicId, 'lessons', v);
-          const s = await getDoc(lessonRef);
-          if (s.exists()) {
-            snap = s;
-            break;
-          }
-        }
-      }
-
-      if (snap && snap.exists()) {
-        const data = snap.data() as LessonDocument;
-        const rawTasks = data.tasks || [];
-        const normalizedTasks = rawTasks.map((t: any) => 
-          enrichTaskWithVisual(normalizeTask(t, { id: snap.id, title: data.title }, { id: topicId }))
-        );
-
-        const rawTheoryPill = data.theory_pill || { concept_essence: data.title };
-        const enrichedTheoryPill = enrichTheoryPillWithVisual(rawTheoryPill, snap.id);
-
-        const lessonDoc: LessonDocument = {
-          ...data,
-          id: snap.id,
-          topic_id: topicId,
-          title: data.title || snap.id,
-          theory_pill: enrichedTheoryPill,
-          formulaSheet: (data as any).formulaSheet || (data as any).formula_sheet || null,
-          formula_sheet: (data as any).formula_sheet || (data as any).formulaSheet || null,
-          tasks: normalizedTasks
-        };
-
-        const allDocVariants = Array.from(new Set([...variants, ...getLessonKeyVariants(lessonDoc.id)]));
-        for (const v of allDocVariants) {
-          lessonCache.set(`${subjectId}/${topicId}/${v}`, lessonDoc);
-          lessonCache.set(`${topicId}/${v}`, lessonDoc);
-          lessonByIdCache.set(v, lessonDoc);
-          if (subjectId) {
-            lessonByIdCache.set(`${subjectId}:${v}`, lessonDoc);
-          }
-          saveToCurriculumStorage(`jasne_curriculum_lesson_${subjectId}_${v}_v1`, lessonDoc);
-          saveToCurriculumStorage(`jasne_curriculum_lesson_${subjectId}_${topicId}_${v}_v1`, lessonDoc);
-        }
-        return lessonDoc;
-      }
-    } catch (err) {
-      console.warn(`[curriculumRepository] Error fetching lesson ${subjectId}/${topicId}/${lessonId}:`, err);
-    }
-
-    // Fallback do wbudowanego kurikulum matematyki Core-4
-    if (subjectId === DEFAULT_SUBJECT_ID || subjectId === 'matematyka-podstawowa' || subjectId === 'math' || topicId.startsWith('dzial-') || lessonId.startsWith('math-') || lessonId.match(/^\d+\.\d+$/)) {
-      const mathDoc = (await loadMathCurriculum()).getMathLessonDocument(topicId, lessonId);
-      if (mathDoc) {
-        const allDocVariants = Array.from(new Set([...variants, ...getLessonKeyVariants(mathDoc.id)]));
-        for (const v of allDocVariants) {
-          lessonCache.set(`${subjectId}/${topicId}/${v}`, mathDoc);
-          lessonCache.set(`${topicId}/${v}`, mathDoc);
-          lessonByIdCache.set(v, mathDoc);
-          if (subjectId) {
-            lessonByIdCache.set(`${subjectId}:${v}`, mathDoc);
-          }
-          saveToCurriculumStorage(`jasne_curriculum_lesson_${subjectId}_${v}_v1`, mathDoc);
-          saveToCurriculumStorage(`jasne_curriculum_lesson_${subjectId}_${topicId}_${v}_v1`, mathDoc);
-        }
-        return mathDoc;
-      }
-    }
-
-    return null;
+    return lesson;
   },
 
   /**
@@ -703,95 +247,26 @@ export const curriculumRepository = {
    * Sprawdza pamięć RAM oraz trwały cache localStorage.
    */
   getCachedLesson(lessonId: string, subjectId?: string): LessonDocument | null {
-    if (!lessonId) return null;
-    const isEnglish = subjectId === 'jezyk-angielski' || subjectId === 'eng' || lessonId.startsWith('eng-');
-    if (isEnglish) {
-      const engDoc = getEnglishCurriculumIfLoaded()?.getEnglishLessonDocument(lessonId) ?? null;
-      if (engDoc) return engDoc;
-    }
-
-    const isPolish = subjectId === 'jezyk-polski' || subjectId === 'pol' || lessonId.startsWith('pol-');
-    const variants = getLessonKeyVariants(lessonId);
-
-    // 1. Sprawdź najpierw klucz z jawnym subjectId w pamięci RAM
-    if (subjectId) {
-      for (const v of variants) {
-        const scoped = lessonByIdCache.get(`${subjectId}:${v}`);
-        if (scoped) return scoped;
+    const subject = canonicalSubject(subjectId || (lessonId.startsWith('pol-') ? 'pol' : lessonId.startsWith('eng-') ? 'eng' : DEFAULT_SUBJECT_ID));
+    for (const id of getLessonKeyVariants(lessonId)) {
+      const lesson = lessonByIdCache.get(`${subject}:${id}`);
+      if (lesson) return lesson;
+      const saved = getFromCurriculumStorage<LessonDocument>(`jasne_curriculum_lesson_${subject}_${id}_v1`);
+      if (saved && !saved.isStale) {
+        lessonByIdCache.set(`${subject}:${id}`, saved.data);
+        return saved.data;
       }
     }
-
-    // 2. Sprawdź bezpośrednio po wariantach w RAM
-    for (const v of variants) {
-      const direct = lessonByIdCache.get(v);
-      if (direct) {
-        const directIsPolish = direct.id.startsWith('pol-') || direct.topic_id?.startsWith('pol-') || Boolean((direct as any).leksykon);
-        if (isPolish && directIsPolish) return direct;
-        if (!isPolish && !directIsPolish) return direct;
-      }
-    }
-
-    for (const lesson of lessonCache.values()) {
-      if (lesson?.id && (variants.includes(lesson.id) || variants.includes(normalizeLessonKey(lesson.id)))) {
-        const lessonIsPolish = lesson.id.startsWith('pol-') || lesson.topic_id?.startsWith('pol-') || Boolean((lesson as any).leksykon);
-        if (isPolish && lessonIsPolish) return lesson;
-        if (!isPolish && !lessonIsPolish) return lesson;
-      }
-    }
-
-    // 3. Sprawdź w trwałym localStorage (Zero-cost cache across F5)
-    const subj = subjectId || (isPolish ? 'jezyk-polski' : DEFAULT_SUBJECT_ID);
-    for (const v of variants) {
-      const local1 = getFromCurriculumStorage<LessonDocument>(`jasne_curriculum_lesson_${subj}_${v}_v1`);
-      if (local1?.data) {
-        const doc = local1.data;
-        const allDocVariants = Array.from(new Set([...variants, ...getLessonKeyVariants(doc.id)]));
-        for (const docV of allDocVariants) {
-          lessonByIdCache.set(docV, doc);
-          if (subj) lessonByIdCache.set(`${subj}:${docV}`, doc);
-        }
-        return doc;
-      }
-    }
-
-    // 4. Przeszukaj ewentualne klucze localStorage pasujące do jakiegokolwiek wariantu
     if (typeof localStorage !== 'undefined') {
-      try {
-        const keys: string[] = Object.keys(localStorage);
-        for (const k of keys) {
-          if (k && k.startsWith('jasne_curriculum_lesson_')) {
-            for (const v of variants) {
-              if (k.includes(`_${v}_`) || k.endsWith(`_${v}_v1`)) {
-                const hit = getFromCurriculumStorage<LessonDocument>(k);
-                if (hit?.data) {
-                  const doc = hit.data;
-                  const allDocVariants = Array.from(new Set([...variants, ...getLessonKeyVariants(doc.id)]));
-                  for (const docV of allDocVariants) {
-                    lessonByIdCache.set(docV, doc);
-                    if (subj) lessonByIdCache.set(`${subj}:${docV}`, doc);
-                  }
-                  return doc;
-                }
-              }
-            }
-          }
+      const variants = getLessonKeyVariants(lessonId);
+      for (const key of Object.keys(localStorage).filter(k => k.startsWith(`jasne_curriculum_lesson_${subject}_`))) {
+        const saved = getFromCurriculumStorage<LessonDocument>(key);
+        if (saved && !saved.isStale && variants.includes(saved.data.id)) {
+          for (const id of variants) lessonByIdCache.set(`${subject}:${id}`, saved.data);
+          return saved.data;
         }
-      } catch {}
-    }
-
-    // 5. Fallback dla matematyki podstawowej ze zintegrowanego kurikulum Core-4
-    if (!isTestEnv && !isPolish && !isEnglish && !lessonId.startsWith('math-pr-')) {
-      // synchroniczny odczyt: działa, gdy kurs PP został już leniwie załadowany
-      const mathDoc = getMathCurriculumIfLoaded()?.getMathLessonDocument(undefined, lessonId) ?? null;
-      if (mathDoc) {
-        for (const v of variants) {
-          lessonByIdCache.set(v, mathDoc);
-          if (subj) lessonByIdCache.set(`${subj}:${v}`, mathDoc);
-        }
-        return mathDoc;
       }
     }
-
     return null;
   },
 
@@ -805,16 +280,7 @@ export const curriculumRepository = {
     topicId?: string,
     subjectId: string = DEFAULT_SUBJECT_ID
   ): Promise<LessonDocument | null> {
-    if (subjectId === 'jezyk-polski' || subjectId === 'pol' || lessonId.startsWith('pol-') || (topicId && topicId.startsWith('pol-')) || lessonId.startsWith('lekcja-')) {
-      const polDoc = getPolishLessonDocument(topicId, lessonId);
-      if (polDoc) return polDoc;
-    }
-
-    if (subjectId === 'jezyk-angielski' || subjectId === 'eng' || lessonId.startsWith('eng-') || (topicId && topicId.startsWith('eng-'))) {
-      const engDoc = (await loadEnglishCurriculum()).getEnglishLessonDocument(lessonId, topicId);
-      if (engDoc) return engDoc;
-    }
-
+    subjectId = canonicalSubject(subjectId);
     const cached = this.getCachedLesson(lessonId, subjectId);
     if (cached) return cached;
 
@@ -823,10 +289,10 @@ export const curriculumRepository = {
     let resolvedTopicId = topicId;
     if (!resolvedTopicId) {
       // 1. Sprawdź czy temat da się odnaleźć w liście tematów z RAM lub localStorage
-      const topics = topicsBySubjectCache.get(subjectId) || 
+      const topics = topicsBySubjectCache.get(subjectId) ||
         getFromCurriculumStorage<TopicDocument[]>(`jasne_curriculum_topics_${subjectId}_v1`)?.data;
       if (topics && Array.isArray(topics)) {
-        const found = topics.find(t => 
+        const found = topics.find(t =>
           t.lessons_metadata?.some(m => variants.includes(m.id) || variants.includes(normalizeLessonKey(m.id)))
         );
         if (found) resolvedTopicId = found.id;
@@ -848,7 +314,7 @@ export const curriculumRepository = {
       // Ostateczna próba: pobierz listę tematów i wyszukaj lekcję
       try {
         const topics = await this.getTopics(subjectId);
-        const found = topics.find(t => 
+        const found = topics.find(t =>
           t.lessons_metadata?.some(m => variants.includes(m.id) || variants.includes(normalizeLessonKey(m.id)))
         );
         if (found) resolvedTopicId = found.id;
@@ -925,8 +391,8 @@ export const curriculumRepository = {
    * Saves user's progress for a specific topic: users/{userId}/progress/{topicId}.
    */
   async saveUserTopicProgress(
-    userId: string, 
-    topicId: string, 
+    userId: string,
+    topicId: string,
     progress: Partial<UserTopicProgressDocument>
   ): Promise<void> {
     if (!userId || !topicId) return;
@@ -977,34 +443,32 @@ export const curriculumRepository = {
    * Zgodnie z zasadą Cache-First (1 odczyt na sesję).
    */
   async getCkeExamTasks(subjectId: string = DEFAULT_SUBJECT_ID): Promise<MaturaTask[]> {
-    const docId = subjectId === 'matematyka-podstawowa' ? 'matura-podstawowa' : `matura-${subjectId}`;
-    if (ckeExamTasksCache.has(docId)) {
-      return ckeExamTasksCache.get(docId)!;
-    }
+    subjectId = canonicalSubject(subjectId);
+    const id = subjectId === DEFAULT_SUBJECT_ID ? 'matura-podstawowa' : `matura-${subjectId}`;
+    return resolveCurriculum(`exams/${id}`, async () => {
+      try {
+        return await readFirestoreTaskBank(subjectId, 'exam');
+      } catch { /* Existing deployments may only expose the legacy exams document. */ }
+      const snapshot = await getDoc(doc(db, 'exams', id));
+      if (!snapshot.exists() || !Array.isArray(snapshot.data().tasks)) throw new Error('Exam bank not published');
+      return snapshot.data().tasks as MaturaTask[];
+    }, () => offlineTasks(subjectId));
+  },
 
-    // Matematyka podstawowa: arkusze CKE są wbudowane w aplikację (zweryfikowane transkrypcje,
-    // 0 odczytów z Firestore) – tak samo jak kurikulum matematyki w getTopics/getLesson.
-    if (docId === 'matura-podstawowa') {
-      const bundled = (await loadMathCurriculum()).getBundledCkeExamTasks();
-      if (bundled.length > 0) {
-        ckeExamTasksCache.set(docId, bundled);
-        return bundled;
-      }
-    }
+  async getPracticeTasks(subjectId: string): Promise<any[]> {
+    subjectId = canonicalSubject(subjectId);
+    return resolveCurriculum(`practice/${subjectId}`, async () => {
+      return readFirestoreTaskBank(subjectId, 'practice');
+    }, () => offlinePracticeTasks(subjectId));
+  },
 
-    try {
-      const snap = await getDoc(doc(db, 'exams', docId));
-      if (snap.exists()) {
-        const data = snap.data() as { tasks?: MaturaTask[] };
-        const tasks = Array.isArray(data.tasks) ? data.tasks : [];
-        ckeExamTasksCache.set(docId, tasks);
-        return tasks;
-      }
-    } catch (err) {
-      console.warn(`[curriculumRepository] Błąd pobierania zadań CKE dla ${docId}:`, err);
-    }
-
-    return [];
+  async getStudyCatalog(subjectId: string): Promise<{ lessons: any[]; sections: any[]; epochs: any[] }> {
+    subjectId = canonicalSubject(subjectId);
+    return resolveCurriculum(`study/${subjectId}`, async () => {
+      const entries = await readFirestoreTaskBank(subjectId, 'study');
+      const byKind = (kind: string) => entries.filter(e => e.kind === kind).map(e => e.data);
+      return { lessons: byKind('lesson'), sections: byKind('section'), epochs: byKind('epoch') };
+    }, () => offlineStudyCatalog(subjectId));
   },
 
   /**
@@ -1012,36 +476,18 @@ export const curriculumRepository = {
    * Zgodnie z zasadą Cache-First.
    */
   async getCkeExamSheet(examId: string): Promise<MaturaTask[]> {
-    if (ckeExamTasksCache.has(examId)) {
-      return ckeExamTasksCache.get(examId)!;
-    }
-
-    // Arkusze matematyki z paczki aplikacji mają pierwszeństwo przed dokumentem w Firestore
-    const bundledSheet = (await loadMathCurriculum()).getBundledCkeExamSheet(examId);
-    if (bundledSheet.length > 0) {
-      ckeExamTasksCache.set(examId, bundledSheet);
-      return bundledSheet;
-    }
-
-    try {
-      const snap = await getDoc(doc(db, 'exams', examId));
-      if (snap.exists()) {
-        const data = snap.data() as { tasks?: MaturaTask[] };
-        const tasks = Array.isArray(data.tasks) ? data.tasks : [];
-        ckeExamTasksCache.set(examId, tasks);
-        return tasks;
-      }
-    } catch (err) {
-      console.warn(`[curriculumRepository] Błąd pobierania arkusza CKE ${examId}:`, err);
-    }
-
-    return [];
+    return resolveCurriculum(`exams/${examId}`, async () => {
+      const snapshot = await getDoc(doc(db, 'exams', examId));
+      if (!snapshot.exists() || !Array.isArray(snapshot.data().tasks)) throw new Error('Exam not published');
+      return snapshot.data().tasks as MaturaTask[];
+    }, () => offlineExam(examId));
   },
 
   /**
    * Clears in-memory caches if manual refresh is requested.
    */
   clearCache(): void {
+    clearCurriculumSources(true);
     subjectsCache = null;
     topicsBySubjectCache.clear();
     topicByIdCache.clear();

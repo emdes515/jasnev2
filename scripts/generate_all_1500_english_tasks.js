@@ -102,7 +102,7 @@ console.log(`✓ Zweryfikowano ${readingWithContext} zadań z czytania z pełnym
 console.log(`✓ Wszystkie ${validCount} zadań spełniają standardy jakości lingwistycznej i schemat JSON.`);
 
 // 3. Zapis do pliku produkcyjnego
-const outDir = path.join(__dirname, '../src/data/english/generated');
+const outDir = path.join(__dirname, '../src/data/offline/english/generated');
 if (!fs.existsSync(outDir)) {
   fs.mkdirSync(outDir, { recursive: true });
 }

@@ -1,21 +1,21 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ARENA_ENABLED } from '../config/features';
 import { motion, AnimatePresence } from 'motion/react';
 import { UserState } from '../types';
-import { 
-  Settings, 
-  LogOut, 
-  Bell, 
-  Shield, 
-  Paintbrush, 
-  ChevronRight, 
-  User, 
-  LogIn, 
-  Flame, 
-  Trophy, 
-  Crown, 
-  CheckCircle2, 
-  Swords, 
+import {
+  Settings,
+  LogOut,
+  Bell,
+  Shield,
+  Paintbrush,
+  ChevronRight,
+  User,
+  LogIn,
+  Flame,
+  Trophy,
+  Crown,
+  CheckCircle2,
+  Swords,
   Zap,
   ShoppingBag,
   Target,
@@ -29,6 +29,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { AchievementsSection } from './AchievementsSection';
 import { PerksVaultSection } from './PerksVaultSection';
 import { JasneLogo } from './ui/JasneLogo';
+import { StudyGoalSettings } from './StudyGoalSettings';
 import { ShopItem, countTotalClaimable } from '../data/achievements';
 import { triggerHaptic, getLocalDateString, filterActualTaskIds } from '../utils';
 import { useTheme, ThemeMode, LIGHT_THEME_READY } from '../services/themeManager';
@@ -37,10 +38,11 @@ interface ProfileViewProps {
   userState: UserState;
   completedTasks?: string[];
   onClaimAchievement?: (achievementId: string, tier: number) => void;
-  onBuyShopItem?: (item: ShopItem, currency: 'tokens' | 'coins') => boolean;
+  onBuyShopItem?: (item: ShopItem, currency: 'tokens' | 'coins') => boolean | Promise<boolean>;
   onUseStreakFreeze?: () => void;
   onOpenAuthModal?: () => void;
   onOpenOnboarding?: () => void;
+  onUpdateUserState?: (updater: (previous: UserState) => UserState) => void;
   onOpenDevHub?: () => void;
   onOpenBlikModal?: () => void;
   initialTab?: 'overview' | 'achievements' | 'perks';
@@ -48,20 +50,27 @@ interface ProfileViewProps {
 
 type ProfileTab = 'achievements' | 'perks' | 'overview';
 
-export function ProfileView({ 
-  userState, 
+export function ProfileView({
+  userState,
   completedTasks = [],
   onClaimAchievement = () => {},
   onBuyShopItem = () => false,
   onUseStreakFreeze,
   onOpenAuthModal,
   onOpenOnboarding,
+  onUpdateUserState,
   onOpenDevHub,
   onOpenBlikModal,
   initialTab = 'overview'
 }: ProfileViewProps) {
   const [user] = useAuthState(auth);
   const [activeTab, setActiveTab] = useState<ProfileTab>(initialTab);
+  const [editingGoal, setEditingGoal] = useState(false);
+  const [goalSaved, setGoalSaved] = useState(false);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'instant' }));
+    return () => cancelAnimationFrame(frame);
+  }, [activeTab]);
   const streakDays = userState?.streakDays || 0;
   const { themeMode, setTheme } = useTheme();
 
@@ -93,17 +102,6 @@ export function ProfileView({
       const isToday = i === 0;
 
       let count = userState?.dailyTaskCounts?.[dateStr] || 0;
-
-      // If it's today and dailyTaskCounts hasn't recorded yet, attribute current completed tasks to today
-      const actualSolvedCount = filterActualTaskIds(completedTasks).length;
-      if (isToday && count === 0 && actualSolvedCount > 0) {
-        count = actualSolvedCount;
-      }
-
-      // If user had active streak on this date but count was 0, ensure at least 1
-      if (count === 0 && userState?.streakActiveDates?.includes(dateStr)) {
-        count = 1;
-      }
 
       days.push({
         date: d,
@@ -152,15 +150,15 @@ export function ProfileView({
   };
 
   return (
-    <div className="flex flex-col p-4 sm:p-6 pt-6 pb-28 sm:pb-32 md:pb-24 max-w-xl mx-auto w-full">
+    <div className="flex flex-col p-4 sm:p-6 lg:p-8 pt-6 pb-28 sm:pb-32 md:pb-24 max-w-4xl mx-auto w-full">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}>
         {/* Top Header */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="font-display text-2xl font-bold text-text-primary">Centrum Gracza</h1>
-          
+          <h1 className="font-display text-2xl font-bold text-text-primary">Twój profil</h1>
+
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
-              <Crown size={12} /> {userState.masteryTokens || 0} Żetonów
+              <Crown size={12} /> Żetony: {userState.masteryTokens || 0}
             </span>
           </div>
         </div>
@@ -172,9 +170,9 @@ export function ProfileView({
               triggerHaptic('light');
               setActiveTab('overview');
             }}
-            className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs transition-all duration-150 active:scale-[0.96] flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-h-11 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all duration-150 active:scale-[0.96] flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'overview'
-                ? 'bg-primary text-[#080B11] shadow-[0_0_16px_rgba(255,184,0,0.25)] font-black'
+                ? 'bg-primary/10 text-primary shadow-none'
                 : 'text-text-muted hover:text-text-primary hover:bg-surface-card-hover'
             }`}
           >
@@ -187,9 +185,9 @@ export function ProfileView({
               triggerHaptic('light');
               setActiveTab('achievements');
             }}
-            className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs transition-all duration-150 active:scale-[0.96] flex items-center justify-center gap-1.5 relative cursor-pointer ${
+            className={`flex-1 min-h-11 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all duration-150 active:scale-[0.96] flex items-center justify-center gap-1.5 relative cursor-pointer ${
               activeTab === 'achievements'
-                ? 'bg-primary text-[#080B11] shadow-[0_0_16px_rgba(255,184,0,0.25)] font-black'
+                ? 'bg-primary/10 text-primary shadow-none'
                 : 'text-text-muted hover:text-text-primary hover:bg-surface-card-hover'
             }`}
           >
@@ -209,9 +207,9 @@ export function ProfileView({
               triggerHaptic('light');
               setActiveTab('perks');
             }}
-            className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs transition-all duration-150 active:scale-[0.96] flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-h-11 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all duration-150 active:scale-[0.96] flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'perks'
-                ? 'bg-primary text-[#080B11] shadow-[0_0_16px_rgba(255,184,0,0.25)] font-black'
+                ? 'bg-primary/10 text-primary shadow-none'
                 : 'text-text-muted hover:text-text-primary hover:bg-surface-card-hover'
             }`}
           >
@@ -231,6 +229,7 @@ export function ProfileView({
 
         {activeTab === 'perks' && (
           <PerksVaultSection
+            onOpenAchievements={() => setActiveTab('achievements')}
             userState={userState}
             onBuyItem={onBuyShopItem}
             onUseStreakFreeze={onUseStreakFreeze}
@@ -240,64 +239,37 @@ export function ProfileView({
 
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Profile Summary Card */}
-            <div className="bg-surface-card border border-surface-border rounded-2xl p-6 flex flex-col items-center shadow-sm">
-              <div className="w-16 h-16 rounded-full bg-primary/15 border border-primary/30 text-primary flex items-center justify-center mb-4">
-                <User size={28} />
+            <section className="bg-surface-card border border-surface-border rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0"><User size={22} /></div>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-semibold text-text-primary break-words">{user ? (user.displayName || 'Uczeń') : 'Konto gościa'}</h2>
+                  <p className="text-xs text-text-secondary mt-1">{user ? 'Postępy zapisane na koncie' : 'Postępy zapisane na tym urządzeniu'}</p>
+                </div>
               </div>
-              
-              <h2 className="font-display text-xl font-bold text-text-primary mb-1">
-                {user ? (user.displayName || 'Uczeń') : 'Gość (Tryb Demo)'}
-              </h2>
-              <p className="text-xs text-text-muted">
-                {user ? user.email : 'Postępy zapisywane lokalnie'}
-              </p>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 w-full gap-2 mt-6">
-                <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
-                  <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Poziom</span>
-                  <span className="text-lg font-display font-bold text-text-primary tabular-nums font-mono">{userState.level || 1}</span>
-                </div>
-                <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
-                  <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Zadania</span>
-                  <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{totalSolvedCount}</span>
-                </div>
-                <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
-                  <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Seria Dni</span>
-                  <span className="text-lg font-display font-bold text-[#F97316] flex items-center gap-1 tabular-nums font-mono">
-                    <Flame size={16} className="fill-[#F97316]" /> {streakDays}
-                  </span>
-                </div>
-                {ARENA_ENABLED ? (
-                  <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
-                    <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">ELO Areny</span>
-                    <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{userState.arenaRating || 1000}</span>
-                  </div>
-                ) : (
-                  <div className="bg-surface-bg border border-surface-border rounded-xl p-3 flex flex-col items-center">
-                    <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider mb-1">Monety</span>
-                    <span className="text-lg font-display font-bold text-primary tabular-nums font-mono">{userState.coins || 0}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5 pt-5 mt-5 border-t border-surface-border">
+                {[['Poziom', userState.level || 1], ['Zadania', totalSolvedCount], ['Passa (dni)', streakDays], ['Monety', userState.coins || 0]].map(([label, value]) => (
+                  <div key={label} className="text-center"><dt className="text-xs text-text-secondary mb-2">{label}</dt><dd className="text-xl font-semibold tabular-nums text-text-primary">{value}</dd></div>
+                ))}
+              </dl>
+            </section>
 
-            {/* Motyw Aplikacji (Szybki Wybór: Ciemny / Jasny / System) */}
+            {/* Wygląd aplikacji (Szybki Wybór: Ciemny / Jasny / System) */}
             {LIGHT_THEME_READY && (
-            <div className="bg-surface-card border border-surface-border rounded-[24px] p-4 sm:p-5 shadow-sm">
+            <div className="bg-surface-card border border-surface-border rounded-2xl p-4 sm:p-5 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
                     {themeMode === 'light' ? <Sun size={18} /> : themeMode === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-bold text-text-primary">Motyw Aplikacji</span>
+                    <span className="text-sm font-bold text-text-primary">Wygląd aplikacji</span>
                     <span className="text-xs text-text-secondary">
-                      {themeMode === 'light' 
-                        ? 'Solar Luminary (Jasny)' 
-                        : themeMode === 'dark' 
-                          ? 'Nocturne Luminary (Ciemny)' 
-                          : 'Automatyczny (Zgodny z systemem)'}
+                      {themeMode === 'light'
+                        ? 'Jasny'
+                        : themeMode === 'dark'
+                          ? 'Ciemny'
+                          : 'Zgodny z ustawieniami urządzenia'}
                     </span>
                   </div>
                 </div>
@@ -320,9 +292,9 @@ export function ProfileView({
                           triggerHaptic('light');
                           setTheme(item.id);
                         }}
-                        className={`relative flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors select-none cursor-pointer ${
-                          isActive 
-                            ? 'text-text-primary font-black' 
+                        className={`relative min-h-11 flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors select-none cursor-pointer ${
+                          isActive
+                            ? 'text-text-primary font-black'
                             : 'text-text-muted hover:text-text-primary'
                         }`}
                       >
@@ -346,39 +318,23 @@ export function ProfileView({
             )}
 
             {/* Dynamic Activity Chart (14 Dni Aktywności) */}
-            <div className="bg-surface-card border border-surface-border rounded-[24px] p-5 sm:p-6 overflow-hidden shadow-md">
-              <div className="flex justify-between items-end mb-4">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-display font-black text-text-primary mb-0.5">
-                    {totalSolvedCount}
-                  </span>
-                  <span className="text-xs text-text-secondary">Rozwiązanych zadań ogółem</span>
-                </div>
-                <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1.5 rounded-full border border-primary/30">
-                  <Flame size={14} className="fill-primary" />
-                  <span className="text-xs font-bold">
-                    Dziś: {todayActivityCount} {todayActivityCount === 1 ? 'zadanie' : 'zadań'}
-                  </span>
-                </div>
+            <div className="bg-surface-card border border-surface-border rounded-2xl p-5 sm:p-6 overflow-hidden shadow-md">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+                <div><h2 className="text-base font-semibold text-text-primary">Historia nauki</h2><p className="text-xs text-text-secondary mt-1">Zadania z ostatnich 14 dni</p></div>
+                <span className="text-sm text-text-secondary">Dzisiaj: <strong className="font-semibold text-text-primary">{todayActivityCount}</strong></span>
               </div>
 
-              {/* Subtitle / Legend - Fixed flex-wrap for mobile */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-text-secondary mb-3 pb-2 border-b border-surface-border">
-                <span>Historia aktywności (ostatnie 14 dni)</span>
-                <span className="text-primary font-medium">Bursztynowy = ukończone zadania</span>
-              </div>
-              
               {/* 14-Day Bars Container */}
               <div className="flex items-end justify-between gap-1 sm:gap-1.5 h-28 pt-3 pb-1">
                 {activityDays.map((d) => {
                   const hasTasks = d.count > 0;
-                  const heightPct = hasTasks 
+                  const heightPct = hasTasks
                     ? Math.max(22, Math.min(100, Math.round((d.count / maxActivityCount) * 100)))
                     : 10;
 
                   return (
-                    <div 
-                      key={d.dateStr} 
+                    <div
+                      key={d.dateStr}
                       className="flex-1 group flex flex-col items-center justify-end h-full relative cursor-pointer min-w-0"
                       title={`${d.date.toLocaleDateString('pl-PL')}: ${d.count} zadań`}
                     >
@@ -394,12 +350,12 @@ export function ProfileView({
                       )}
 
                       {/* Bar / Point */}
-                      <div 
+                      <div
                         className={`w-full rounded-t-md transition-all duration-300 ${
                           hasTasks
                             ? d.isToday
-                              ? 'bg-gradient-to-t from-primary-dark via-primary to-yellow-300 shadow-[0_0_12px_rgba(255,184,0,0.4)] border-t border-white/40'
-                              : 'bg-gradient-to-t from-primary-dark/80 to-primary group-hover:to-primary-hover shadow-[0_0_8px_rgba(245,158,11,0.25)]'
+                              ? 'bg-primary'
+                              : 'bg-primary/70'
                             : 'bg-surface-border/40 group-hover:bg-surface-border/70'
                         }`}
                         style={{ height: `${heightPct}%` }}
@@ -416,10 +372,10 @@ export function ProfileView({
             </div>
 
             {/* Quick Actions & Settings */}
-            <div className="bg-surface-card border border-surface-border rounded-[24px] overflow-hidden shadow-sm">
+            <div className="bg-surface-card border border-surface-border rounded-2xl overflow-hidden shadow-sm">
 
               {onOpenDevHub && (
-                <button 
+                <button
                   onClick={() => {
                     triggerHaptic('medium');
                     onOpenDevHub();
@@ -446,12 +402,14 @@ export function ProfileView({
                 </button>
               )}
 
-              {onOpenOnboarding && (
-                <button 
+              {(onUpdateUserState || onOpenOnboarding) && (
+                <button
                   onClick={() => {
                     triggerHaptic('light');
-                    onOpenOnboarding();
+                    if (onUpdateUserState) { setGoalSaved(false); setEditingGoal(previous => !previous); }
+                    else onOpenOnboarding?.();
                   }}
+                  aria-expanded={editingGoal}
                   className="w-full p-4 flex items-center gap-4 hover:bg-surface-card-hover transition-colors border-b border-surface-border text-left cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
@@ -459,13 +417,13 @@ export function ProfileView({
                   </div>
                   <div className="flex flex-col items-start flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-text-primary">Twój Cel i Egzamin</span>
+                      <span className="text-sm font-bold text-text-primary">Cel nauki</span>
                       <span className="text-[10px] bg-primary/15 text-primary font-bold px-2 py-0.5 rounded-full border border-primary/30">
                         {userState?.onboardingPreferences?.targetScore ? `${userState.onboardingPreferences.targetScore}%` : 'Ustaw'}
                       </span>
                     </div>
                     <span className="text-xs text-text-secondary truncate max-w-full">
-                      {userState?.onboardingPreferences 
+                      {userState?.onboardingPreferences
                         ? `${userState.onboardingPreferences.targetExam === 'matura_2025' ? 'Nowa Formuła 2023' : userState.onboardingPreferences.targetExam === 'poprawka' ? 'Szybka Poprawka' : 'Egzamin Ósmoklasisty'} • ${userState.onboardingPreferences.dailyMinutes} min dziennie`
                         : 'Zmień cel maturalny i czas nauki'}
                     </span>
@@ -474,7 +432,15 @@ export function ProfileView({
                 </button>
               )}
 
-              <button 
+              {editingGoal && onUpdateUserState && <StudyGoalSettings value={userState.onboardingPreferences} onCancel={() => setEditingGoal(false)} onSave={preferences => {
+                onUpdateUserState(previous => ({ ...previous, onboardingPreferences: preferences }));
+                setEditingGoal(false);
+                setGoalSaved(true);
+                triggerHaptic('success');
+              }} />}
+              {goalSaved && <p role="status" className="px-4 py-3 text-sm text-emerald-400 border-b border-surface-border">Cel nauki zapisany.</p>}
+
+              <button
                 onClick={() => setActiveTab('achievements')}
                 className="w-full p-4 flex items-center gap-4 hover:bg-surface-card-hover transition-colors border-b border-surface-border cursor-pointer text-left"
               >
@@ -482,13 +448,13 @@ export function ProfileView({
                   <Trophy size={18} />
                 </div>
                 <div className="flex flex-col items-start flex-1">
-                  <span className="text-sm font-bold text-text-primary">System Odznak</span>
+                  <span className="text-sm font-bold text-text-primary">Twoje odznaki</span>
                   <span className="text-xs text-text-secondary">Odbieraj nagrody za postępy</span>
                 </div>
                 <ChevronRight size={18} className="text-text-muted shrink-0" />
               </button>
 
-              <button 
+              <button
                 onClick={() => setActiveTab('perks')}
                 className="w-full p-4 flex items-center gap-4 hover:bg-surface-card-hover transition-colors border-b border-surface-border cursor-pointer text-left"
               >
@@ -496,13 +462,13 @@ export function ProfileView({
                   <Zap size={18} />
                 </div>
                 <div className="flex flex-col items-start flex-1">
-                  <span className="text-sm font-bold text-text-primary">Skarbiec & Perki</span>
-                  <span className="text-xs text-text-secondary">Zarządzaj bonusami i tarczami</span>
+                  <span className="text-sm font-bold text-text-primary">Bonusy i nagrody</span>
+                  <span className="text-xs text-text-secondary">Sprawdź dostępne bonusy</span>
                 </div>
                 <ChevronRight size={18} className="text-text-muted shrink-0" />
               </button>
 
-              <button 
+              <button
                 onClick={handleAuthAction}
                 className="w-full p-4 flex items-center gap-4 hover:bg-surface-card-hover transition-colors cursor-pointer text-left"
               >
@@ -521,7 +487,7 @@ export function ProfileView({
             <div className="mt-8 pt-6 border-t border-surface-border flex flex-col items-center justify-center gap-2 opacity-75">
               <JasneLogo variant="horizontal" size={26} glow={false} />
               <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
-                Matura staje się prosta • CKE 2025
+                Matura staje się prosta
               </span>
             </div>
           </div>

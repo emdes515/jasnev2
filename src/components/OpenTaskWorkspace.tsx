@@ -33,6 +33,7 @@ import { triggerHaptic } from '../utils';
 export interface OpenTaskWorkspaceProps {
   task?: any;
   isEvaluated?: boolean;
+  selfAssessed?: boolean;
   isCorrect?: boolean | null;
   value: string;
   onChangeValue: (val: string) => void;
@@ -311,6 +312,7 @@ const ESSAY_CONNECTORS = [
 export function OpenTaskWorkspace({
   task,
   isEvaluated = false,
+  selfAssessed = false,
   isCorrect = null,
   value,
   onChangeValue,
@@ -1867,10 +1869,10 @@ export function OpenTaskWorkspace({
                 )}
                 <div className="min-w-0 flex-1">
                   <span className="text-xs font-bold text-white block truncate">
-                    {isCorrect ? 'Rozwiązanie zaliczone' : 'Wymaga uzupełnienia / poprawy'}
+                    {selfAssessed ? 'Samoocena zapisana' : isCorrect ? 'Rozwiązanie zaliczone' : 'Wymaga uzupełnienia / poprawy'}
                   </span>
                   <span className="text-[11px] text-slate-400 block truncate">
-                    {isCorrect ? 'Odpowiedź spełnia kryteria CKE' : 'Możesz dopracować rozwiązanie i sprawdzić ponownie'}
+                    {selfAssessed ? 'Punkty przyznane według Twojej oceny etapów' : isCorrect ? 'Odpowiedź spełnia kryteria CKE' : 'Możesz dopracować rozwiązanie i sprawdzić ponownie'}
                   </span>
                 </div>
               </div>

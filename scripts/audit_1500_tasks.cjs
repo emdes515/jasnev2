@@ -1,6 +1,6 @@
 
 const fs = require('fs');
-const data = JSON.parse(fs.readFileSync('src/data/math/generated/all_1500_tasks.json', 'utf8'));
+const data = JSON.parse(fs.readFileSync('src/data/offline/math/generated/all_1500_tasks.json', 'utf8'));
 
 const issues = [];
 

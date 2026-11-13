@@ -382,7 +382,7 @@ export function ArenaView({ userState, onUpdateUserState, saveUserData, onNaviga
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
             Wyłączyliśmy testową wersję z botami, aby dać Ci <strong>prawdziwy tryb rywalizacji</strong>. 
-            Przenosimy pojedynki na zsynchronizowany w milisekundach silnik multiplayer z ligami ELO i pewniakami z arkuszy CKE.
+            Przygotowujemy pojedynki na żywo z zadaniami maturalnymi i rankingiem ELO.
           </p>
         </motion.div>
 
@@ -404,7 +404,7 @@ export function ArenaView({ userState, onUpdateUserState, saveUserData, onNaviga
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-mono text-emerald-300 font-bold bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30">
-                88% UKOŃCZONE
+                W PRZYGOTOWANIU
               </span>
               <span className="text-[11px] text-slate-400">Ostatnia prosta przed premierą</span>
             </div>
@@ -503,13 +503,13 @@ export function ArenaView({ userState, onUpdateUserState, saveUserData, onNaviga
                   </h3>
                   <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-emerald-200/80">
                     <span className="bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded">
-                      💰 +100 Żetonów w Skarbcu
+                       +100 Żetonów w Skarbcu
                     </span>
                     <span className="bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded">
-                      🛡️ +1 Tarcza ELO
+                       +1 Tarcza ELO
                     </span>
                     <span className="bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded">
-                      🎖️ Tytuł: Pionier Areny 2025
+                       Tytuł: Pionier Areny 2025
                     </span>
                   </div>
                 </div>

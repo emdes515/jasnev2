@@ -163,20 +163,16 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
-              <span>PUŁAPKA EGZAMINACYJNA CKE • TYPOWY BŁĄD</span>
+              <span>Typowy błąd</span>
             </h3>
             <p className="text-[11px] text-slate-400">
-              Analiza różnicowa: błąd interferencji L1 vs wzorzec klucza maturalnego
+              Porównaj zdanie błędne z poprawnym.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {cards.tip.examTrapFrequency && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300 bg-rose-500/10 border border-rose-500/25 px-2.5 py-1 rounded-full shrink-0">
-              {cards.tip.examTrapFrequency}
-            </span>
-          )}
+
         </div>
       </div>
 
@@ -193,11 +189,11 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
                 <span>Częsty błąd maturzystów (DON'T)</span>
               </div>
               <span className="text-[10px] font-extrabold text-rose-400 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded-md">
-                0 PKT CKE
+                Błędnie
               </span>
             </div>
 
-            <div className="p-3 rounded-xl bg-black/50 border border-rose-500/30 text-rose-200 font-mono text-xs sm:text-sm font-bold line-through decoration-rose-400 decoration-2 break-words">
+            <div className="p-3 rounded-xl bg-black/50 border border-rose-500/30 text-rose-200 font-sans text-sm sm:text-base font-medium break-words">
               {cards.error.wrongText}
             </div>
 
@@ -220,14 +216,14 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
             <div className="flex items-center justify-between gap-2 border-b border-emerald-500/20 pb-2">
               <div className="flex items-center gap-2 text-emerald-400 text-xs font-black uppercase tracking-wider">
                 <CheckCircle2 className="w-4 h-4 stroke-[2.5] shrink-0" />
-                <span>Poprawne podejście (DO)</span>
+                <span>Poprawne podejście</span>
               </div>
               <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md">
-                KLUCZ CKE
+                POPRAWNIE
               </span>
             </div>
 
-            <div className="p-3 rounded-xl bg-black/50 border border-emerald-500/30 text-emerald-300 font-mono text-xs sm:text-sm font-bold break-words">
+            <div className="p-3 rounded-xl bg-black/50 border border-emerald-500/30 text-emerald-300 font-sans text-sm sm:text-base font-medium break-words">
               {cards.correct.rightText}
             </div>
 
@@ -250,7 +246,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
         <div className="flex items-center justify-between gap-2 border-b border-amber-500/20 pb-2 flex-wrap">
           <div className="flex items-center gap-2 text-[#FFB800] text-xs font-black uppercase tracking-wider">
             <GraduationCap className="w-4 h-4 stroke-[2.5] shrink-0" />
-            <span>Wskazówka egzaminatora • CKE Patent</span>
+            <span>Jak zapamiętać</span>
           </div>
           <span className="text-[10px] font-extrabold text-[#FFDCA1] bg-[#FFB800]/15 border border-[#FFB800]/30 px-2 py-0.5 rounded-md">
             MNEMOTECHNIKA
@@ -281,7 +277,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
                 )}
               </h4>
               <p className="text-[11px] text-slate-400">
-                Wymóg Gatekeepera: Rozwiąż mini-trening, by odblokować zadania bojowe lekcji (brak utraty serc).
+                Wybierz poprawną odpowiedź, aby przejść do zadań. Tutaj nie tracisz serc.
               </p>
             </div>
           </div>
@@ -334,7 +330,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
                     {isWin && <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />}
                     {isLoss && <XCircle className="w-4 h-4 text-rose-400 stroke-[3]" />}
                   </div>
-                  <div className="font-mono text-xs sm:text-sm font-semibold leading-relaxed">
+                  <div className="font-sans text-xs sm:text-sm font-semibold leading-relaxed">
                     {c.optionA.text}
                   </div>
                 </button>
@@ -371,7 +367,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
                     {isWin && <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />}
                     {isLoss && <XCircle className="w-4 h-4 text-rose-400 stroke-[3]" />}
                   </div>
-                  <div className="font-mono text-xs sm:text-sm font-semibold leading-relaxed">
+                  <div className="font-sans text-xs sm:text-sm font-semibold leading-relaxed">
                     {c.optionB.text}
                   </div>
                 </button>
@@ -389,7 +385,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
               const c = challenge as TrapChallengeSpotAndFix;
               return (
                 <>
-                  <div className="p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 font-mono leading-relaxed">
+                  <div className="p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
                     {c.sentenceWithMistake.split('[').map((part, idx) => {
                       if (!part.includes(']')) return <span key={idx}>{part}</span>;
                       const [mistake, rest] = part.split(']');
@@ -421,7 +417,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
                           type="button"
                           onClick={() => handleSelectSpotAndFix(opt.isCorrect, opt.id)}
                           disabled={hasPassed}
-                          className={`p-3 rounded-xl border text-center font-mono font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+                          className={`p-3 rounded-xl border text-center font-sans font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                             isWin
                               ? 'bg-emerald-950/50 border-emerald-500 text-emerald-200 shadow-md'
                               : isLoss
@@ -451,7 +447,7 @@ export const EnglishTrapInteractive: React.FC<EnglishTrapInteractiveProps> = ({
               const c = challenge as TrapChallengeTrueFalse;
               return (
                 <>
-                  <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 font-mono leading-relaxed">
+                  <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
                     {c.statement}
                   </div>
 

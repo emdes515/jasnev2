@@ -23,7 +23,7 @@ export function Navigation({ currentTab, setTab, userState, onProfileClick }: Na
   };
 
   const navItems = [
-    { id: 'dashboard' as TabState, label: 'Dashboard', sublabel: 'Główny panel', icon: LayoutDashboard },
+    { id: 'dashboard' as TabState, label: 'Pulpit', sublabel: 'Główny panel', icon: LayoutDashboard },
     { id: 'nauka' as TabState, label: 'Nauka', sublabel: 'Mapa Wiedzy', icon: GraduationCap },
     { id: 'simulator' as TabState, label: 'Matura', sublabel: 'Symulator arkusza', icon: FileText },
     { id: 'arena' as TabState, label: 'Arena', sublabel: 'Wkrótce: Live 1v1', icon: Swords },
@@ -58,10 +58,10 @@ export function Navigation({ currentTab, setTab, userState, onProfileClick }: Na
                 aria-current={isActive ? 'page' : undefined}
                 whileTap={{ scale: 0.93 }}
                 onClick={() => handleTabChange(item.id)}
-                className={`relative flex items-center justify-center gap-1.5 min-h-[48px] py-2.5 px-3 rounded-2xl transition-colors duration-200 select-none ${
+                className={`relative flex flex-1 flex-col items-center justify-center gap-1 min-h-[48px] py-2 px-1 rounded-2xl transition-colors duration-200 select-none ${
                   isActive 
                     ? 'flex-1' 
-                    : 'text-text-muted hover:text-text-primary px-3'
+                    : 'text-text-muted hover:text-text-primary'
                 }`}
               >
                 {isActive && (
@@ -79,11 +79,7 @@ export function Navigation({ currentTab, setTab, userState, onProfileClick }: Na
                     <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse" />
                   )}
                 </div>
-                {isActive && (
-                  <span className="relative z-10 text-[11px] font-black tracking-wide whitespace-nowrap text-[#080B11]">
-                    {item.label}
-                  </span>
-                )}
+                <span className={`relative z-10 text-[11px] font-bold whitespace-nowrap ${isActive ? 'text-[#080B11]' : 'text-text-secondary'}`}>{item.label}</span>
               </motion.button>
             );
           })}

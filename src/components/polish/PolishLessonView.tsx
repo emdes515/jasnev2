@@ -1,3 +1,4 @@
+import { useTaskBank } from '../../hooks/useTaskBank';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Clock,
@@ -110,14 +111,15 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
   }, [lesson]);
 
   // Zadania przypisane do tej lekcji: pełen pakiet 35 zadań CKE (20 zamkniętych + 15 otwartych)
+  const practiceTasks = useTaskBank('jezyk-polski', true);
   const [currentTasks, setCurrentTasks] = useState<PolishTask[]>(() => {
-    return getTasksForLesson(lesson);
+    return getTasksForLesson(lesson, false, practiceTasks);
   });
 
   useEffect(() => {
-    setCurrentTasks(getTasksForLesson(lesson));
+    setCurrentTasks(getTasksForLesson(lesson, false, practiceTasks));
     setLessonPreReadingActive(true);
-  }, [lesson]);
+  }, [lesson, practiceTasks]);
 
   const lessonTasks = currentTasks;
 
@@ -213,7 +215,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
   };
 
   const executeRandomize = () => {
-    const newTasks = resetLessonTasks(lesson);
+    const newTasks = resetLessonTasks(lesson, practiceTasks);
     setCurrentTasks(newTasks);
     setActiveTaskIndex(0);
     setTaskAnswers({});
@@ -255,7 +257,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
     } else {
       triggerHaptic('error');
       playErrorSound();
-      setCooldownErrorMsg(`Niewystarczająca liczba monet (posiadasz ${userState?.coins ?? 0} z wymaganych ${COOLDOWN_COIN_COST} 🪙). Rozwiązuj inne lekcje, aby zdobyć monety!`);
+      setCooldownErrorMsg(`Niewystarczająca liczba monet (posiadasz ${userState?.coins ?? 0} z wymaganych ${COOLDOWN_COIN_COST} ). Rozwiązuj inne lekcje, aby zdobyć monety!`);
     }
   };
 
@@ -761,8 +763,8 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
       feedback: {
         isCorrect: isFull,
         message: isFull
-          ? `✅ Znakomita analiza! Poprawnie dopasowano wszystkie pozycje i zneutralizowano dystraktor (+${earnedPoints} pkt).`
-          : `⚠️ Poprawne dopasowanie w procedurze 2. szansy (+${earnedPoints} pkt). Dystraktor został zdemaskowany.`,
+          ? ` Znakomita analiza! Poprawnie dopasowano wszystkie pozycje i zneutralizowano dystraktor (+${earnedPoints} pkt).`
+          : ` Poprawne dopasowanie w procedurze 2. szansy (+${earnedPoints} pkt). Dystraktor został zdemaskowany.`,
       },
     });
 
@@ -884,10 +886,10 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
             {userState && (
               <div className="hidden md:flex items-center gap-3 bg-[#0e1522] px-3 py-1.5 rounded-xl border border-[#141d2e] text-xs">
                 <span className="flex items-center gap-1 text-rose-400 font-semibold" title="Serca">
-                  ❤️ {userState.hearts ?? 5}
+                   {userState.hearts ?? 5}
                 </span>
                 <span className="flex items-center gap-1 text-[#ffdca1] font-semibold" title="Monety">
-                  🪙 {userState.coins ?? 0}
+                   {userState.coins ?? 0}
                 </span>
                 <span className="flex items-center gap-1 text-orange-400 font-semibold" title="Dni streaku">
                   <Flame className="w-3.5 h-3.5 fill-orange-500" /> {userState.streakDays ?? 0}
@@ -1339,7 +1341,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
                         title="Otwórz czytelnię pełnych tekstów CKE"
                       >
                         <BookOpen className="w-3.5 h-3.5" />
-                        <span>📖 Teksty CKE</span>
+                        <span> Teksty CKE</span>
                       </button>
 
                       {filteredTasks.map((t) => {
@@ -1483,7 +1485,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
                         <RefreshCw className={`w-3.5 h-3.5 ${cooldownRemainingMs > 0 ? 'text-[#ffb800]' : 'text-[#ffdca1]'}`} />
                         <span>
                           {cooldownRemainingMs > 0
-                            ? `Nowy zestaw (${formatCooldown(cooldownRemainingMs)} lub 50 🪙)`
+                            ? `Nowy zestaw (${formatCooldown(cooldownRemainingMs)} lub 50 )`
                             : `Wylosuj nowy zestaw (${closedTasks.length} zamkniętych + ${openTasks.length} otwartych)`}
                         </span>
                       </button>
@@ -1952,10 +1954,10 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
                                 <div className="flex items-center justify-between pt-2">
                                   <div className="text-[11px] text-[#94a3b8]">
                                     {synthesisWordCount < 60
-                                      ? `⚠️ Brakuje jeszcze ${60 - synthesisWordCount} słów do dolnego progu CKE.`
+                                      ? ` Brakuje jeszcze ${60 - synthesisWordCount} słów do dolnego progu CKE.`
                                       : synthesisWordCount <= 90
-                                      ? '✔️ Długość tekstu idealnie spełnia kryterium CKE (60–90).'
-                                      : `⚠️ Przekroczono limit o ${synthesisWordCount - 90} słów.`}
+                                      ? ' Długość tekstu idealnie spełnia kryterium CKE (60–90).'
+                                      : ` Przekroczono limit o ${synthesisWordCount - 90} słów.`}
                                   </div>
                                   <button
                                     onClick={handleSubmitSynthesis}
@@ -2172,7 +2174,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
                                 </>
                               ) : (
                                 <span className="text-[11px] text-[#94a3b8] italic">
-                                  🔒 Klucz CKE i wyjaśnienia odblokują się po zatwierdzeniu odpowiedzi.
+                                   Klucz CKE i wyjaśnienia odblokują się po zatwierdzeniu odpowiedzi.
                                 </span>
                               )}
                             </div>
@@ -2336,7 +2338,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
               <div className="w-px h-8 bg-[#141d2e]" />
               <div className="text-center">
                 <span className="text-xs text-[#94a3b8] block">Monety</span>
-                <span className="text-lg font-black text-[#ffb800]">+50 🪙</span>
+                <span className="text-lg font-black text-[#ffb800]">+50 </span>
               </div>
             </div>
 
@@ -2534,7 +2536,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
                 <span className="text-[#94a3b8]">Twoje aktualne saldo monet:</span>
                 <span className="font-bold text-[#ffdca1] flex items-center gap-1.5">
                   <Coins className="w-3.5 h-3.5 text-[#ffb800]" />
-                  {userState?.coins ?? 0} 🪙
+                  {userState?.coins ?? 0}
                 </span>
               </div>
 
@@ -2562,7 +2564,7 @@ export const PolishLessonView: React.FC<PolishLessonViewProps> = ({
                 className="w-full sm:w-auto flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#ea580c] to-[#ffb800] hover:from-[#f97316] hover:to-[#ffc72c] text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-[#ffb800]/15 transition-all cursor-pointer"
               >
                 <Coins className="w-3.5 h-3.5" />
-                <span>Odblokuj za 50 🪙</span>
+                <span>Odblokuj za 50 </span>
               </button>
             </div>
           </div>

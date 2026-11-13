@@ -59,7 +59,7 @@ export function ExamHubModal({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 40, scale: 0.98 }}
           transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-          className="bg-[#0b0f19] border border-white/10 rounded-t-3xl sm:rounded-3xl max-w-xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative"
+          className="bg-[#0b0f19] border border-white/10 rounded-t-3xl sm:rounded-3xl max-w-xl w-full max-h-[90dvh] overflow-hidden flex flex-col shadow-2xl relative"
         >
           {/* Header */}
           <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-white/5 flex items-start justify-between gap-3 bg-gradient-to-b from-[#111726]/70 to-transparent shrink-0">
@@ -93,7 +93,7 @@ export function ExamHubModal({
           </div>
 
           {/* Lista 3 Trybów w stylu Bento */}
-          <div className="p-4 sm:p-6 overflow-y-auto space-y-3 custom-scrollbar flex-1">
+          <div className="p-4 sm:p-6 focus-scroll overflow-y-auto space-y-3 custom-scrollbar flex-1">
             {/* Tryb 1: Rozwiąż wszystkie zadania z bazy (Maraton CKE) */}
             <div
               onClick={() => handleModeClick('maraton')}

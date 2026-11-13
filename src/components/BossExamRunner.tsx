@@ -241,7 +241,7 @@ export const BossExamRunner: React.FC<BossExamRunnerProps> = ({
     return (
       <div 
         id="boss-exam-results-screen"
-        className="fixed inset-0 z-50 bg-[#070A0F]/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 text-white select-none overflow-y-auto"
+        className="focus-result fixed inset-0 z-50 bg-[#070A0F]/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-6 text-white select-none overflow-y-auto"
       >
         <div className="w-full max-w-xl bg-[#0B0F19] rounded-3xl border border-white/10 flex flex-col p-6 sm:p-8 text-white relative shadow-2xl my-auto">
           
@@ -433,7 +433,7 @@ export const BossExamRunner: React.FC<BossExamRunnerProps> = ({
   return (
     <div 
       id="boss-exam-screen"
-      className="fixed inset-0 z-50 bg-[#070A0F] flex flex-col text-white select-none overflow-hidden"
+      className="focus-screen fixed inset-0 z-50 bg-[#070A0F] flex flex-col text-white select-none overflow-hidden"
     >
       {/* Top Exam Header */}
       <header className="w-full bg-[#0B0F19] border-b border-white/10 px-4 py-3 flex items-center justify-between shrink-0">
@@ -441,7 +441,7 @@ export const BossExamRunner: React.FC<BossExamRunnerProps> = ({
           <button
             id="boss-exam-exit-button"
             onClick={() => setShowExitConfirm(true)}
-            className="w-9 h-9 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center justify-center cursor-pointer"
+            className="w-11 h-11 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center justify-center cursor-pointer"
             title="Przerwij sprawdzian"
           >
             <X size={20} />
@@ -498,7 +498,7 @@ export const BossExamRunner: React.FC<BossExamRunnerProps> = ({
       </div>
 
       {/* Question Content Area */}
-      <main className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 max-w-3xl w-full mx-auto flex flex-col justify-between">
+      <main className="focus-scroll flex-1 overflow-y-auto px-4 sm:px-6 py-6 max-w-3xl w-full mx-auto flex flex-col justify-between">
         <div className="space-y-6">
           {/* Question banner */}
           <div className="p-5 sm:p-6 rounded-2xl bg-[#0F1622] border border-white/10 shadow-lg">
