@@ -43,7 +43,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
-import { MaturaTask, UserState, CkeTaskCompletionRecord } from '../types';
+import { MaturaTask, UserState, CkeTaskCompletionRecord, SubjectKey } from '../types';
 import { curriculumRepository } from '../services/curriculumRepository';
 import {
   generateFullMaturaExam,
@@ -312,6 +312,8 @@ export interface MaturaSimulatorViewProps {
   onActiveSessionChange?: (isActive: boolean) => void;
   initialView?: 'hub' | 'exam_setup' | 'full_exams' | 'topics_bank' | 'topic_detail' | 'exam' | 'exam_review' | 'maraton' | 'mistakes';
   currentSubject?: 'matematyka' | 'polski' | 'angielski';
+  /** Kanoniczny klucz przedmiotu z poziomem (np. 'eng-roz'); decyduje o banku zadań i arkuszach. */
+  subjectKey?: SubjectKey;
   onSelectSubject?: (subject: 'matematyka' | 'polski' | 'angielski') => void;
   onNavigateBack?: () => void;
 }
@@ -326,16 +328,20 @@ export function MaturaSimulatorView({
   onActiveSessionChange,
   initialView = 'hub',
   currentSubject,
+  subjectKey,
   onSelectSubject,
   onNavigateBack
 }: MaturaSimulatorViewProps) {
+  const isExtended = subjectKey === 'math-roz' || subjectKey === 'eng-roz';
+  const mathBankId = subjectKey === 'math-roz' ? 'matematyka-rozszerzona' : 'matematyka-podstawowa';
+  const englishBankId = subjectKey === 'eng-roz' ? 'jezyk-angielski-rozszerzony' : 'jezyk-angielski';
   // Przełącznik przedmiotu w symulatorze matury
   const [examSubject, setExamSubject] = useState<'matematyka' | 'polski' | 'angielski'>(() => {
     if (currentSubject === 'polski' || userState?.currentSubject === 'polski') return 'polski';
     if (currentSubject === 'angielski' || userState?.currentSubject === 'angielski') return 'angielski';
     return 'matematyka';
   });
-  const ALL_ENGLISH_TASKS = useTaskBank('jezyk-angielski');
+  const ALL_ENGLISH_TASKS = useTaskBank(englishBankId);
   const ALL_POLISH_TASKS = useTaskBank('jezyk-polski');
 
   // Reaktywna synchronizacja przedmiotu z paska górnego
@@ -458,8 +464,8 @@ export function MaturaSimulatorView({
       setLoadError(null);
       try {
         const [loadedTasks, practiceTasks] = await Promise.all([
-          curriculumRepository.getCkeExamTasks('matematyka-podstawowa'),
-          curriculumRepository.getPracticeTasks('matematyka-podstawowa')
+          curriculumRepository.getCkeExamTasks(mathBankId),
+          curriculumRepository.getPracticeTasks(mathBankId)
         ]);
         if (!isMounted) return;
         setMaturaPracticePool(practiceTasks);
@@ -476,7 +482,7 @@ export function MaturaSimulatorView({
     };
     void load();
     return () => { isMounted = false; };
-  }, []);
+  }, [mathBankId]);
 
   // Lista 15 kanonicznych działów CKE dla Matematyki
   const CANONICAL_TOPICS = useMemo(() => [
@@ -1494,6 +1500,11 @@ export function MaturaSimulatorView({
             setIsPolishFullExamActive(false);
           }}
         />
+      ) : isExtended && !loading && examSubject !== 'polski' && currentSubjectTasks.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center py-16 px-6 text-center" role="status">
+          <p className="text-text-primary text-base font-semibold mb-2">Arkusze na poziomie rozszerzonym są jeszcze niedostępne</p>
+          <p className="text-text-secondary text-sm max-w-sm leading-relaxed mb-5">Nie mamy zweryfikowanych arkuszy CKE dla tego poziomu, więc nie podstawiamy zadań z podstawy. Skorzystaj z lekcji i treningu albo przełącz poziom na podstawowy.</p>
+        </div>
       ) : loading && examSubject === 'matematyka' && tasks.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center py-20">
           <Loader2 className="w-10 h-10 text-[#FFB800] animate-spin mb-4" />

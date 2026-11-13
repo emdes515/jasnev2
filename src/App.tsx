@@ -726,7 +726,7 @@ export default function App() {
       clearSessionState().catch(() => {});
     }
 
-    const isEng = Boolean(task?.isEnglish || (selectedSubjectKey === 'eng') || task?.subjectId === 'jezyk-angielski' || task?.subjectKey === 'eng');
+    const isEng = Boolean(task?.isEnglish || (selectedSubjectKey === 'eng' || selectedSubjectKey === 'eng-roz') || task?.subjectId === 'jezyk-angielski' || task?.subjectKey === 'eng');
     const isPol = !isEng && Boolean(task?.isPolish || (selectedSubjectKey === 'pol') || task?.subjectId === 'jezyk-polski' || task?.subjectKey === 'pol');
 
     const tasksList = lessonTasks || task?.tasks || task?.lessonTasks || (task ? [task] : []);
@@ -761,7 +761,7 @@ export default function App() {
     const sessionPayload = {
       isSession: true,
       isPolish: selectedSubjectKey === 'pol',
-      isEnglish: selectedSubjectKey === 'eng',
+      isEnglish: selectedSubjectKey === 'eng' || selectedSubjectKey === 'eng-roz',
       subjectId: normalizeSubjectFirestoreId(selectedSubjectKey),
       topicId: 'rehab-mistakes',
       lessonId: 'rehab',
@@ -1649,6 +1649,7 @@ export default function App() {
                 )}
                 {currentTab === 'simulator' && (
                   <MaturaSimulatorView
+                    subjectKey={selectedSubjectKey}
                     lessonMistakes={lessonMistakes}
                     initialView={simulatorInitialView}
                     onEarnReward={handleMaturaReward}
@@ -1770,7 +1771,7 @@ export default function App() {
           const customSession = {
             isSession: true,
             isPolish: selectedSubjectKey === 'pol',
-            isEnglish: selectedSubjectKey === 'eng',
+            isEnglish: selectedSubjectKey === 'eng' || selectedSubjectKey === 'eng-roz',
             subjectId: normalizeSubjectFirestoreId(selectedSubjectKey),
             topicId: 'custom-ai-task',
             lessonId: 'ai-gen',
