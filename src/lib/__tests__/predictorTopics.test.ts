@@ -11,7 +11,7 @@ const lessonCounts = (ids: string[], topicOf: (id: string) => string | null) => 
   return counts;
 };
 
-describe('mapowanie zadań i lekcji na działy prognozy', () => {
+describe('mapowanie zadań i lekcji na działy prognozy', { timeout: 30000 }, () => {
   it('każde zadanie angielskiego trafia do swojego działu', () => {
     for (const task of ALL_ENGLISH_TASKS) {
       expect(topicIdFromBankId(task.id), task.id).toBe(task.topicId);

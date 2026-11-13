@@ -49,3 +49,14 @@ Wynik na pulpicie i w szczegółach renderuje wspólny `PredictionScore`; przed 
 ## Odznaki i skarbiec
 
 Używaj wspólnych `RewardButton`, `RewardStatus` i `RewardSummary` z `src/components/rewards/RewardsUI.tsx`. Status ma opisywać rzeczywisty stan, także gdy kolejna ranga jest gotowa do odbioru po odebraniu poprzedniej. Nagrody wyświetlają XP, monety, żetony i faktyczne efekty. Ceny mają wskazaną walutę, brak środków i limit zapasu mają jawny opis. Nie oferuj płatności ani produktu, którego efekt nie jest zaimplementowany. Testuj wyniki asynchroniczne i blokadę podwójnego kliknięcia bez wydawania waluty użytkownika.
+
+## Lekcja: Pełna lekcja i Same zadania
+
+Karta lekcji w `LearnView` ma dwie akcje i żadnego okna z pigułką. Pigułka jest krokiem pełnoekranowej sesji (`SessionRunner`, `focus-screen`), a nie modalem nad mapą.
+
+- **Pełna lekcja** (główna akcja): pigułka, następnie zadania, wynik i powtórka. Sesja startuje od `currentStep: 0`.
+- **Same zadania**: `handleStartLessonSession(..., tasksOnly = true)` ustawia `currentStep: 1`, więc teoria jest pominięta. W sesji angielskiego pomija to także bramkę mini-treningu (`isEnglishTrapPassed`); uznajemy to za świadomy wybór ucznia, który zna materiał.
+- **Teoria w trakcie zadań**: przycisk `session-theory-review-button` (widoczny tylko dla niesprawdzonego zadania i gdy lekcja ma pigułkę) otwiera pigułkę. Niewysłana odpowiedź jest zapamiętana, a `session-theory-return-button` („Wróć do zadania”) wraca do tego samego zadania bez zerowania kolejki. Sprawdzone zadanie nie pokazuje przycisku, więc powrót nie pozwala ponowić odpowiedzi ani wydać serca drugi raz.
+- Kontrola wyglądu: nagłówek mieści się przy 320 px (przycisk powrotu skraca się do „Wróć”), cele dotykowe mają co najmniej 44 × 44 px.
+
+Test: `src/components/__tests__/SessionRunnerTheoryReview.test.tsx`. Zrzuty: `artifacts/ui-review/lekcja-*.jpg`.

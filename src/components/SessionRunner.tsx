@@ -3376,15 +3376,14 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
 
   const leaveTheoryToTasks = () => {
     setCurrentStep(1);
-    if (isTheoryReview) {
-      // Powrót z podglądu teorii: to samo zadanie, bez zerowania kolejki.
-      setIsTheoryReview(false);
-      return;
+    // Kolejka nie jest zerowana: przy pierwszym wejściu indeks i tak wynosi 0, a po powrocie
+    // z podglądu teorii (także po odświeżeniu strony) wracamy do tego samego zadania.
+    setIsTheoryReview(false);
+    if (!isTheoryReview) {
+      setSelectedOption(null);
+      setIsEvaluated(false);
+      setIsCorrect(null);
     }
-    setCurrentQueueIndex(0);
-    setSelectedOption(null);
-    setIsEvaluated(false);
-    setIsCorrect(null);
   };
 
   const openTheoryFromTasks = () => {
@@ -3868,12 +3867,30 @@ export const SessionRunner: React.FC<SessionRunnerProps> = ({
                   triggerHaptic('light');
                   openTheoryFromTasks();
                 }}
-                className="flex items-center justify-center gap-1.5 min-h-11 px-3 rounded-lg text-xs font-semibold shrink-0 cursor-pointer text-slate-200 bg-slate-800/80 border border-white/15 hover:bg-slate-700/80 focus-visible:outline-2 focus-visible:outline-primary"
+                className="flex items-center justify-center gap-1.5 min-h-11 min-w-11 px-3 rounded-lg text-xs font-semibold shrink-0 cursor-pointer text-slate-200 bg-slate-800/80 border border-white/15 hover:bg-slate-700/80 focus-visible:outline-2 focus-visible:outline-primary"
                 title="Wróć do teorii (zadanie i odpowiedź zostaną zachowane)"
                 aria-label="Wróć do teorii"
               >
                 <Compass className="w-3.5 h-3.5 shrink-0" />
                 <span className="hidden sm:inline">Teoria</span>
+              </button>
+            )}
+
+            {/* Podgląd teorii z poziomu zadań: stały skrót powrotu, bez przeklikiwania czterech kart */}
+            {isTheoryStep && isTheoryReview && (
+              <button
+                id="session-theory-return-button"
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  leaveTheoryToTasks();
+                }}
+                className="flex items-center justify-center gap-1.5 min-h-11 min-w-11 px-3 rounded-lg text-xs font-semibold shrink-0 cursor-pointer text-[#080B11] bg-[#FFB800] hover:bg-[#FFC72C] focus-visible:outline-2 focus-visible:outline-primary"
+                aria-label="Wróć do zadania"
+              >
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                <span className="sm:hidden">Wróć</span>
+                <span className="hidden sm:inline">Wróć do zadania</span>
               </button>
             )}
 
