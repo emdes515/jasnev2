@@ -1,3 +1,4 @@
+import { isChoiceAnswerCorrect } from '../../lib/choiceAnswer';
 import { taskProvenance } from '../../lib/taskProvenance';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
@@ -361,21 +362,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
       const selected = currentAnswerState.selectedOption;
       if (!selected) return;
 
-      const normSelected = selected.trim().toLowerCase();
-      const normCorrect = currentTask.correctAnswer.trim().toLowerCase();
-
-      // Check against option index or option text or letter
-      isCorrect =
-        normSelected === normCorrect ||
-        (currentTask.options && currentTask.options.some((opt, idx) => {
-          const letter = String.fromCharCode(65 + idx).toLowerCase();
-          return (normSelected === letter || normSelected === opt.toLowerCase()) && opt.toLowerCase() === normCorrect;
-        }));
-
-      // Alternative direct text match
-      if (!isCorrect && normSelected.includes(normCorrect)) {
-        isCorrect = true;
-      }
+      isCorrect = isChoiceAnswerCorrect(currentTask.options, selected, currentTask.correctAnswer);
     } else {
       // WORD_INPUT
       const entered = currentAnswerState.textAnswer.trim().toLowerCase();
@@ -1102,7 +1089,7 @@ export const EnglishLessonView: React.FC<EnglishLessonViewProps> = ({
                           const letter = String.fromCharCode(65 + optIdx);
                           const isSelected = currentAnswerState.selectedOption === opt || currentAnswerState.selectedOption === letter;
                           const isSubmitted = currentAnswerState.isSubmitted;
-                          const isCorrectOption = opt.trim().toLowerCase() === currentTask.correctAnswer.trim().toLowerCase() || letter.toLowerCase() === currentTask.correctAnswer.trim().toLowerCase();
+                          const isCorrectOption = isChoiceAnswerCorrect(currentTask.options, opt, currentTask.correctAnswer);
 
                           let btnStyle = 'border-[#141d2e] bg-[#070a0f] text-[#dfe2f1] hover:border-[#ffb800]/40 hover:bg-[#141d2e]';
 
